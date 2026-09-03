@@ -115,20 +115,24 @@ A transcript coming back is the pass condition for the whole submission.
 through Workers AI (Whisper), which works and is verified, but is not what the
 challenge is judging.
 
-### And then make the provider stick
+### The provider is already committed, which changes the order of the above
 
-`--var` lasts exactly one deploy. `providerFor` prefers Workers AI whenever the
-`AI` binding is present (`test/transcribe.test.mjs:31` pins this), so a
-correctly bound key on its own will never select AssemblyAI, and the next
-`npx wrangler deploy` typed without the flag quietly returns the submission URL
-to Whisper. Once the curl above passes, move it into `wrangler.jsonc`:
+`wrangler.jsonc` now carries `"vars": { "TRANSCRIBE_PROVIDER": "assemblyai" }`.
+`--var` lasts exactly one deploy, and `providerFor` prefers Workers AI whenever
+the `AI` binding is present (`test/transcribe.test.mjs:31` pins this), so a
+correctly bound key on its own would never have selected AssemblyAI and any
+later `npx wrangler deploy` typed without the flag would have quietly returned
+the submission URL to Whisper. A judge opening the URL after an unrelated deploy
+would then have been judging the wrong provider, which is the whole submission.
 
-```jsonc
-"vars": { "TRANSCRIBE_PROVIDER": "assemblyai" },
-```
+The consequence is the thing to be careful about: **the next deploy of this
+repository puts the live URL on AssemblyAI whether or not the key is bound**,
+and until it is, `/api/transcribe` will answer 502 for everybody. So the secret
+comes first. The `--var` on the deploy above is now redundant rather than wrong,
+and either form does the same thing.
 
-and redeploy. Do not skip this. A judge opening the URL after an unrelated
-deploy would be judging the wrong provider, which is the whole submission.
+To put the live URL back on Workers AI at any point, delete the `vars` block and
+deploy. That is the rollback, and it is one line.
 
 ### If it still fails
 

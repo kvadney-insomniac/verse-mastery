@@ -23,13 +23,28 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"],
   },
-  // Speech-to-text with no secret anywhere: the model is a binding rather than
-  // a key, so there is nothing in this repo, and nothing in a Worker secret,
-  // for a scanner to find at a public endpoint. That is why it is the default
-  // provider. The alternatives both need a key and are selected the same way:
-  // TRANSCRIBE_PROVIDER=groq with `wrangler secret put GROQ_API_KEY`, or
-  // TRANSCRIBE_PROVIDER=assemblyai with `wrangler secret put
-  // ASSEMBLYAI_API_KEY`. The route supports all three.
+  // Which provider answers /api/transcribe, stated here rather than passed to a
+  // deploy. `--var TRANSCRIBE_PROVIDER:assemblyai` lasts exactly one deploy,
+  // and the code's own default is Workers AI whenever the `AI` binding exists
+  // (worker/transcribe.js, providerFor), so a deploy typed without the flag
+  // silently returns this Worker to Whisper. That is a difference nobody can
+  // see from the outside and nobody would think to check, which is the whole
+  // argument for it living in the file that gets committed.
+  //
+  // This deploy needs ASSEMBLYAI_API_KEY as a Worker secret, and needs it under
+  // exactly that name: `wrangler secret put ASSEMBLYAI_API_KEY`. The route
+  // refuses with `no ASSEMBLYAI_API_KEY binding` when it is missing, rather
+  // than sending nothing and reading back the 401 that gets for it.
+  "vars": {
+    "TRANSCRIBE_PROVIDER": "assemblyai",
+  },
+  // Workers AI stays the binding and stays the code's default, and the reason
+  // is worth keeping: the model is a binding rather than a key, so there is
+  // nothing in this repo, and nothing in a Worker secret, for a scanner to find
+  // at a public endpoint. It is what this Worker falls back to by deleting one
+  // line above, and it is what `npm run dev` gets. The third provider is
+  // selected the same way as the second: TRANSCRIBE_PROVIDER=groq with
+  // `wrangler secret put GROQ_API_KEY`. The route supports all three.
   "ai": {
     "binding": "AI",
   },
