@@ -10,13 +10,19 @@ Cloudflare Workers free tier, Kentaro's own account (`kentarovadney@berkeley.edu
 account `12278462f7fbd1f84fcd356483424960`). Worker name is `verse-mastery`,
 deliberately not `verse-memory`, which is the church's app upstream.
 
-Branch is `public-kjv`, committed but **not pushed**, in three commits:
+Branch is `public-kjv`, committed but **not pushed**, in five commits:
 
 ```
-HEAD     Give the app a real voice, and stop asking a stranger for their gender
+ed24f5c  Correct the handoff: the 401 was ours, not AssemblyAI's
+0849dec  Name the missing key instead of letting the provider guess
+4e465c8  Give the app a real voice, and stop asking a stranger for their gender
 5dcc2e7  Add AssemblyAI as a third transcription provider
 82fad9f  Replace every em-dash, and guard against the next one
 ```
+
+Which remote it is pushed to is an open question and Kentaro's: this branch sits
+on the church's `verse-memory` remote, and lablab will want a repository a judge
+can open.
 
 Node 22 is required for wrangler and is not the default on this machine:
 
@@ -79,12 +85,29 @@ The last command should print one secret, named `ASSEMBLYAI_API_KEY`.
 
 ### Then the pass condition
 
+There is no `sample.wav` in this repository and none is needed. The app can
+speak its own test audio, so real speech can be produced and transcribed
+without a sound ever leaving the machine. This round trip is verified working
+against the live URL as of 2026-09-03, through Workers AI:
+
+```bash
+B=https://verse-mastery.verse-mastery.workers.dev
+curl -s --max-time 120 -X POST -H "Content-Type: application/json" \
+  -d '{"text":"The Lord is my shepherd, I shall not want."}' \
+  $B/api/speak -o probe.mp3
+curl -s --max-time 120 -X POST -H "Content-Type: audio/mpeg" \
+  --data-binary @probe.mp3 $B/api/transcribe
+```
+
+It returns the sentence back verbatim. `/api/transcribe` admits anything whose
+Content-Type starts with `audio/` (`worker/transcribe.js:329`), and AssemblyAI
+accepts MP3, so the same `probe.mp3` is the input for the real test:
+
 ```bash
 ALLOW_LOCAL_ONLY_BUILD=1 npm run build
 npx wrangler deploy --var TRANSCRIBE_PROVIDER:assemblyai
-curl -s --max-time 120 -X POST -H "Content-Type: audio/wav" \
-  --data-binary @sample.wav \
-  https://verse-mastery.verse-mastery.workers.dev/api/transcribe
+curl -s --max-time 120 -X POST -H "Content-Type: audio/mpeg" \
+  --data-binary @probe.mp3 $B/api/transcribe
 ```
 
 A transcript coming back is the pass condition for the whole submission.
@@ -92,7 +115,24 @@ A transcript coming back is the pass condition for the whole submission.
 through Workers AI (Whisper), which works and is verified, but is not what the
 challenge is judging.
 
-If it still fails, the log line now names the fault instead of describing the
+### And then make the provider stick
+
+`--var` lasts exactly one deploy. `providerFor` prefers Workers AI whenever the
+`AI` binding is present (`test/transcribe.test.mjs:31` pins this), so a
+correctly bound key on its own will never select AssemblyAI, and the next
+`npx wrangler deploy` typed without the flag quietly returns the submission URL
+to Whisper. Once the curl above passes, move it into `wrangler.jsonc`:
+
+```jsonc
+"vars": { "TRANSCRIBE_PROVIDER": "assemblyai" },
+```
+
+and redeploy. Do not skip this. A judge opening the URL after an unrelated
+deploy would be judging the wrong provider, which is the whole submission.
+
+### If it still fails
+
+The log line now names the fault instead of describing the
 symptom. `transcribe assemblyai: no ASSEMBLYAI_API_KEY binding` means the
 secret still is not bound. Anything else is genuinely upstream, and only then
 is the error table worth opening: an EU account must use
@@ -171,7 +211,7 @@ replacing the legacy `word_boost` / `boost_param`. `prompt` is deliberately
 never set: vocabulary biasing is permitted, sequence biasing is a validity bug
 in a scoring app.
 
-**The voice, the profile and the queue** (HEAD), 19 files. `src/tts.js` and
+**The voice, the profile and the queue**, `4e465c8`, 19 files. `src/tts.js` and
 `test/tts.test.mjs` are new; `src/speaker.js`, `src/beat.js`, `src/config.js`,
 `src/App.js`, `src/profile.js`, `src/viewmodel/speak.js` and
 `playwright.config.mjs` change.
