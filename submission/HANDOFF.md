@@ -149,11 +149,20 @@ is what the current docs specify and what the code sends.
 ### Two operational notes, both learned the slow way
 
 `wrangler tail` does **not** see traffic to a version preview URL, with or
-without `--version-id`. It prints nothing at all, not even its own banner, so
-it reads like a working tail on a silent Worker. Logs only arrive for the
-version that is actually deployed. `wrangler versions upload` is still the
-right way to try something without moving production, but read the result from
-the HTTP response, not the log.
+without `--version-id`. It connects and says so, and then simply never reports
+the request, while a request to the production URL in the same session is
+reported normally. That is what was observed: one `POST /api/transcribe - Ok`
+for the live host, nothing at all for the preview host, on the same open tail.
+Logs only arrive for the version that is actually deployed. `wrangler versions
+upload` is still the right way to try something without moving production, but
+read the result from the HTTP response, not the log.
+
+Two things about that tail will waste time if they are not expected. It drops
+its connection every minute or so ("Tail connection lost. Reconnecting"), and
+after five failures it gives up and exits, so a long tail is not a thing you can
+leave running. And piping it into anything (`| head`, `| grep`) buffers the
+output, so the terminal stays blank while the tail is in fact working. Redirect
+to a file and read the file.
 
 Test audio does not have to be spoken. A silent WAV built in a few lines of
 Python is enough to exercise the route and the provider boundary end to end,
