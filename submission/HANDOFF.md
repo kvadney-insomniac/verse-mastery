@@ -37,33 +37,50 @@ Google sign-in gate restricted to church domains.
 
 ## The one thing blocking the submission
 
-**The AssemblyAI key is set as a Worker secret and returns 401.**
+**The AssemblyAI key was never bound under the name the code reads.** This was
+found on 2026-09-03 and it is not any of the three causes the previous version
+of this file listed. Those were guesses against AssemblyAI's error table; the
+fault never left this account.
 
-`wrangler secret put ASSEMBLYAI_API_KEY` succeeded (secret id
-`430b0f795fbd4865ac882f536fa706bd`). Flipping the provider gives:
+`wrangler secret list` and `wrangler versions view` both say the same thing:
 
 ```
-POST /api/transcribe  ->  502   worker log: "transcribe assemblyai: upload 401"
+Secrets:
+Secret Name:  430b0f795fbd4865ac882f536fa706bd
 ```
 
-That is the **first** authenticated call, `POST https://api.assemblyai.com/v2/upload`,
-before any transcription parameter is involved. So this is the auth boundary and
-not the request shape. AssemblyAI's own error table gives three causes for a 401:
+That hex string is the secret's **name**, not an id. There is no secret named
+`ASSEMBLYAI_API_KEY` on this Worker, so `env.ASSEMBLYAI_API_KEY` was
+`undefined`, the string `undefined` went up in the `authorization` header, and
+AssemblyAI answered 401. A 401 for a key that was never sent looks exactly like
+a 401 for a revoked key or an unpaid account, which is why it read as an
+account problem for a day.
 
-1. **Insufficient balance or no payment method on the account.** Most likely on
-   a new account, and the one to check first.
-2. **Wrong region.** An EU account must use `api.eu.assemblyai.com`. The code
-   uses the US host. If the account is EU, change `ASSEMBLYAI_UPLOAD_URL` and
-   `ASSEMBLYAI_TRANSCRIPT_URL` in `worker/transcribe.js`.
-3. **A malformed key**, for instance a stray character pasted with it. Re-run
-   `wrangler secret put` to rule this out.
+### Two things to do, both Kentaro's
 
-The header format is already correct: a bare `authorization` whose whole value
-is the key, no `Bearer`. That is checked against the current docs.
+**1. Treat that key as exposed and rotate it.** `430b0f795fbd4865ac882f536fa706bd`
+is 32 lowercase hex characters, which is the shape of an AssemblyAI key. The
+likely slip is `wrangler secret put <the key>`, which takes the first argument
+as the name and then prompts for a value. Secret _names_ are not secret: they
+show in `wrangler secret list`, in `wrangler versions view`, and on the
+Cloudflare dashboard. Rotating is cheap and this is not worth being wrong
+about, so rotate first and bind the new key, not that one.
 
-Once the 401 is resolved:
+**2. Bind it under the right name, and clear the wrong one.**
 
 ```bash
+export PATH="$HOME/.nvm/versions/node/v22.22.2/bin:$PATH"
+npx wrangler secret put ASSEMBLYAI_API_KEY
+npx wrangler secret delete 430b0f795fbd4865ac882f536fa706bd
+npx wrangler secret list
+```
+
+The last command should print one secret, named `ASSEMBLYAI_API_KEY`.
+
+### Then the pass condition
+
+```bash
+ALLOW_LOCAL_ONLY_BUILD=1 npm run build
 npx wrangler deploy --var TRANSCRIBE_PROVIDER:assemblyai
 curl -s --max-time 120 -X POST -H "Content-Type: audio/wav" \
   --data-binary @sample.wav \
@@ -75,8 +92,29 @@ A transcript coming back is the pass condition for the whole submission.
 through Workers AI (Whisper), which works and is verified, but is not what the
 challenge is judging.
 
-Do not generate the test WAV with `say`. See "Never make sound on this machine"
-below.
+If it still fails, the log line now names the fault instead of describing the
+symptom. `transcribe assemblyai: no ASSEMBLYAI_API_KEY binding` means the
+secret still is not bound. Anything else is genuinely upstream, and only then
+is the error table worth opening: an EU account must use
+`api.eu.assemblyai.com`, which means changing `ASSEMBLYAI_UPLOAD_URL` and
+`ASSEMBLYAI_TRANSCRIPT_URL` in `worker/transcribe.js`, and a new account with
+no payment method has no balance to spend. The header format is not a
+candidate: a bare `authorization` whose whole value is the key, no `Bearer`,
+is what the current docs specify and what the code sends.
+
+### Two operational notes, both learned the slow way
+
+`wrangler tail` does **not** see traffic to a version preview URL, with or
+without `--version-id`. It prints nothing at all, not even its own banner, so
+it reads like a working tail on a silent Worker. Logs only arrive for the
+version that is actually deployed. `wrangler versions upload` is still the
+right way to try something without moving production, but read the result from
+the HTTP response, not the log.
+
+Test audio does not have to be spoken. A silent WAV built in a few lines of
+Python is enough to exercise the route and the provider boundary end to end,
+and Workers AI answers it with `{"text":""}`, correctly. Nothing has to be
+played to anybody. See "Never make sound on this machine" below.
 
 ## What is verified working
 
@@ -84,11 +122,17 @@ below.
 he maketh me to lie down in green pastures."}` for a real WAV, via Workers AI.
 - `/api/speak` returns real MP3 from `@cf/deepgram/aura-2-en`, 24 kHz mono.
 - 405 on GET, 415 on a non-audio content type, 400 on an empty speak body.
-- 1,040 unit tests, 102 browser tests, lint, format and the prose guard all pass.
+- 1,041 unit tests, 102 browser tests, lint, format and the prose guard all pass
+  as of 2026-09-03, on `0849dec`.
+- Both keyed providers refuse before their first upstream call when the key is
+  not bound, naming the binding. Pinned in `test/transcribe.test.mjs`.
 
 ## What is NOT verified
 
-- **The AssemblyAI provider has never successfully run.** See above.
+- **The AssemblyAI provider has still never successfully run.** The cause of
+  the 401 is now known and proven (no such binding), but nothing has been
+  transcribed through AssemblyAI, and no second fault behind the first can be
+  ruled out until a correctly named key is bound. See above.
 - **How the new voice sounds inside a live Speak session.** The route returns
   valid audio and the fallback path is byte-for-byte the old one, and all 34
   pre-existing speaker tests pass, but no one has run a hands-free session end
@@ -132,8 +176,11 @@ in a scoring app.
 `src/App.js`, `src/profile.js`, `src/viewmodel/speak.js` and
 `playwright.config.mjs` change.
 
-Each commit passes lint, format, the prose guard, 1,040 unit tests and 102
+Each commit passes lint, format, the prose guard, the unit tests and 102
 browser tests on its own.
+
+`0849dec`, **the missing-key guard**, 2 files. `worker/transcribe.js` and
+`test/transcribe.test.mjs`. This is the commit that closes the 401.
 
 ## Submission assets
 
