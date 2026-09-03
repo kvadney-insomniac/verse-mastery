@@ -12,7 +12,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { providerFor, wordsOf } from "../worker/transcribe.js";
+import { PROVIDERS, providerFor, wordsOf } from "../worker/transcribe.js";
 
 test("providerFor takes TRANSCRIBE_PROVIDER over anything the environment implies", () => {
   assert.equal(providerFor({ TRANSCRIBE_PROVIDER: "assemblyai", AI: {}, GROQ_API_KEY: "k" }), "assemblyai");
@@ -63,4 +63,21 @@ test("wordsOf answers an unset vocab with a list nothing needs to guard", () => 
 test("wordsOf caps a vocab that has run away", () => {
   const many = Array.from({ length: 1500 }, (_, i) => "w" + i).join(" ");
   assert.equal(wordsOf(many).length, 1000);
+});
+
+/* The two keyed providers refuse before they call anybody.
+ *
+ * These reach into PROVIDERS rather than the fetch handler and still touch no
+ * network, because refusing is the whole of what they do here: the guard runs
+ * before the first request is built. The assertion worth having is on the
+ * message, not the throw. A provider that fails without naming the binding
+ * sends whoever is reading the log to the upstream error table, and an
+ * unbound key arrives there disguised as a bad one. */
+test("the keyed providers name the binding they were not given", async () => {
+  await assert.rejects(() => PROVIDERS.assemblyai({}, new Uint8Array(1), "audio/wav", ""), {
+    message: "no ASSEMBLYAI_API_KEY binding",
+  });
+  await assert.rejects(() => PROVIDERS.groq({}, new Uint8Array(1), "audio/wav", ""), {
+    message: "no GROQ_API_KEY binding",
+  });
 });

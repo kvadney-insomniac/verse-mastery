@@ -126,7 +126,7 @@ const ok = (text) =>
  * Each takes the audio and returns a transcript string. Neither is handed a
  * verse; the only text either can receive is `vocab`, which came from the
  * environment and not from the request. */
-const PROVIDERS = {
+export const PROVIDERS = {
   /* Cloudflare Workers AI. Slightly cheaper than Groq (~$0.031 vs $0.04 per
    * audio hour) and, the reason it is the default, **there is no secret at
    * all**. The model is a binding, so there is no key in this repo, no key in a
@@ -155,6 +155,8 @@ const PROVIDERS = {
    * secret, `wrangler secret put GROQ_API_KEY`, and that key is the whole
    * reason this is not the default. */
   async groq(env, bytes, mime, vocab) {
+    /* The same trap as the AssemblyAI branch below, for the same reason. */
+    if (!env.GROQ_API_KEY) throw new Error("no GROQ_API_KEY binding");
     const form = new FormData();
     form.append("file", new Blob([bytes], { type: mime }), "recitation" + extensionFor(mime));
     form.append("model", GROQ_MODEL);
@@ -197,6 +199,17 @@ const PROVIDERS = {
      * PCM and the client records Opus (see MAX_BODY_BYTES), so using it would
      * mean transcoding audio in a Worker to save a round trip. */
     const key = env.ASSEMBLYAI_API_KEY;
+    /* Say so here rather than letting the absence travel. `TRANSCRIBE_PROVIDER`
+     * names a provider outright and is honoured whether or not its key was
+     * bound, which is the right precedence (an operator who names one wants
+     * that one, not a silent substitution), but it means a secret bound under
+     * the wrong name reaches this line as `undefined`, goes up in the
+     * `authorization` header, and comes back a 401 indistinguishable from a
+     * revoked key or an unpaid account. That is a day of reading the wrong
+     * error table. The message below is one this file wrote, so it lands in
+     * the log under the rule the catch site keeps, and it names the binding
+     * rather than the symptom. */
+    if (!key) throw new Error("no ASSEMBLYAI_API_KEY binding");
 
     const up = await fetch(ASSEMBLYAI_UPLOAD_URL, {
       method: "POST",
