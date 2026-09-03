@@ -10,9 +10,17 @@ Cloudflare Workers free tier, Kentaro's own account (`kentarovadney@berkeley.edu
 account `12278462f7fbd1f84fcd356483424960`). Worker name is `verse-mastery`,
 deliberately not `verse-memory`, which is the church's app upstream.
 
-Branch is `public-kjv`, committed but **not pushed**, in five commits:
+The work is **merged to `main`** of the public submission repository,
+https://github.com/kvadney-insomniac/verse-mastery, as PR #1, merge commit
+`015f030`. That repository is public and its description is the public-domain
+KJV edition, so it is the one a lablab judge can be pointed at. CI and the Pages
+build both passed on `main` after the merge.
 
 ```
+015f030  Merge pull request #1 from kvadney-insomniac/public-kjv
+6b63adb  Correct the note on wrangler tail: it does connect, it just stays quiet
+6564c5d  Name the provider in the config rather than on the command line
+32e883e  Give the handoff a pass condition that does not need a file nobody has
 ed24f5c  Correct the handoff: the 401 was ours, not AssemblyAI's
 0849dec  Name the missing key instead of letting the provider guess
 4e465c8  Give the app a real voice, and stop asking a stranger for their gender
@@ -20,9 +28,21 @@ ed24f5c  Correct the handoff: the 401 was ours, not AssemblyAI's
 82fad9f  Replace every em-dash, and guard against the next one
 ```
 
-Which remote it is pushed to is an open question and Kentaro's: this branch sits
-on the church's `verse-memory` remote, and lablab will want a repository a judge
-can open.
+The `public-kjv` branch is kept rather than deleted, since the hashes above are
+cited throughout this file.
+
+**The church's repositories were deliberately not touched.** `origin` is
+`godwinlaw/verse-memory` and `fork` is `kvadney-insomniac/verse-memory`, which
+still holds `public-kjv` at the older `4e465c8`. Nothing here was pushed to
+either, because this is the KJV public edition and the church's instance is the
+ESV one.
+
+The public demo is https://kvadney-insomniac.github.io/verse-mastery/, published
+by `.github/workflows/pages.yml`. Note that the Pages **deploy** job can only
+run from `main`: a push to any other branch builds and then fails the deploy
+step with "not allowed to deploy to github-pages due to environment protection
+rules". That failure is the environment gate and not the tree, and the `build`
+job passing above it is the signal worth reading.
 
 Node 22 is required for wrangler and is not the default on this machine:
 
