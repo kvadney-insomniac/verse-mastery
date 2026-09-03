@@ -1,8 +1,8 @@
 /* Speak mode: the hands-free recitation loop, as a pure module.
  *
- * The session is a cycle — PROMPT (speak the reference) → LISTEN (the member
+ * The session is a cycle, PROMPT (speak the reference) → LISTEN (the member
  * recites) → GRADE → FEEDBACK (speak how it went) → NEXT (advance the queue,
- * wrapping) — and this file models all of it that can be modelled without a
+ * wrapping), and this file models all of it that can be modelled without a
  * browser: what to say, how to mark what was heard, and where the queue goes
  * next. The microphone, the voice and the silence timer live in App.js, which
  * is why nothing here holds a timer or touches the DOM.
@@ -12,8 +12,8 @@
  * which is right for something typed and wrong for something said: its cursor
  * only advances on a match, so three words the engine put in that the passage
  * did not want desynchronized it for the rest of the verse. A word-perfect
- * Proverbs 3:5-6 preceded by "trust in the— " — a false start, the commonest
- * thing in real recitation — scored 14%. The member had recited it perfectly.
+ * Proverbs 3:5-6 preceded by "trust in the...", a false start, the commonest
+ * thing in real recitation, scored 14%. The member had recited it perfectly.
  *
  * `scoreRecital()` aligns instead, and charges almost nothing for a word nobody
  * asked for, so false starts, self-corrections and the engine's own noise are
@@ -21,7 +21,7 @@
  * what it should. grading.js stays exactly as it was: nothing a member *types*
  * is forgiven, and the two graders never have to agree.
  *
- * Speak mode is practice only — nothing here (or in its callers) writes
+ * Speak mode is practice only, nothing here (or in its callers) writes
  * progress or moves a verse along the ladder. Giving a clean spoken recital SRS
  * credit is follow-up work, and `strictScore` is the figure that gate should
  * read when it is built: it never counts the phonetic tier. */
@@ -35,7 +35,7 @@ export const SPEAK_PHASES = ["idle", "prompt", "listen", "feedback"];
 /* What the speaker says to open a turn. */
 export const promptFor = (passage) => copy.speak.prompt(passage.ref);
 
-/* The queue wraps rather than ends — the loop runs until the member stops it. */
+/* The queue wraps rather than ends, the loop runs until the member stops it. */
 export const nextIndex = (index, queueLength) => (queueLength ? (index + 1) % queueLength : 0);
 
 /* The phase after this one. GRADE is instantaneous (it happens between LISTEN
@@ -47,15 +47,15 @@ export function nextPhase({ phase, index, queueLength }) {
   return { phase: "prompt", index: nextIndex(index, queueLength) };
 }
 
-/* Slice one graded diff into per-verse tallies. The passage was graded whole —
- * so a word said early still matches within gradeWritten's lookahead — and the
+/* Slice one graded diff into per-verse tallies. The passage was graded whole,
+ * so a word said early still matches within gradeWritten's lookahead, and the
  * verses then read their own words back out of the diff by position, since a
  * passage's text is the flat join of its verses. */
 function perVerseOf(diff, verses) {
   const out = [];
   let at = 0;
   verses.forEach((verse, i) => {
-    /* A verse is a plain string — `data/passages.js` stores `verses` as an
+    /* A verse is a plain string, `data/passages.js` stores `verses` as an
      * array of strings whose join is `text` (test/passages.test.mjs asserts
      * exactly that). Reading `.text` off one gave `undefined.split`, which
      * threw on every real multi-verse passage in the set; the unit test missed
@@ -75,7 +75,7 @@ function perVerseOf(diff, verses) {
  *
  * Always returns { score, pct, spokenFeedback }; `perWord` rides along in word
  * mode (one entry per passage word, plus the missed words the feedback names)
- * and `perVerse` in verse mode when the passage carries a `verses` array — a
+ * and `perVerse` in verse mode when the passage carries a `verses` array, a
  * single-verse passage in verse mode just gets the whole-passage sentence. */
 export function feedbackFor(passage, transcript, mode) {
   const said = (transcript || "").trim();
@@ -89,7 +89,7 @@ export function feedbackFor(passage, transcript, mode) {
     spokenFeedback: "",
   };
 
-  /* Nothing worth marking came back — an empty recital, or a transcript with
+  /* Nothing worth marking came back, an empty recital, or a transcript with
    * too little of the passage in it to be a reading of it at all. Saying "seven
    * percent" to a member whose microphone was covered is a figure about the
    * app's own failure, dressed up as theirs. */
@@ -103,13 +103,13 @@ export function feedbackFor(passage, transcript, mode) {
   if (mode === "word") {
     result.perWord = graded.diff.map((w) => ({ word: w.word, hit: w.hit }));
     /* A word nobody was ever asked to say is not a word they missed. Four
-     * passages carry a scripture reference inside their own text — a
-     * fetch-time leak, see recital.js — and those words are excused from the
+     * passages carry a scripture reference inside their own text, a
+     * fetch-time leak, see recital.js, and those words are excused from the
      * mark; reading them back would tell a member who recited perfectly that
      * they had missed "1". */
     const missed = graded.diff.filter((w) => !w.hit && !w.optional).map((w) => w.word);
     result.missed = missed;
-    // Cap what is read aloud — a badly missed chapter should not be recited
+    // Cap what is read aloud, a badly missed chapter should not be recited
     // back at the member word by word while they drive.
     if (missed.length) parts.push(copy.speak.missedWords(missed.slice(0, MAX_SPOKEN_MISSES)));
   }
@@ -133,7 +133,7 @@ export const MAX_SPOKEN_MISSES = 8;
  *
  * The thing worth giving back is the verse. So three of these four bands end
  * with the passage read aloud, which is both the feedback and the next
- * repetition — it is the beat a recall drill has always had (prompt, silence,
+ * repetition, it is the beat a recall drill has always had (prompt, silence,
  * attempt, *answer*) and the one this loop was missing. A clean recital is
  * answered with speed instead, which is the only reward worth anything to
  * somebody driving. */
@@ -155,7 +155,7 @@ export function bandFor(score) {
  * hurts: the pause in a half-remembered verse is exactly where the recall is
  * happening, so a member who stops to think is cut off and marked on the
  * fragment. So the window widens when what has been heard so far is plainly
- * short of the passage — the app can see it is not finished, and waits like a
+ * short of the passage, the app can see it is not finished, and waits like a
  * person would. When the transcript already covers the passage there is
  * nothing to wait for, and the shorter window keeps the session moving. */
 export const SILENCE_DONE_MS = 2000;
@@ -176,7 +176,7 @@ export function silenceMsFor(passage, heard) {
 /* The prompter: the next few words, for a member who has dried up.
  *
  * The first-letter scaffold is what a member on a screen reaches for when a
- * verse will not come, and Speak mode had no equivalent — being stuck meant
+ * verse will not come, and Speak mode had no equivalent, being stuck meant
  * waiting out the silence and being marked on nothing. Feeding the next few
  * words is the same help in the only form a car can take it, and the alignment
  * is positional (the Nth word heard is the Nth word of the passage), which is
@@ -202,7 +202,7 @@ export function promptWordsFor(passage, heard, count = PROMPT_WORDS) {
  *
  * Two things make it safe. The vocabulary was checked against all 183 shipped
  * passages and these six appear in none of them (the obvious candidate, "help",
- * appears in the Psalms and is deliberately not here — "hint" is the free one).
+ * appears in the Psalms and is deliberately not here, "hint" is the free one).
  * And a command is only read as a command when it is *all* that was heard: a
  * member reciting says a verse, not a single word, so a lone word is never a
  * recital being thrown away. */

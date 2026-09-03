@@ -1,4 +1,4 @@
-/* recital-score — the public surface.
+/* recital-score, the public surface.
  *
  * Everything below is re-exported from `src/`, which is a verbatim extraction
  * from the app this was written for (see README, and the LICENSE's attribution).
@@ -6,13 +6,13 @@
  * microphone: they are the original reasoning, kept because it is the best
  * documentation the algorithm has, and kept *byte-identical* so that the app and
  * this package cannot quietly drift apart. Nothing about the API is specific to
- * that app — a "passage" is any text you know in advance and expect somebody to
+ * that app, a "passage" is any text you know in advance and expect somebody to
  * produce from memory, and a "transcript" is whatever a recognizer heard.
  *
  * The tuning constants are exported rather than hidden because they are the
  * whole of the design: every one of them is a judgement somebody made about what
  * a mistake is worth, and a caller scoring something other than scripture recital
- * — a language drill, a reading tutor, a voice-agent eval — will want to argue
+ *, a language drill, a reading tutor, a voice-agent eval, will want to argue
  * with at least one of them. Each is annotated with what moving it does.
  */
 
@@ -22,7 +22,7 @@ export {
    * The first argument is an object with a `text` string, not a bare string. */
   scoreRecital,
   /* Needleman–Wunsch on its own, over `(refWords, heardTokens, options?)`.
-   * Reach for it when you want the operation list without a score on top — a
+   * Reach for it when you want the operation list without a score on top, a
    * custom metric, a diff view, or a test of the recurrence itself. */
   alignWords,
   /* The transcript as the aligner wants it: normalized tokens, contractions
@@ -32,7 +32,7 @@ export {
   /* Which word types in a text are proper nouns, by capitalization away from a
    * sentence start. This is the gate on the phonetic tier, and nothing else
    * reads it. Pass your own set to `alignWords` if your text does not carry the
-   * signal — a language whose nouns are all capitalized, say. */
+   * signal, a language whose nouns are all capitalized, say. */
   properNouns,
   /* Reference words that belong to an embedded citation and so are words nobody
    * recites: free to omit, and out of the denominator. Domain-specific and
@@ -41,7 +41,7 @@ export {
   optionalRefWords,
   /* The scoring matrix, and the reason the thing works. Raise `INS` and
    * disfluencies stop being free; lower `OMIT` and a forgotten clause stops
-   * costing what it should. `INS + OMIT > SUB` must keep holding — see the
+   * costing what it should. `INS + OMIT > SUB` must keep holding, see the
    * README's cost table and the test that pins it. */
   COST,
   /* Below this fraction of the expected length, a transcript is not scored at
@@ -56,7 +56,7 @@ export {
    * only allocation guard the O(n·m) matrix needs. */
   MAX_SIGNAL_TOKENS,
   /* A transcript this much longer than the text is flagged `verbose` rather
-   * than adjusted — it is the caller's business to decide that a recitation
+   * than adjusted, it is the caller's business to decide that a recitation
    * carrying half again as many tokens as the text has words is not evidence. */
   VERBOSE_RATIO,
   /* The three reasons a result can carry instead of a score: `empty`,
@@ -75,7 +75,7 @@ export {
    * score. */
   HOMOPHONES,
   /* The phonetic tier's known false-positive surface, refused in both
-   * directions. Recompute it over your own corpus — the surface belongs to the
+   * directions. Recompute it over your own corpus, the surface belongs to the
    * vocabulary, so changing the corpus grows it. */
   PHONETIC_BLOCK,
   /* The edit tier's two dials: how far apart two spellings may be (1), and the
@@ -89,7 +89,7 @@ export {
   MIN_PHONETIC_LEN,
   MAX_PHONETIC_EDITS,
   /* The predicates the edit tier is built from, exported so a caller can reuse
-   * exactly the app's notion of "the same word said out loud" elsewhere —
+   * exactly the app's notion of "the same word said out loud" elsewhere,
    * fitting heard words back onto expected text, say. */
   same,
   stem,

@@ -1,7 +1,7 @@
 /* View-models for the full-screen gates that stand in front of the app, in the
  * order a member meets them: the refusal on a phone, the opening splash, the
- * Google sign-in prompt, the member profile form, and — once, for a member who
- * just finished that form for the first time — a nudge toward the guide. */
+ * Google sign-in prompt, the member profile form, and, once, for a member who
+ * just finished that form for the first time, a nudge toward the guide. */
 
 import { copy } from "../copy.js";
 import {
@@ -23,7 +23,7 @@ import { PRIMARY_DOMAIN } from "../firebase.js";
 
 /* The mobile gate is a warning, not a dead end: the wording is the same every
  * time (copy.mobileGate), and the one thing on it to press is Continue, which
- * lets the member through for this visit. The acknowledgement is state-only —
+ * lets the member through for this visit. The acknowledgement is state-only,
  * deliberately not persisted, so the safety line is heard again next visit. */
 export function mobileGateVals({ groupName, actions }) {
   return { groupName, onContinue: actions.acknowledgeMobile };
@@ -31,7 +31,7 @@ export function mobileGateVals({ groupName, actions }) {
 
 /* The splash carries nothing but the app's identity and the shape of the wait:
  * it is up before there is any progress, profile, or account to show. The three
- * steps are the only thing on it drawn from data, and only just — `count` is
+ * steps are the only thing on it drawn from data, and only just, `count` is
  * the size of the set, which is known from the passage module at import time
  * rather than from anything still loading. */
 export function splashVals({ groupName, passageCount }) {
@@ -63,7 +63,7 @@ export function authGateVals({ auth, groupName, motto, actions }) {
  * Firestore error so the sentence can name the likely cause without the view
  * knowing anything about Firebase. */
 export function syncGateVals({ sync, auth, groupName, busy, actions }) {
-  /* The SDK never loaded, so there was no sign-in and no read to fail — a
+  /* The SDK never loaded, so there was no sign-in and no read to fail, a
    * different sentence from a read that was refused, and a different thing to
    * go and check. */
   const unreachable = (auth || {}).status === "disabled" && auth.reason === "unreachable";
@@ -182,7 +182,7 @@ export function profileFormVals({ state, groupName, isSetup, actions }) {
      * not waiting on Save, and not cancelled by Cancel: pressing one of these
      * turns the page over there and then, which is also the only demonstration
      * the setting needs. Offered on the settings form for the same reason as
-     * the review settings below — the system already answers for a member who
+     * the review settings below, the system already answers for a member who
      * has never thought about it. */
     showAppearance: !isSetup,
     theme: state.theme,
@@ -196,17 +196,17 @@ export function profileFormVals({ state, groupName, isSetup, actions }) {
 
     // How reviews behave is not asked for at sign-up. A member meeting the app
     // for the first time has no way to judge how many verses a sitting should
-    // hold or how far one may fade before it comes back — the questions only
+    // hold or how far one may fade before it comes back, the questions only
     // mean something once they have used it. Nothing is lost by leaving them:
     // submitProfile writes the same defaults either way, and Settings is where
     // they are changed afterwards.
     showReviewSettings: !isSetup,
 
     // Resetting the record. Offered only to a member who already has a profile
-    // — the setup form is a gate, and there is nothing behind it yet to clear.
+    //, the setup form is a gate, and there is nothing behind it yet to clear.
     showReset: !isSetup,
-    // Anything at all recorded is something to reset — a passage can carry
-    // freshness and a stability without having reached either count — so both
+    // Anything at all recorded is something to reset, a passage can carry
+    // freshness and a stability without having reached either count, so both
     // the button and the line above it read the record itself, not the counts.
     canReset: hasRecord,
     resetStanding: hasRecord
@@ -224,7 +224,7 @@ export function profileFormVals({ state, groupName, isSetup, actions }) {
 }
 
 /* Shown once, right after a member finishes the profile form for the first
- * time — before they are turned loose on the board. A nudge toward the guide,
+ * time, before they are turned loose on the board. A nudge toward the guide,
  * with a way out for anyone who would rather start memorizing right away. */
 export function welcomeVals({ groupName, actions }) {
   return {

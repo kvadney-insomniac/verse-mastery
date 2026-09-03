@@ -2,13 +2,13 @@
  * lawyer cares about is byte-for-byte what the licence requires.
  *
  * data/translations.js is the only hand-written file in data/, which is why it
- * is worth a test file of its own — everything else in there is regenerated
+ * is worth a test file of its own, everything else in there is regenerated
  * from a source that will not accept a typo, and this one will. Two of its
  * fields carry more weight than they look like they do. `notice` is what
  * src/views/footer.js prints under every signed-in screen, so an entry with an
  * empty one is a build that shows scripture and says nothing about where it
  * came from. And `publicDomain` is what test/passages.test.mjs consults before
- * applying Crossway's storage caps, so a string "false" — perfectly truthy —
+ * applying Crossway's storage caps, so a string "false", perfectly truthy,
  * would switch those caps off on an ESV build without anything failing.
  *
  * The ESV notice is asserted as a literal rather than compared against
@@ -35,7 +35,7 @@ test("the table is a non-empty list of well-formed entries", () => {
     assert.ok(t.id && typeof t.id === "string", "a translation has no id");
     assert.ok(!ids.has(t.id), `duplicate translation id ${t.id}`);
     ids.add(t.id);
-    assert.equal(t.id, t.id.toLowerCase(), `${t.id} should be lower case — it is matched against a CLI flag`);
+    assert.equal(t.id, t.id.toLowerCase(), `${t.id} should be lower case, it is matched against a CLI flag`);
     assert.ok(t.name && typeof t.name === "string", `${t.id} has no name`);
     assert.ok(t.abbrev && typeof t.abbrev === "string", `${t.id} has no abbreviation`);
     assert.ok(/^https:\/\//.test(t.source || ""), `${t.id} has no https source`);
@@ -53,7 +53,7 @@ test("every entry carries a notice that says something", () => {
 
 /* Not `assert.ok(t.publicDomain !== undefined)`: the point is the type. This
  * flag decides whether a licence is enforced, and every wrong-typed value that
- * could get in here — "false", 0, null — is one that answers the question
+ * could get in here, "false", 0, null, is one that answers the question
  * confidently and wrongly. */
 test("publicDomain is a boolean on every entry", () => {
   for (const t of translations) {

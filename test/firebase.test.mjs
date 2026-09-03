@@ -61,7 +61,7 @@ test('the single entry "*" admits any real address, and only a real address', ()
   assert.equal(emailAllowed("", any), false);
   assert.equal(emailAllowed(null, any), false);
   assert.equal(emailAllowed(undefined, any), false);
-  // The wildcard is only a wildcard on its own — beside a real domain it is a
+  // The wildcard is only a wildcard on its own, beside a real domain it is a
   // domain that matches nothing, the same reading the rules generator takes.
   assert.equal(emailAllowed("member@gmail.com", ["*", "acts2.network"]), false);
   assert.equal(emailAllowed("member@acts2.network", ["*", "acts2.network"]), true);
@@ -69,7 +69,7 @@ test('the single entry "*" admits any real address, and only a real address', ()
 
 test("the configured list is normalized, so a stray @ or capital is not a lockout", () => {
   // The shapes a deployer plausibly types into config.js. Forgiving these is
-  // about reading the config charitably, never about matching more loosely —
+  // about reading the config charitably, never about matching more loosely,
   // whatever comes out is still compared whole.
   assert.deepEqual(normalizeDomains(["  @ACTS2.Network ", "GPMail.org"]), ["acts2.network", "gpmail.org"]);
   assert.deepEqual(normalizeDomains(["*"]), ["*"]);

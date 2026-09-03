@@ -1,12 +1,12 @@
 /**
- * Samuel mode — the study set for a member sitting a test on 1 and 2 Samuel on
+ * Samuel mode, the study set for a member sitting a test on 1 and 2 Samuel on
  * 30 September. Where the rest of the app is about holding a verse word for
  * word, this is about holding a *book*: who did what, where it happened, and
  * which chapter to turn to. So nothing here is a passage record and nothing
- * here goes near `srs.js` — it is three flat tables that a study screen reads.
+ * here goes near `srs.js`, it is three flat tables that a study screen reads.
  *
  * **This file is authored, not generated, and that is the one thing to know
- * before editing it.** `data/passages.js` and `data/keywords.js` are output —
+ * before editing it.** `data/passages.js` and `data/keywords.js` are output,
  * re-run the tool and they come back. This file has no tool behind it: every
  * summary, every distractor and every chapter number was written and checked by
  * hand, so a correction belongs here, in the record it is wrong in.
@@ -14,28 +14,28 @@
  * **There is deliberately no scripture text in it.** The verse set is ESV ©
  * Crossway, fetched once at authoring time with a key that is not in the build
  * (see The three shelves in CLAUDE.md), and the licence that covers a stored
- * passage does not cover a second copy of the book smuggled in as a study aid —
+ * passage does not cover a second copy of the book smuggled in as a study aid,
  * chapter headings included, since those are Crossway's editorial work too. So
  * what is written here is factual prose in our own words: who is in a chapter,
  * what happens in it, what a member is likely to be asked about it. Facts are
  * not the translation. Where a phrase is famous enough that a member will be
  * examined on the words themselves it appears as a short marked quotation of a
  * few words and never as a verse, which is also why no `text` field exists on
- * any of these records — there is nowhere for a verse to accidentally land.
+ * any of these records, there is nowhere for a verse to accidentally land.
  *
  * Three exports, in the order a screen wants them:
  *
- * - `SAMUEL_CHAPTERS` — all 55 chapters, 1 Samuel 1–31 and 2 Samuel 1–24, in
+ * - `SAMUEL_CHAPTERS`, all 55 chapters, 1 Samuel 1–31 and 2 Samuel 1–24, in
  *   order and with no gaps. It is the spine: the questions take their `ref`,
  *   `book` and `chapter` from it, so an error corrected here is corrected
  *   everywhere, and a chapter with nothing to say still gets a record rather
  *   than being skipped, because a member revising by chapter needs the whole
  *   ladder to climb.
- * - `SAMUEL_PEOPLE` — the figures worth knowing by name, each with the one
+ * - `SAMUEL_PEOPLE`, the figures worth knowing by name, each with the one
  *   sentence that places them and the chapters they principally appear in. It
  *   is a study list, not an index: a name that appears once in a genealogy is
  *   left out on purpose, since a list that holds everybody teaches nothing.
- * - `SAMUEL_QUESTIONS` — the quiz itself. Every chapter is covered at least
+ * - `SAMUEL_QUESTIONS`, the quiz itself. Every chapter is covered at least
  *   once and the famous ones several times over. `answer` and `options` are
  *   kept apart rather than pre-shuffled with an index, so the quiz can shuffle
  *   them per sitting and a member cannot learn the shape of the answer instead
@@ -43,8 +43,8 @@
  *   string so a screen can filter by chapter without parsing prose.
  *
  * The wrong options are the part that takes the work. They are always the same
- * kind of thing as the answer — a person for a person, a place for a place, a
- * number for a number — and usually drawn from elsewhere in these two books, so
+ * kind of thing as the answer, a person for a person, a place for a place, a
+ * number for a number, and usually drawn from elsewhere in these two books, so
  * that choosing between them is an act of recall rather than of elimination.
  * A distractor a member can rule out without knowing the story has taught them
  * nothing and has quietly made the question easier than the test will be.
@@ -101,7 +101,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 6,
     title: "The Philistines send the ark home",
     summary:
-      "On the advice of their priests and diviners the Philistines send the ark back on a new cart drawn by two milk cows, with golden tumors and golden mice as a guilt offering. The cows go straight to Beth-shemesh, where the people rejoice — until men there are struck down for looking into the ark, and Beth-shemesh asks Kiriath-jearim to take it.",
+      "On the advice of their priests and diviners the Philistines send the ark back on a new cart drawn by two milk cows, with golden tumors and golden mice as a guilt offering. The cows go straight to Beth-shemesh, where the people rejoice, until men there are struck down for looking into the ark, and Beth-shemesh asks Kiriath-jearim to take it.",
     people: [],
     places: ["Ekron", "Beth-shemesh", "Kiriath-jearim"],
   },
@@ -119,7 +119,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 8,
     title: "Israel demands a king",
     summary:
-      "Samuel is old and his sons Joel and Abijah, judges at Beersheba, take bribes and pervert justice. The elders come to Ramah asking for a king to judge them like all the nations. The LORD tells Samuel it is himself they have rejected, and has Samuel warn them what a king will take — sons, daughters, fields, flocks, a tenth of everything — but the people insist.",
+      "Samuel is old and his sons Joel and Abijah, judges at Beersheba, take bribes and pervert justice. The elders come to Ramah asking for a king to judge them like all the nations. The LORD tells Samuel it is himself they have rejected, and has Samuel warn them what a king will take (sons, daughters, fields, flocks, a tenth of everything), but the people insist.",
     people: ["Samuel", "Joel", "Abijah"],
     places: ["Ramah", "Beersheba"],
   },
@@ -137,7 +137,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 10,
     title: "Samuel anoints Saul; the lot falls at Mizpah",
     summary:
-      "Samuel pours a flask of oil on Saul's head privately and gives him three signs to expect on the road, the last of which is meeting a band of prophets and prophesying with them — the origin of the saying about Saul being among the prophets. Samuel then gathers Israel at Mizpah, where the lot falls to Saul, who is found hiding among the baggage.",
+      "Samuel pours a flask of oil on Saul's head privately and gives him three signs to expect on the road, the last of which is meeting a band of prophets and prophesying with them, the origin of the saying about Saul being among the prophets. Samuel then gathers Israel at Mizpah, where the lot falls to Saul, who is found hiding among the baggage.",
     people: ["Samuel", "Saul"],
     places: ["Mizpah", "Gibeah", "Zelzah", "Tabor"],
   },
@@ -209,7 +209,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 18,
     title: "Jonathan's covenant and Saul's jealousy",
     summary:
-      "Jonathan makes a covenant with David and gives him his robe and armor. The women meet the returning army singing that Saul has struck down thousands and David ten thousands, and from that day Saul eyes him; twice he throws his spear at David. Saul offers Merab and then Michal, setting a bride price of a hundred Philistine foreskins in the hope David will die collecting it — and David brings two hundred.",
+      "Jonathan makes a covenant with David and gives him his robe and armor. The women meet the returning army singing that Saul has struck down thousands and David ten thousands, and from that day Saul eyes him; twice he throws his spear at David. Saul offers Merab and then Michal, setting a bride price of a hundred Philistine foreskins in the hope David will die collecting it, and David brings two hundred.",
     people: ["Jonathan", "David", "Saul", "Merab", "Michal"],
     places: ["Gibeah"],
   },
@@ -227,7 +227,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 20,
     title: "Jonathan's arrows and the new moon feast",
     summary:
-      "David asks Jonathan to test his father's intentions by noting whether his absence from the new moon feast is resented. Saul's fury — and the spear he throws at his own son — settles it. Jonathan goes out to shoot arrows with a boy as the agreed signal, sends the boy away, and the two friends part with a covenant between them.",
+      "David asks Jonathan to test his father's intentions by noting whether his absence from the new moon feast is resented. Saul's fury, and the spear he throws at his own son, settles it. Jonathan goes out to shoot arrows with a boy as the agreed signal, sends the boy away, and the two friends part with a covenant between them.",
     people: ["Jonathan", "David", "Saul"],
     places: ["Gibeah", "Ramah"],
   },
@@ -299,7 +299,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 28,
     title: "Saul consults the medium at En-dor",
     summary:
-      "With the Philistines massed and no answer from the LORD by dreams, Urim or prophets, Saul disguises himself and goes by night to a medium at En-dor — a practice he had himself banned. Samuel appears, the woman recognises the king, and the message is worse than the silence: the kingdom is torn away, and tomorrow Saul and his sons will be with him.",
+      "With the Philistines massed and no answer from the LORD by dreams, Urim or prophets, Saul disguises himself and goes by night to a medium at En-dor, a practice he had himself banned. Samuel appears, the woman recognises the king, and the message is worse than the silence: the kingdom is torn away, and tomorrow Saul and his sons will be with him.",
     people: ["Saul", "the medium of En-dor", "Samuel", "Achish", "David"],
     places: ["En-dor", "Shunem", "Gilboa"],
   },
@@ -335,7 +335,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 1,
     title: "News of Saul's death and the Song of the Bow",
     summary:
-      "An Amalekite arrives at Ziklag with Saul's crown and armlet, claiming he finished the wounded king himself — a claim the previous chapter contradicts — and David has him executed for lifting a hand against the LORD's anointed. David then composes a lament for Saul and Jonathan, the Song of the Bow, and orders it taught to Judah.",
+      "An Amalekite arrives at Ziklag with Saul's crown and armlet, claiming he finished the wounded king himself, a claim the previous chapter contradicts, and David has him executed for lifting a hand against the LORD's anointed. David then composes a lament for Saul and Jonathan, the Song of the Bow, and orders it taught to Judah.",
     people: ["David", "an Amalekite messenger", "Saul", "Jonathan"],
     places: ["Ziklag", "Mount Gilboa"],
   },
@@ -353,7 +353,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 3,
     title: "Abner defects and Joab murders him",
     summary:
-      "The war drags on, David growing stronger, and six sons are born to him at Hebron. Accused by Ish-bosheth over Saul's concubine Rizpah, Abner changes sides and begins bringing Israel over to David, who requires Michal back first — her husband Paltiel following in tears. Joab, avenging Asahel, takes Abner aside at the gate of Hebron and stabs him, and David mourns publicly and disowns the killing.",
+      "The war drags on, David growing stronger, and six sons are born to him at Hebron. Accused by Ish-bosheth over Saul's concubine Rizpah, Abner changes sides and begins bringing Israel over to David, who requires Michal back first, her husband Paltiel following in tears. Joab, avenging Asahel, takes Abner aside at the gate of Hebron and stabs him, and David mourns publicly and disowns the killing.",
     people: ["Abner", "Ish-bosheth", "Rizpah", "Michal", "Paltiel", "Joab", "David", "Asahel"],
     places: ["Hebron", "Mahanaim", "Bahurim"],
   },
@@ -389,7 +389,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 7,
     title: "The covenant: the LORD will build David a house",
     summary:
-      "David, settled in a cedar palace, proposes to build a house for the ark, and Nathan approves before the word of the LORD comes that night reversing it. David will not build the house; his son will. Instead the LORD will make David a house — an offspring whose kingdom is established forever, a father-and-son relationship that discipline will not dissolve. David goes in and prays.",
+      "David, settled in a cedar palace, proposes to build a house for the ark, and Nathan approves before the word of the LORD comes that night reversing it. David will not build the house; his son will. Instead the LORD will make David a house: an offspring whose kingdom is established forever, a father-and-son relationship that discipline will not dissolve. David goes in and prays.",
     people: ["David", "Nathan"],
     places: ["Jerusalem"],
   },
@@ -398,7 +398,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 8,
     title: "David's victories and his officials",
     summary:
-      "A summary of the wars: the Philistines subdued, Moab measured out with a line, Hadadezer of Zobah defeated along with the Syrians of Damascus, garrisons set in Edom, and tribute and dedicated metal brought to Jerusalem. It closes with the roll of David's government — Joab over the army, Jehoshaphat recorder, Zadok and Ahimelech priests, Seraiah secretary, Benaiah over the Cherethites and Pelethites.",
+      "A summary of the wars: the Philistines subdued, Moab measured out with a line, Hadadezer of Zobah defeated along with the Syrians of Damascus, garrisons set in Edom, and tribute and dedicated metal brought to Jerusalem. It closes with the roll of David's government: Joab over the army, Jehoshaphat recorder, Zadok and Ahimelech priests, Seraiah secretary, Benaiah over the Cherethites and Pelethites.",
     people: ["David", "Hadadezer", "Toi", "Joab", "Jehoshaphat", "Zadok", "Ahimelech", "Seraiah", "Benaiah"],
     places: ["Moab", "Zobah", "Damascus", "Edom", "Jerusalem"],
   },
@@ -425,7 +425,7 @@ export const SAMUEL_CHAPTERS = [
     chapter: 11,
     title: "David, Bathsheba, and the death of Uriah",
     summary:
-      "In the spring, when kings go out to battle, David stays in Jerusalem, sees Bathsheba bathing, and sends for her; she conceives. Uriah the Hittite is recalled from the siege of Rabbah but will not go home to his wife while the army is in the field, even drunk. So David sends him back carrying his own death warrant — orders to Joab to put him where the fighting is hardest and withdraw.",
+      "In the spring, when kings go out to battle, David stays in Jerusalem, sees Bathsheba bathing, and sends for her; she conceives. Uriah the Hittite is recalled from the siege of Rabbah but will not go home to his wife while the army is in the field, even drunk. So David sends him back carrying his own death warrant: orders to Joab to put him where the fighting is hardest and withdraw.",
     people: ["David", "Bathsheba", "Uriah", "Joab"],
     places: ["Jerusalem", "Rabbah"],
   },
@@ -586,7 +586,7 @@ export const SAMUEL_PEOPLE = [
   },
   {
     name: "Joel and Abijah",
-    who: "Samuel's sons, judges at Beersheba who take bribes — the pretext for Israel's demand for a king.",
+    who: "Samuel's sons, judges at Beersheba who take bribes: the pretext for Israel's demand for a king.",
     chapters: ["1 Samuel 8"],
   },
   {
@@ -686,7 +686,7 @@ export const SAMUEL_PEOPLE = [
   },
   {
     name: "Joab",
-    who: "David's nephew and army commander, indispensable and ruthless — killer of Abner, Absalom and Amasa, and the one man who speaks bluntly to the king.",
+    who: "David's nephew and army commander, indispensable and ruthless: killer of Abner, Absalom and Amasa, and the one man who speaks bluntly to the king.",
     chapters: ["2 Samuel 2", "2 Samuel 3", "2 Samuel 11", "2 Samuel 14", "2 Samuel 18", "2 Samuel 20"],
   },
   {
@@ -696,7 +696,7 @@ export const SAMUEL_PEOPLE = [
   },
   {
     name: "Asahel",
-    who: "The third son of Zeruiah, fast as a wild gazelle, killed by Abner at Gibeon — the blood feud that costs Abner his life.",
+    who: "The third son of Zeruiah, fast as a wild gazelle, killed by Abner at Gibeon: the blood feud that costs Abner his life.",
     chapters: ["2 Samuel 2", "2 Samuel 3", "2 Samuel 23"],
   },
   {
@@ -761,7 +761,7 @@ export const SAMUEL_PEOPLE = [
   },
   {
     name: "Tamar",
-    who: "Absalom's sister, violated by Amnon and left desolate in her brother's house — the wrong the king does not punish.",
+    who: "Absalom's sister, violated by Amnon and left desolate in her brother's house: the wrong the king does not punish.",
     chapters: ["2 Samuel 13"],
   },
   {
@@ -1675,7 +1675,7 @@ export const SAMUEL_QUESTIONS = [
     kind: "what",
     prompt: "What did Michal put in the bed to buy David time?",
     answer: "A household image, with goats' hair at its head",
-    options: ["A bundle of clothes", "A servant of her own household", "Nothing — she simply barred the door"],
+    options: ["A bundle of clothes", "A servant of her own household", "Nothing: she simply barred the door"],
     ref: "1 Samuel 19",
     book: "1 Samuel",
     chapter: 19,

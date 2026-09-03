@@ -4,35 +4,35 @@
  * speech recognizer hands back a *spelling*, not a sound. A member reciting
  * Galatians perfectly gets "sews" for `sow`; a member reciting Isaiah 9 gets
  * "naftali" for `Naphtali`. Neither of those is a recall error, and marking
- * them wrong fails the member who said the verse right — which is precisely the
+ * them wrong fails the member who said the verse right, which is precisely the
  * failure reciting aloud was meant to save them from.
  *
  * The rule CLAUDE.md states about `voice.js` still holds, only its address has
  * changed: **nothing a member types is forgiven; what a microphone heard is.**
  * `grading.js` is exact and stays exact. This module is the loose half, and the
- * only things allowed to import it are the two with a microphone behind them —
+ * only things allowed to import it are the two with a microphone behind them,
  * `voice.js`, which fits heard words back onto the passage, and `recital.js`,
  * which scores a spoken recitation.
  *
  * Four tiers, strongest first, and each one is narrower than it looks:
  *
- *   exact      — the same word once `norm()` has taken case and punctuation off.
- *   homophone  — a curated, hand-audited pair. Not a recall error at all: the
+ *   exact     , the same word once `norm()` has taken case and punctuation off.
+ *   homophone , a curated, hand-audited pair. Not a recall error at all: the
  *                member produced the right sound and the engine picked a
  *                spelling. `no`/`know` is the argument for having the table,
  *                since both words are under MIN_FUZZY_LEN and no other tier can
  *                reach them.
- *   edit       — within one edit, ignoring a plural ending on either side, and
+ *   edit      , within one edit, ignoring a plural ending on either side, and
  *                never on a word short enough for one edit to be most of it.
  *                Moved here verbatim from `voice.js`, which imports it back.
- *   phonetic   — Double Metaphone key equality, gated hard (see below). This
+ *   phonetic  , Double Metaphone key equality, gated hard (see below). This
  *                tier is deliberately the weakest and the most expensive, and
  *                the scorer's strict figure excludes it entirely.
  *
  * The tiers are OR'd; the phonetic tier's *internals* are an AND, and that
  * conjunction is the whole reason it is safe. Measured over this repo's 1,546
  * word vocabulary, crediting on key equality alone admits 194 pairs at two
- * edits — `love`/`life`, `holy`/`whole`, `blessed`/`pleased` — every one of
+ * edits, `love`/`life`, `holy`/`whole`, `blessed`/`pleased`, every one of
  * which is a word a member could genuinely have got wrong. Requiring key
  * equality *and* a two-edit gate *and* that the reference word be a proper noun
  * collapses that to a handful, because a name has no near neighbour in the
@@ -44,14 +44,14 @@
 import { norm } from "./text.js";
 
 /* How far apart two spellings may be and still be the same word said out loud.
- * One edit, and never on a word short enough for one edit to be most of it —
+ * One edit, and never on a word short enough for one edit to be most of it,
  * "us" and "as" are two words, "Jews" and "Jew" are one word twice. */
 export const MAX_EDITS = 1;
 export const MIN_FUZZY_LEN = 3;
 
 /* The phonetic tier's gate. Five letters because a four-letter word reduces to
  * a key that is a claim about almost nothing, and two edits because at one edit
- * the tier is a measured no-op — everything within one edit is already caught
+ * the tier is a measured no-op, everything within one edit is already caught
  * above it. Two edits is what buys `naftali`/`Naphtali` and `pharoah`/`Pharaoh`,
  * and it is also what would buy `love`/`life` if the proper-noun gate were not
  * there to stop it. */
@@ -62,7 +62,7 @@ export const MAX_PHONETIC_EDITS = 2;
  * sound; agreeing on it is not evidence of anything. */
 const MIN_PHONETIC_KEY = 2;
 
-/* Whether two strings are within MAX_EDITS of each other — one substitution,
+/* Whether two strings are within MAX_EDITS of each other, one substitution,
  * insertion, or deletion. Walked in step rather than scored with a full edit
  * matrix, because the only question ever asked is "one or fewer", and the
  * answer to that is known the second time the walk falls out of step. */
@@ -108,7 +108,7 @@ export const stem = (w) => w.replace(/(?:es|s)$/, "");
  * the alternative failed a member who said the verse right. MAX_EDITS and
  * MIN_FUZZY_LEN are where that is tuned.
  *
- * This is `voice.js`'s own predicate, unchanged — it moved here so that the
+ * This is `voice.js`'s own predicate, unchanged, it moved here so that the
  * recital scorer and the transcription box cannot come to disagree about what
  * counts as the same word. */
 export function same(heard, want) {
@@ -129,7 +129,7 @@ export function same(heard, want) {
  * down and nothing more. It is the mirror of PHONETIC_BLOCK below, and the two
  * tables together are the whole hand-tuned surface of the design.
  *
- * Every pair here was checked against the shipped vocabulary — at least one
+ * Every pair here was checked against the shipped vocabulary, at least one
  * side of each appears in the passage set, which is what makes it worth an
  * entry. A homophone earns full credit including in the strict score, because
  * nothing was got wrong: the member produced the correct sound and the engine
@@ -157,7 +157,7 @@ export const HOMOPHONES = [
   ["knew", "new"],
 ];
 
-/* Both directions, indexed once at load rather than scanned per comparison —
+/* Both directions, indexed once at load rather than scanned per comparison,
  * the aligner asks this question O(n·m) times per recital. */
 const HOMOPHONE_INDEX = new Map();
 for (const [a, b] of HOMOPHONES) {
@@ -175,7 +175,7 @@ const homophone = (a, b) => HOMOPHONE_INDEX.get(a)?.has(b) === true;
  * every pair where a proper noun of five letters or more collides with an
  * ordinary vocabulary word under the gate. Listed by name rather than described
  * by a rule, because a risk surface you can read is a risk surface you can
- * reason about — and because `test/wordmatch.test.mjs` recomputes the collision
+ * reason about, and because `test/wordmatch.test.mjs` recomputes the collision
  * set over every shipped passage and fails loudly the day a new passage
  * introduces one this table does not name.
  *
@@ -184,12 +184,12 @@ const homophone = (a, b) => HOMOPHONE_INDEX.get(a)?.has(b) === true;
  * a public-domain translation, and they are the mechanism working rather than a
  * surprise: **the surface belongs to the corpus, so changing the corpus grows
  * it.** `Creator` against `creature` and `Ghost` (as in Holy Ghost) against
- * `goest` are exactly the kind of pair the gate exists to refuse — a member who
+ * `goest` are exactly the kind of pair the gate exists to refuse, a member who
  * says one of them has said a different word, and crediting it would be the
  * scorer marking its own homework. They cost nothing on a set that does not use
  * them, which is why the table is one table rather than one per translation.
  *
- * Under this port of the algorithm only six of the ten can actually fire — the
+ * Under this port of the algorithm only six of the ten can actually fire, the
  * other four are stopped by a gate before their keys are ever compared (`even`
  * and `jews` are under five letters; `better` keeps its B where Philips' own
  * reference would fold it into P; `destroyer` carries a second R). The inert
@@ -222,14 +222,14 @@ const blocked = (a, b) => BLOCK_INDEX.has(`${a}|${b}`);
 
 const VOWELS = "AEIOUY";
 
-/* Codes emitted are a restricted set — A B F H J K L M N P R S T X, plus 0 for
+/* Codes emitted are a restricted set, A B F H J K L M N P R S T X, plus 0 for
  * the *th* sound. The reduction is aggressive by design (D emits T, V emits F,
  * Z emits S, G emits K), which is exactly why this tier needs the edit gate and
  * the proper-noun gate above it.
  *
  * Two keys come back rather than one, and that is the "double": they are
  * identical except where a rule declares a genuine pronunciation variant, of
- * which this vocabulary exercises one — an initial J, which a Spanish reading
+ * which this vocabulary exercises one, an initial J, which a Spanish reading
  * gives a vowel. Two words match if any of the four cross-pairs agree.
  *
  * **The key is never truncated.** Philips' reference implementation caps at
@@ -254,7 +254,7 @@ export function doubleMetaphone(word) {
    * letter" rather than as the empty string, or every `includes("")` test in
    * the rules below would answer true. */
   /* Out of bounds is a character that can never match rather than "", because
-   * an empty string is a substring of everything — `"AEIOU".includes("")` is
+   * an empty string is a substring of everything, `"AEIOU".includes("")` is
    * true, and a sentinel that reads as a vowel off both ends of the word is a
    * silent wrong answer. Written as an escape: a raw NUL in the source makes
    * the file binary to half the tools that would otherwise read it. */
@@ -268,7 +268,7 @@ export function doubleMetaphone(word) {
   /* A silent first letter. These five clusters open with a letter English
    * writes and does not say. */
   if (["GN", "KN", "PN", "WR", "PS"].includes(span(0, 2))) i = 1;
-  /* And an initial X is an S — Xerxes, not ks-erxes. */
+  /* And an initial X is an S, Xerxes, not ks-erxes. */
   if (s[0] === "X") {
     add("S");
     i = 1;
@@ -307,7 +307,7 @@ export function doubleMetaphone(word) {
         if (span(i, 2) === "CH") {
           /* CH is the one genuinely ambiguous cluster in this vocabulary, and
            * it separates `Christ` from `Jericho`. A Greek-rooted CH followed by
-           * a consonant is a K — Christ, chrism, chronicle — as is one inside
+           * a consonant is a K, Christ, chrism, chronicle, as is one inside
            * the -ARCH-/ORCHES- shapes and one followed by T or S. Everywhere
            * else it is the English X sound, which is why `Jericho` stays JRX
            * and "jerico" (which reads as a hard C) is honestly not rescued. */
@@ -347,7 +347,7 @@ export function doubleMetaphone(word) {
 
       case "G":
         if (span(i, 2) === "GH") {
-          /* Silent after a vowel — thou*gh*, brou*gh*t — and a hard G
+          /* Silent after a vowel, thou*gh*, brou*gh*t, and a hard G
            * otherwise, as in ghost. */
           if (!vowel(i - 1)) add("K");
           i += 2;
@@ -508,7 +508,7 @@ function phoneticallySame(a, b) {
 /* The one predicate the aligner asks.
  *
  * `proper` is whether the *reference* word is a proper noun, which is the gate
- * on the phonetic tier — it is a fact about the passage, not about the
+ * on the phonetic tier, it is a fact about the passage, not about the
  * transcript, so the caller works it out from `passage.text` and passes it in.
  * Returning the tier rather than a boolean is what lets the scorer price the
  * tiers apart (a tie should prefer the exact reading) and lets the strict

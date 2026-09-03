@@ -1,7 +1,7 @@
 /* Representative UI states, shared by the render tests.
  *
  * Each scenario is a plain `{ name, props, state }` that can be pushed straight
- * into an App instance — no store, no mounting. Together they cover every view
+ * into an App instance, no store, no mounting. Together they cover every view
  * and every review mode, so a render pass over all of them exercises the whole
  * template layer. Keep them deterministic: fixed timestamps only, no Date.now().
  */
@@ -10,7 +10,7 @@ import { passages } from "../../data/passages.js";
 import { SAMUEL_QUESTIONS } from "../../data/samuel.js";
 import { applyExam, buildExam, DEFAULT_SETUP, normalizeSetup, scoreExam } from "../../src/exam.js";
 
-/* 2026-08-15T12:00:00Z — matches freezeClock()'s default so freshness values are
+/* 2026-08-15T12:00:00Z, matches freezeClock()'s default so freshness values are
  * stable. Offsets are expressed in days before that instant. */
 export const NOW = new Date("2026-08-15T12:00:00.000Z").getTime();
 const daysAgo = (n) => NOW - n * 86400000;
@@ -45,7 +45,7 @@ const LOG = {
 };
 
 /* The roster, as App.loadRoster builds it. `freshnessScore` is Σ retrievability
- * across a member's committed verses, so it is always at or below `count` — and
+ * across a member's committed verses, so it is always at or below `count`, and
  * it is not optional: the board ranks on it and quotes it as an average, so a
  * row without one renders "NaN%". */
 const PEERS = [
@@ -131,7 +131,7 @@ export function baseState(overrides = {}) {
     typeGraded: false,
     typeFirstLetter: false,
     // No microphone in this suite, so the default is a browser that cannot
-    // listen — the state App.js would be in on Firefox. The voice/* scenarios
+    // listen, the state App.js would be in on Firefox. The voice/* scenarios
     // below are what exercise one that can.
     voice: quietVoice(),
     scrambleOrder: [],
@@ -185,7 +185,7 @@ const learning = (overrides) =>
 const listening = (voice, overrides) =>
   learning({ mode: "type", voice: quietVoice({ supported: true, ...voice }), ...overrides });
 
-/* Every passage committed and fully fresh — nothing to review, nothing to
+/* Every passage committed and fully fresh, nothing to review, nothing to
  * learn. Both empty states at once. */
 const allCommitted = () =>
   Object.fromEntries(
@@ -193,8 +193,8 @@ const allCommitted = () =>
   );
 
 /* One fixed paper, covering all four activities (ten verses dealt round-robin
- * over four activities reaches every one). The seed is fixed, so the questions —
- * and therefore the markup — are the same on every run. */
+ * over four activities reaches every one). The seed is fixed, so the questions,
+ * and therefore the markup, are the same on every run. */
 export const EXAM = buildExam({
   passages,
   progress: progressFixture(),
@@ -226,7 +226,7 @@ const EXAM_RESULT = {
   rows: applyExam({ progress: progressFixture(), results: scored.results, now: NOW }).rows,
 };
 
-/* A paper over committed verses only — the three with real history — sat badly.
+/* A paper over committed verses only, the three with real history, sat badly.
  * Verse 1 goes into it nearly fully fresh, so this is the fixture where the
  * summary has a verse that came out faded. */
 const COMMITTED_EXAM = buildExam({
@@ -274,7 +274,7 @@ export const scenarios = [
   // ── the sync gate ──────────────────────────────────────────────────────────
   // A signed-in member with no profile *on this device* is only a new member
   // once the cloud record has been read. Until then the gate stands in front of
-  // the sign-up form — see views/sync-gate.js for why that matters.
+  // the sign-up form, see views/sync-gate.js for why that matters.
   { name: "sync/pulling", state: baseState({ profile: {}, sync: { status: "pulling" } }) },
   {
     name: "sync/refused",
@@ -290,7 +290,7 @@ export const scenarios = [
   { name: "sync/banner-on-board", state: baseState({ sync: { status: "error", code: "unavailable" } }) },
   /* The SDK never loaded. "disabled" skips the sign-in gate by design, so
    * without a reason on it this member fell straight through to the sign-up
-   * form and a private local record — which is what a blocked gstatic looks
+   * form and a private local record, which is what a blocked gstatic looks
    * like to someone who already has an account. */
   {
     name: "sync/sdk-unreachable",
@@ -317,7 +317,7 @@ export const scenarios = [
     }),
   },
   { name: "profile/edit", state: baseState({ editingProfile: true, profileDraft: { ...PROFILE } }) },
-  // A member who has overridden their system on this device — the only thing
+  // A member who has overridden their system on this device, the only thing
   // that changes on the form is which of the three is standing selected.
   {
     name: "profile/edit-theme-dark",
@@ -358,7 +358,7 @@ export const scenarios = [
       reviewSetup: { manualSize: 10, manualFreshness: 100 },
     }),
   },
-  // Nothing committed at all — there is no review to configure, so the screen
+  // Nothing committed at all, there is no review to configure, so the screen
   // explains what commits a passage and points at a learn session instead.
   { name: "review-setup/nothing-committed", state: baseState({ view: "review-setup", progress: {} }) },
   // A member who has opened "How it works" this visit.
@@ -410,7 +410,7 @@ export const scenarios = [
     name: "review/type-graded",
     state: reviewing({ mode: "type", typed: "hear o israel the lord our god", typeGraded: true }),
   },
-  // "O" is skipped outright and "Lord" is written as "load" — one miss with
+  // "O" is skipped outright and "Lord" is written as "load", one miss with
   // nothing typed in its place, one with the wrong word right there.
   {
     name: "review/type-graded-mistakes",
@@ -487,7 +487,7 @@ export const scenarios = [
       results: { 5: { id: 5, mode: "type", score: 1, peeks: 0, before: 37, after: 100, committed: true } },
     }),
   },
-  // An attempt that fell short — the retry offered right on the result strip.
+  // An attempt that fell short, the retry offered right on the result strip.
   {
     name: "learn/not-committed",
     state: learning({
@@ -506,7 +506,7 @@ export const scenarios = [
     }),
   },
   // The two dialogs, which are where a review session talks about freshness
-  // most plainly — so the learn wording of both needs exercising.
+  // most plainly, so the learn wording of both needs exercising.
   { name: "learn/moving-on-unsubmitted", state: learning({ mode: "type", reviewMoveAsk: "next" }) },
   { name: "learn/leaving", state: learning({ mode: "type", reviewLeaveAsk: true }) },
   {
@@ -548,7 +548,7 @@ export const scenarios = [
   { name: "voice/blocked", state: listening({ error: "not-allowed" }) },
   // The scaffold has nothing to recite, so the switch is not offered with it on.
   { name: "voice/scaffold-on", state: listening({}, { typeFirstLetter: true, typed: "h o i" }) },
-  // A review sitting recites too — the same one switch.
+  // A review sitting recites too, the same one switch.
   {
     name: "voice/review-session",
     state: reviewing({ mode: "type", voice: quietVoice({ supported: true, status: "listening" }) }),
@@ -675,7 +675,7 @@ export const scenarios = [
   },
 
   {
-    /* A session the microphone ended, not the member — the one case where the
+    /* A session the microphone ended, not the member, the one case where the
      * screen going back to the setup needs a sentence beside it. */
     name: "speak/stopped-by-mic",
     state: baseState({

@@ -1,4 +1,4 @@
-# Speech recognition for recited scripture — research
+# Speech recognition for recited scripture, research
 
 Researched 2026-08-22. Chrome stable at the time of writing is **151/152**
 ([Chrome Releases, Aug 2026](https://chromereleases.googleblog.com/2026/08/)).
@@ -17,8 +17,8 @@ recognised words back onto the passage.
 ### The one thing that matters most, stated first
 
 **There is a trap at the centre of this problem.** Every "bias the recogniser
-toward the expected text" mechanism — Chrome's `phrases`, Whisper's
-`initial_prompt`, Deepgram's keyterms — makes the recogniser _more likely to
+toward the expected text" mechanism, Chrome's `phrases`, Whisper's
+`initial_prompt`, Deepgram's keyterms, makes the recogniser _more likely to
 output the expected verse whether or not the member actually said it_. That is
 free accuracy for a dictation app and a **validity bug for a scoring app**. Whisper's
 `prefix` parameter is the extreme case: it literally forces the decoder to start
@@ -27,17 +27,17 @@ with the text you give it.
 So the biasing recommendation is not "bias toward this verse", it is:
 
 - **Bias toward the vocabulary, not the word sequence.** Feed the recogniser the
-  _rare tokens_ of the corpus — proper nouns (`Shadrach`, `Melchizedek`,
+  _rare tokens_ of the corpus, proper nouns (`Shadrach`, `Melchizedek`,
   `Zerubbabel`), archaic function words (`thy`, `thine`, `hath`), and
-  `steadfast` / `LORD` — not the ordered verse text. This fixes "the engine
+  `steadfast` / `LORD`, not the ordered verse text. This fixes "the engine
   cannot spell Habakkuk" without fixing "the member skipped verse 3".
 - **Use moderate boosts.** MDN is explicit: _"A high value such as 9.0 or 10.0
   might make the recognition engine erroneously recognize other phrases as the
   specified phrase. Therefore, such values should be used rarely"_
   ([MDN, `SpeechRecognitionPhrase.boost`](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognitionPhrase/boost)).
   Start at 2.0–3.0 and measure.
-- **If you ever do verse-level prompting, keep two transcripts** — an unbiased
-  one for the score and a biased one for display — or the score stops meaning
+- **If you ever do verse-level prompting, keep two transcripts**, an unbiased
+  one for the score and a biased one for display, or the score stops meaning
   anything.
 
 This tension should be written into the design the way "the microphone is never
@@ -56,14 +56,14 @@ than patching them:
   no error and no `onend` you can distinguish from a real end
   ([chromium-html5, "Web Speech API limit of 60 seconds?"](https://groups.google.com/a/chromium.org/g/chromium-html5/c/s2XhT-Y5qAc)).
   A 60-second passage is right on that line.
-- `continuous` on **Chrome for Android is a documented no-op** — MDN's compat
+- `continuous` on **Chrome for Android is a documented no-op**, MDN's compat
   data records _"The property can be set, but has no effect"_
   ([BCD `api/SpeechRecognition.json`](https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/SpeechRecognition.json)).
   The car use case is on a phone. This is very likely a large part of why the
   experience "really sucks".
 - iOS Safari's implementation is separately unreliable in continuous mode
   (self-stopping, first-attempt failures, interim results that behave
-  inconsistently) — see §2.4.
+  inconsistently), see §2.4.
 - The restart pattern the app uses today (`rec.start()` immediately inside
   `onend`) is the pattern Chrome **rate-limits**, which makes sessions "end
   instantaneously" (§1.3).
@@ -75,7 +75,7 @@ blob to a Cloudflare Worker.
 
 Recommended backend: **Cloudflare Workers AI `@cf/openai/whisper-large-v3-turbo`**,
 because the app already deploys to Workers, the price is `$0.00051 per audio
-minute`, and — critically — the endpoint exposes `initial_prompt` _and_
+minute`, and, critically, the endpoint exposes `initial_prompt` _and_
 `prefix` biasing parameters
 ([Cloudflare model page](https://developers.cloudflare.com/workers-ai/models/whisper-large-v3-turbo/)).
 The free allowance of 10,000 neurons/day at 46.63 neurons/audio-minute works out
@@ -86,7 +86,7 @@ Beyond that, an hour of recitation costs about **three cents**.
 Perceived latency cost: a 20-second recitation becomes a ~1–3 second wait after
 the member stops speaking, instead of a transcript that appears as they go.
 _(That range is an estimate from typical turbo-Whisper serving latencies plus a
-~60 KB Opus upload — I did not benchmark Workers AI directly. Measure it before
+~60 KB Opus upload, I did not benchmark Workers AI directly. Measure it before
 committing.)_ Speak mode already pauses to say feedback, so a short wait lands
 inside a gap the design has already accepted.
 
@@ -105,15 +105,15 @@ zero money.)_
   (§1.4) and Chrome has supported the attribute since Chrome 33, but there are
   widespread reports that Chrome returns a single alternative in practice,
   especially with `continuous`/`interimResults` on. **Test this empirically
-  before building on it — it is a ten-minute experiment.**
+  before building on it, it is a ten-minute experiment.**
 - **Turn on `SpeechRecognition.phrases` where available** (Chrome **142+**,
   desktop only) with the _vocabulary_ list from the caveat above. See §2.2.
 
 **3. Endpointing: Silero VAD via `@ricky0123/vad-web`** if `speechend` proves
 too jumpy for a car or a run. _(Costs: ~2 MB model + onnxruntime-web WASM,
 loaded lazily on entering Speak mode.)_ It loads from jsDelivr as **classic
-`<script>` tags exposing a global** — the same pattern `index.html` already uses
-for React/htm — so it fits the no-bundler constraint without argument (§5.2).
+`<script>` tags exposing a global**, the same pattern `index.html` already uses
+for React/htm, so it fits the no-bundler constraint without argument (§5.2).
 Load it with the same lazy `import()`-with-`.catch` discipline as
 `loadRunPlaylist`.
 
@@ -122,7 +122,7 @@ Load it with the same lazy `import()`-with-`.catch` discipline as
 - **Whisper in the browser (transformers.js).** ~41 MB first load for
   `whisper-tiny.en` int8, ~77 MB for `base.en` int8 (§3.2). WebGPU is _slower_
   than WASM for Whisper on at least some Apple silicon (§3.4). And the feature
-  that would justify it — `initial_prompt` — **is not implemented**; the PR is
+  that would justify it, `initial_prompt`, **is not implemented**; the PR is
   still open (§3.5). Revisit if that PR merges _and_ you want offline-in-a-car.
 - **Deepgram / AssemblyAI as the first move.** Both are excellent and both have
   real phrase biasing, but they are 8–10× the price of Workers AI Whisper for
@@ -159,7 +159,7 @@ Practical consequences for this app:
 
 - **No network, no recognition.** A member reciting in a car with patchy
   cellular gets `network` errors, and `recognizer.js` correctly stops the whole
-  session on those — which means one tunnel ends the sitting.
+  session on those, which means one tunnel ends the sitting.
 - **The transcription is a round trip.** Interim results are streamed back, but
   they are Google's guesses about conversational English, revised in flight.
 - **Privacy**: every recitation is audio sent to a third party. Worth a line in
@@ -174,18 +174,18 @@ The spec has **no** stated session-length limit
 ([W3C/WebAudio Web Speech API spec](https://webaudio.github.io/web-speech-api/)).
 Chrome's implementation does, in practice: with `continuous = true`, recognition
 stops after roughly a minute even while audio continues, and **no error is
-raised** — reported repeatedly on chromium-html5
+raised**, reported repeatedly on chromium-html5
 ([_Web Speech API limit of 60 seconds?_](https://groups.google.com/a/chromium.org/g/chromium-html5/c/s2XhT-Y5qAc)).
 Chrome also stops accepting input after a period of silence.
 
 ⚠️ This "about a minute" figure is developer-observed, not documented by Google,
 and may have moved. It is nonetheless the well-known behaviour that
-`recognizer.js`'s `wanted` flag exists to paper over — and the comment in that
+`recognizer.js`'s `wanted` flag exists to paper over, and the comment in that
 file ("Chrome ends a session of its own accord after a pause") is correct.
 
 **No per-origin quota applies to Chrome-branded builds.** The often-cited "50
 requests per day" limit is for the _Chrome Speech API key_ used by Chromium
-builds and by developers embedding Chromium — not for web pages running in
+builds and by developers embedding Chromium, not for web pages running in
 Chrome itself
 ([chromium-dev, _Raise Quota at Speech API?_](https://groups.google.com/a/chromium.org/g/chromium-dev/c/TJRsxtxkB_Y)).
 This is exactly the failure mode that bites Electron apps
@@ -203,7 +203,7 @@ instantaneously" thereafter
 ([chromium-html5 thread](https://groups.google.com/a/chromium.org/g/chromium-html5/c/s2XhT-Y5qAc)).
 The current code calls `rec.start()` **synchronously inside `onend`**, which is
 the worst case for that limiter, and swallows the resulting exception with an
-empty `catch` that relies on "the next `onend` will try again" — a loop that can
+empty `catch` that relies on "the next `onend` will try again", a loop that can
 spin.
 
 Concrete fixes, all free:
@@ -219,7 +219,7 @@ Also worth knowing: each restart is a **new** `SpeechRecognitionResultList`, so
 because it settles text into `typed`, but any per-session accumulator elsewhere
 would not.
 
-### 1.4 `confidence` — what it means, and whether it is usable
+### 1.4 `confidence`, what it means, and whether it is usable
 
 The spec defines it as _"a numeric estimate between 0 and 1 of how confident the
 recognition system is that the recognition is correct"_
@@ -227,12 +227,12 @@ recognition system is that the recognition is correct"_
 close to useless here:
 
 - It is **per-alternative for a whole result**, not per word. You cannot tell
-  which word in a recited verse the engine was unsure about — which is precisely
+  which word in a recited verse the engine was unsure about, which is precisely
   what a scoring app would want.
 - The values on final results are **not calibrated in any documented way**.
   There is no published mapping from Chrome's `confidence` to an error rate.
 - ⚠️ It is widely reported that Chrome leaves `confidence` at `0` on **interim**
-  results, but I found **no primary source** for that in this research — treat
+  results, but I found **no primary source** for that in this research, treat
   it as unverified and check it with the same ten-minute `onresult` experiment
   as §7 item 1.
 
@@ -241,7 +241,7 @@ close to useless here:
 known passage is strictly better information than the engine's self-report,
 because you know the answer and the engine does not.
 
-### 1.5 `maxAlternatives` — the free best-of-N idea
+### 1.5 `maxAlternatives`, the free best-of-N idea
 
 The spec: _"This attribute will set the maximum number of
 SpeechRecognitionAlternatives per result. The default value is 1."_
@@ -252,8 +252,8 @@ attribute since **Chrome 33**, Safari since **14.1**
 The idea is sound and it is exactly the right shape for this app: set
 `maxAlternatives = 5`, and for each final result, score every alternative
 against the expected passage with the machinery `voice.js` already has, then
-accept the best-matching one. That converts N-best rescoring — a real ASR
-technique — into ten lines of client code, and it **biases only the
+accept the best-matching one. That converts N-best rescoring, a real ASR
+technique, into ten lines of client code, and it **biases only the
 _selection_, never the acoustics**, which makes it much safer for scoring than
 `phrases` or `initial_prompt`: the engine still had to consider that hypothesis
 on its own merits.
@@ -270,26 +270,26 @@ design depends on it.
 
 ## 2. Biasing recognition toward the expected text
 
-### 2.1 `SpeechGrammarList` / JSGF is dead — spec-level, not just Chrome
+### 2.1 `SpeechGrammarList` / JSGF is dead, spec-level, not just Chrome
 
 The spec now says it outright:
 
 > "Grammar support has been deprecated and removed. The grammar objects remain
 > in the spec for backwards compatibility purposes only and do not affect speech
 > recognition."
-> — [W3C/WebAudio Web Speech API](https://webaudio.github.io/web-speech-api/)
+> , [W3C/WebAudio Web Speech API](https://webaudio.github.io/web-speech-api/)
 
 That matches the long-standing Chromium position: grammars are ignored and are
 **never sent to the server**
 ([chromium-html5, _SpeechGrammarList working?_](https://groups.google.com/a/chromium.org/g/chromium-html5/c/wHhkRzshYzw);
 [chromium-dev, _Google Speech API - webkitSpeechGrammarList_](https://groups.google.com/a/chromium.org/g/chromium-dev/c/y0TO8MI10LI)).
 `webkitSpeechGrammarList` still exists in Chrome (BCD lists `grammars` from
-Chrome 33) and constructing one throws nothing — it is a **no-op**. Safari never
+Chrome 33) and constructing one throws nothing, it is a **no-op**. Safari never
 implemented it at all.
 
 **Do not spend any time on JSGF.** It was the obvious answer and it is gone.
 
-### 2.2 `SpeechRecognition.phrases` — contextual biasing, and it shipped
+### 2.2 `SpeechRecognition.phrases`, contextual biasing, and it shipped
 
 This is the replacement, and it is the most directly relevant new API for this
 app.
@@ -319,8 +319,8 @@ app.
   improves accuracy for domain vocabulary" as a claim to verify, not a fact.
 
 **How to use it here (safely).** Build one phrase list per session from the
-_rare vocabulary_ of the passage set — proper nouns, archaic forms, `LORD`,
-`steadfast`, `Shadrach`, `Meshach`, `Abednego` — at boost 2.0–3.0. Do **not**
+_rare vocabulary_ of the passage set, proper nouns, archaic forms, `LORD`,
+`steadfast`, `Shadrach`, `Meshach`, `Abednego`, at boost 2.0–3.0. Do **not**
 push whole verse text at boost 9. See the trap at the top of this document.
 
 ### 2.3 On-device recognition: `available()`, `install()`, `processLocally`
@@ -339,7 +339,7 @@ push whole verse text at boost 9. See the trap at the top of this document.
   It rides on Chrome's **SODA** components (visible at `chrome://components`).
 - **Does it improve accuracy?** The explainer claims "better accuracy and
   latency" but gives **no benchmarks**. Do not assume on-device SODA beats
-  Google's cloud model on hard vocabulary — historically the cloud model is the
+  Google's cloud model on hard vocabulary, historically the cloud model is the
   stronger one. What on-device unambiguously buys you is (a) no network
   dependency, (b) no audio leaving the device, and (c) **access to `phrases`**.
 - ⚠️ **Reliability warning, and it lands on your primary platform.** There is a
@@ -366,12 +366,12 @@ push whole verse text at boost 9. See the trap at the top of this document.
   false** on Safari and Safari iOS.
 - Practical reports of iOS behaviour: the microphone not stopping when the
   speaker does, "buffer clogging", no recognition on the first attempt, and
-  `interimResults` behaving inconsistently — with recognition sometimes
+  `interimResults` behaving inconsistently, with recognition sometimes
   throttling and flipping to cloud processing
   ([lilting.ch, _How to Stabilize the WebSpeech API on iOS_](https://lilting.ch/en/articles/ios-webspeech-api-tips);
   [WebKit/Documentation#120](https://github.com/WebKit/Documentation/issues/120)).
   The community workaround is **push-to-talk with a singleton recognizer**,
-  warmed up in advance — which is nearly the opposite of a hands-free continuous
+  warmed up in advance, which is nearly the opposite of a hands-free continuous
   loop.
 - On macOS, "Listen for 'Hey Siri'" being enabled has been reported to suppress
   `onresult` entirely.
@@ -401,7 +401,7 @@ It fits this app's constraints. It would want the same lazy
 `import().catch()` treatment as `loadRunPlaylist`, and it really wants a Web
 Worker so inference does not block the render thread.
 
-### 3.2 Model sizes — real numbers from the model cards
+### 3.2 Model sizes, real numbers from the model cards
 
 From the ONNX file listings on Hugging Face
 ([whisper-tiny.en](https://huggingface.co/onnx-community/whisper-tiny.en/tree/main/onnx),
@@ -434,7 +434,7 @@ Cache API after the first run, but a phone will evict it. **This is the fact
 that disqualifies in-browser Whisper as the primary path for the car and running
 use cases**, independent of accuracy.
 
-### 3.4 WebGPU vs WASM — WebGPU is not automatically faster
+### 3.4 WebGPU vs WASM, WebGPU is not automatically faster
 
 The one concrete, apples-to-apples benchmark I found, on a **Mac mini M2**,
 transcribing **60 seconds** of audio with transformers.js Whisper
@@ -449,35 +449,35 @@ transcribing **60 seconds** of audio with transformers.js Whisper
 WASM beat WebGPU in every configuration on that hardware, dramatically so for
 int8. Transformers.js v3's headline claim is "up to 100× faster than WASM" for
 WebGPU
-([HF blog, _Transformers.js v3_](https://www.huggingface.co/blog/transformersjs-v3)) —
+([HF blog, _Transformers.js v3_](https://www.huggingface.co/blog/transformersjs-v3)),
 that is an embedding-model figure and clearly does **not** transfer to Whisper's
 autoregressive decoder on Apple silicon.
 
 ⚠️ Extrapolating from that single data point: a **20-second** utterance on a
 mid-range laptop is plausibly **1.5–2.5 s** with `base.en` on WASM, and on a
-mid-range phone perhaps **5–15 s** — but I have no phone benchmark and these are
+mid-range phone perhaps **5–15 s**, but I have no phone benchmark and these are
 extrapolations, not measurements. Memory: expect roughly 2–3× the model file
 size resident.
 
 Also note that Whisper processes audio in fixed **30-second windows**, so a
 20-second utterance costs the same as a 30-second one.
 
-### 3.5 Whisper prompting in transformers.js — **not available yet**
+### 3.5 Whisper prompting in transformers.js, **not available yet**
 
 This is the finding that decides it. Python `transformers` supports
 `prompt_ids` / `initial_prompt`. transformers.js does **not**:
 
 - [transformers.js#923](https://github.com/xenova/transformers.js/issues/923),
-  "WhisperModel initial_prompt", opened **8 Sep 2024** — still **open**.
+  "WhisperModel initial_prompt", opened **8 Sep 2024**, still **open**.
 - [transformers.js#1028](https://github.com/huggingface/transformers.js/issues/1028),
-  "Supports Whisper `prompt` and `prefix`", opened **14 Nov 2024** — still
+  "Supports Whisper `prompt` and `prefix`", opened **14 Nov 2024**, still
   **open**.
 - [PR #1540](https://github.com/huggingface/transformers.js/pull/1540) implements
-  `prompt_ids` (~20 lines, closes both issues), created **22 Feb 2026** — still
+  `prompt_ids` (~20 lines, closes both issues), created **22 Feb 2026**, still
   **open, unmerged** as of this research.
 
-So the biggest reason to run Whisper client-side — biasing it toward the
-expected verse — is currently unavailable. Meanwhile the _server-side_ Whisper
+So the biggest reason to run Whisper client-side, biasing it toward the
+expected verse, is currently unavailable. Meanwhile the _server-side_ Whisper
 at Cloudflare exposes `initial_prompt` today (§6.1). That asymmetry is the whole
 argument for the proxy.
 
@@ -487,7 +487,7 @@ argument for the proxy.
   Emscripten build you host yourself rather than as a CDN-published ES module,
   which makes it a worse fit for a no-build app; its `initial_prompt` support
   would also need you to drive the C API from JS. ⚠️ **I did not verify the
-  packaging claim with a search this session** — it is recall, not a sourced
+  packaging claim with a search this session**, it is recall, not a sourced
   finding. Since it would only matter if you decided against transformers.js
   anyway, I did not spend a search on it. Not recommended here.
 - **Moonshine** (Useful Sensors) is genuinely interesting for this shape of
@@ -505,13 +505,13 @@ argument for the proxy.
 
 ---
 
-## 4. Streaming vs. batch — batch wins here
+## 4. Streaming vs. batch, batch wins here
 
 **Streaming is not needed for this feature and is actively harmful.** The member
 recites 20–60 seconds and then wants a score. There is no interaction that
 depends on partial text: `speak.js` goes PROMPT → LISTEN → GRADE → FEEDBACK, and
 the grading happens once, at the end. Streaming buys a live transcript on
-screen — for a member who is driving or running and _must not look at the
+screen, for a member who is driving or running and _must not look at the
 screen_, that is worth nothing.
 
 What record-then-transcribe dodges:
@@ -524,7 +524,7 @@ What record-then-transcribe dodges:
 - Single-shot recognition is what iOS Safari is actually _good_ at.
 
 Costs: perceived latency (see recommendation 1) and the loss of the live
-"filling in" effect on the desktop typed box in Review mode — so **keep the Web
+"filling in" effect on the desktop typed box in Review mode, so **keep the Web
 Speech path for the desktop `type` activity** where the member is looking at the
 textarea, and use batch for **Speak mode** where they are not. That split maps
 exactly onto where each API is strong.
@@ -555,12 +555,12 @@ exactly onto where each API is strong.
   prepared to resample manually via `OfflineAudioContext`.
 
 - **iOS gesture rule.** `AudioContext` starts suspended on iOS until a user
-  gesture — but Speak mode's design already funnels everything through the one
+  gesture, but Speak mode's design already funnels everything through the one
   Start press, so this is already solved.
 
 ---
 
-## 5. Endpointing — knowing when the member stopped
+## 5. Endpointing, knowing when the member stopped
 
 The current rule (2.5 s of quiet after a settled result, with a max-wait
 ceiling) is reasonable as a fallback but is the wrong primary signal: it is
@@ -576,7 +576,7 @@ recognition has started/ended")
 `speechend` as the primary endpoint and the 2.5 s timer only as a ceiling is a
 strictly better rule than what is there now, and costs nothing.
 
-⚠️ Not reliable on iOS Safari — see §2.4, where the microphone is reported not
+⚠️ Not reliable on iOS Safari, see §2.4, where the microphone is reported not
 to stop at all when the speaker does.
 
 ### 5.2 Web Audio RMS/energy VAD (free, ~50 lines)
@@ -590,7 +590,7 @@ frame energies as the floor) rather than constant.
 ### 5.3 Silero VAD via `@ricky0123/vad-web` (recommended if energy VAD isn't enough)
 
 - **Fits the no-bundler constraint cleanly.** Documented CDN usage is two
-  classic script tags exposing a `vad` global — the same shape as this app's
+  classic script tags exposing a `vad` global, the same shape as this app's
   React/htm loading
   ([vad-web browser guide](https://docs.vad.ricky0123.com/user-guide/browser/)):
 
@@ -604,7 +604,7 @@ frame energies as the floor) rather than constant.
     onnxWASMBasePath: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
     baseAssetPath: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.29/dist/",
     onSpeechEnd: (audio) => {
-      /* Float32Array @ 16 kHz — feed it straight to the transcriber */
+      /* Float32Array @ 16 kHz, feed it straight to the transcriber */
     },
   });
   ```
@@ -617,11 +617,11 @@ frame energies as the floor) rather than constant.
 - **Why it's the right tool here:** it is a _neural_ speech/non-speech
   classifier, so it distinguishes a member's voice from road noise in a way an
   energy threshold cannot. And its `onSpeechEnd` hands you a **Float32Array at
-  16 kHz** — exactly what a transcriber wants — so it does the endpointing _and_
+  16 kHz**, exactly what a transcriber wants, so it does the endpointing _and_
   the audio capture in one component. That is a very clean fit with
   recommendation 1.
 - **Tuning:** `positiveSpeechThreshold` / `negativeSpeechThreshold`,
-  `redemptionFrames` (how much silence before declaring the end — raise this for
+  `redemptionFrames` (how much silence before declaring the end, raise this for
   a member pausing between verses), `minSpeechFrames`, `preSpeechPadFrames`.
   ⚠️ The browser guide page I fetched did not list the default values; get them
   from the API docs before tuning.
@@ -636,7 +636,7 @@ The app already deploys to Workers, so a `POST /api/transcribe` route on the
 same Worker is essentially free infrastructure and keeps any API key off the
 client. All prices below are pay-as-you-go, checked 2026-08-22.
 
-### 6.1 Cloudflare Workers AI — Whisper ⭐ recommended first move
+### 6.1 Cloudflare Workers AI, Whisper ⭐ recommended first move
 
 - **Models:** `@cf/openai/whisper` and `@cf/openai/whisper-large-v3-turbo`.
 - **Price:** `$0.0005` per audio minute for both; large-v3-turbo is quoted more
@@ -651,7 +651,7 @@ client. All prices below are pay-as-you-go, checked 2026-08-22.
   `vad_filter`, `beam_size`, `condition_on_previous_text`,
   `hallucination_silence_threshold`, and the usual Whisper thresholds.
 - **Accuracy:** large-v3-turbo is a far stronger model than `whisper-tiny` and
-  is not tuned for conversational English the way Google's Web Speech model is —
+  is not tuned for conversational English the way Google's Web Speech model is,
   it handles formal, read, archaic English well, which is exactly this corpus.
 - **Same-vendor, same-deploy, one `env.AI.run()` call.** No new account, no
   second bill.
@@ -662,7 +662,7 @@ client. All prices below are pay-as-you-go, checked 2026-08-22.
   output to begin with your text. Use `initial_prompt` with _vocabulary_, never
   `prefix` with the verse.
 
-### 6.2 Deepgram — best-in-class biasing, ~10× the price
+### 6.2 Deepgram, best-in-class biasing, ~10× the price
 
 - **Nova-3 pre-recorded:** `$0.0043`/min monolingual. **Streaming:**
   `$0.0048`/min (promotional; list `$0.0077`/min)
@@ -677,7 +677,7 @@ client. All prices below are pay-as-you-go, checked 2026-08-22.
   0.887 → 0.990 ("nacho") and 0.712 → 0.965 ("tretinoin"). Those are confidence
   scores, not WER, and the docs caveat "actual results may vary".
 - **Verdict:** the 100-term / 500-token budget is a _very_ good fit for the
-  vocabulary-biasing strategy — you could ship one global list of the ~100
+  vocabulary-biasing strategy, you could ship one global list of the ~100
   rarest tokens across the whole passage set and never change it per card.
   Total `$0.0056`/min, ~11× Workers AI. Escalate here if Whisper's accuracy
   disappoints.
@@ -689,7 +689,7 @@ client. All prices below are pay-as-you-go, checked 2026-08-22.
   English:** `$0.15/hr` ([AssemblyAI pricing](https://www.assemblyai.com/pricing)).
   **$50 free credit.**
 - **Biasing:** keyterms prompting, **+$0.05/hr for up to 1,000 terms** on async
-  Universal-3.5 Pro — a much larger budget than Deepgram's 100.
+  Universal-3.5 Pro, a much larger budget than Deepgram's 100.
 - ⚠️ The pricing page warns that the **legacy `word_boost` parameter may
   silently route requests to cheaper models**, producing surprising bills and
   surprising accuracy. Use the modern keyterms parameter.
@@ -713,7 +713,7 @@ client. All prices below are pay-as-you-go, checked 2026-08-22.
   context) and, on the newer models, **`keywords`** (literal terms expected in
   the audio) plus `languages`
   ([Create transcription reference](https://developers.openai.com/api/reference/resources/audio/subresources/transcriptions/methods/create)).
-  The docs are explicit that _"Keywords are hints, not required output"_ — the
+  The docs are explicit that _"Keywords are hints, not required output"_, the
   right semantics for a scoring app.
 - The classic Whisper `prompt` is capped at **224 tokens**, and attention weights
   the _end_ of a long prompt more heavily
@@ -736,13 +736,13 @@ an order of magnitude cheaper.
 Assume 40 members × 10 recitations/day × 40 s = ~266 audio min/day ≈ 4.4 audio
 hours/day ≈ **133 audio hours/month**.
 
-| Option                            | $/audio-min | monthly at 133 hr                                                                         | biasing                             |
-| --------------------------------- | ----------- | ----------------------------------------------------------------------------------------- | ----------------------------------- |
-| Web Speech API                    | $0          | $0                                                                                        | `phrases`, desktop Chrome 142+ only |
-| Workers AI whisper-large-v3-turbo | $0.00051    | **~$4** gross — but the free 214 min/day covers all but ~52 min/day, so **~$0.80** actual | `initial_prompt`, `prefix`          |
-| AssemblyAI Universal-2 async      | $0.0025     | ~$20                                                                                      | keyterms, up to 1,000               |
-| OpenAI `gpt-transcribe`           | $0.0045     | ~$36                                                                                      | `prompt`, `keywords`                |
-| Deepgram Nova-3 + keyterms        | $0.0056     | ~$45                                                                                      | keyterms, up to 100                 |
+| Option                            | $/audio-min | monthly at 133 hr                                                                        | biasing                             |
+| --------------------------------- | ----------- | ---------------------------------------------------------------------------------------- | ----------------------------------- |
+| Web Speech API                    | $0          | $0                                                                                       | `phrases`, desktop Chrome 142+ only |
+| Workers AI whisper-large-v3-turbo | $0.00051    | **~$4** gross, but the free 214 min/day covers all but ~52 min/day, so **~$0.80** actual | `initial_prompt`, `prefix`          |
+| AssemblyAI Universal-2 async      | $0.0025     | ~$20                                                                                     | keyterms, up to 1,000               |
+| OpenAI `gpt-transcribe`           | $0.0045     | ~$36                                                                                     | `prompt`, `keywords`                |
+| Deepgram Nova-3 + keyterms        | $0.0056     | ~$45                                                                                     | keyterms, up to 100                 |
 
 The costs are all small. **Choose on accuracy and on how well the biasing
 mechanism suits a scoring app, not on price.**
@@ -758,7 +758,7 @@ answer changes the design:
    under `continuous` + `interimResults`? Log `result.length` in `onresult`.
 2. **Does on-device work on this Mac?**
    `await SpeechRecognition.available({ langs:['en-US'], processLocally:true })`
-   — and if `"downloadable"`, does `install()` actually complete? (§2.3 warns it
+   , and if `"downloadable"`, does `install()` actually complete? (§2.3 warns it
    may not.)
 3. **Does `phrases` work without `processLocally`** in Chrome 151? Set phrases,
    leave `processLocally` false, and see whether `start()` succeeds and whether
@@ -774,47 +774,47 @@ answer changes the design:
 
 ## Sources
 
-- [MDN — Using the Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API)
-- [MDN — SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
-- [MDN — SpeechRecognition.phrases](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/phrases)
-- [MDN — SpeechRecognitionPhrase.boost](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognitionPhrase/boost)
-- [MDN — SpeechRecognition.processLocally](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/processLocally)
-- [MDN — SpeechRecognition.install()](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/install_static)
-- [MDN browser-compat-data — api/SpeechRecognition.json](https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/SpeechRecognition.json)
-- [W3C/WebAudio — Web Speech API specification](https://webaudio.github.io/web-speech-api/)
-- [W3C explainer — contextual biasing](https://github.com/WebAudio/web-speech-api/blob/main/explainers/contextual-biasing.md)
-- [W3C explainer — on-device speech recognition](https://github.com/WebAudio/web-speech-api/blob/main/explainers/on-device-speech-recognition.md)
-- [Chrome for Developers — Voice driven web apps](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api)
+- [MDN, Using the Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API)
+- [MDN, SpeechRecognition](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
+- [MDN, SpeechRecognition.phrases](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/phrases)
+- [MDN, SpeechRecognitionPhrase.boost](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognitionPhrase/boost)
+- [MDN, SpeechRecognition.processLocally](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/processLocally)
+- [MDN, SpeechRecognition.install()](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/install_static)
+- [MDN browser-compat-data, api/SpeechRecognition.json](https://raw.githubusercontent.com/mdn/browser-compat-data/main/api/SpeechRecognition.json)
+- [W3C/WebAudio, Web Speech API specification](https://webaudio.github.io/web-speech-api/)
+- [W3C explainer, contextual biasing](https://github.com/WebAudio/web-speech-api/blob/main/explainers/contextual-biasing.md)
+- [W3C explainer, on-device speech recognition](https://github.com/WebAudio/web-speech-api/blob/main/explainers/on-device-speech-recognition.md)
+- [Chrome for Developers, Voice driven web apps](https://developer.chrome.com/blog/voice-driven-web-apps-introduction-to-the-web-speech-api)
 - [Chrome 142 release notes](https://developer.chrome.com/release-notes/142)
-- [blink-dev — Intent to Ship: Web Speech API contextual biasing](https://www.mail-archive.com/blink-dev@chromium.org/msg14350.html)
-- [Chrome Platform Status — Web Speech API contextual biasing](https://chromestatus.com/feature/5225615177023488)
-- [chromium-html5 — SpeechGrammarList working?](https://groups.google.com/a/chromium.org/g/chromium-html5/c/wHhkRzshYzw)
-- [chromium-dev — Google Speech API: webkitSpeechGrammarList](https://groups.google.com/a/chromium.org/g/chromium-dev/c/y0TO8MI10LI)
-- [chromium-html5 — Web Speech API limit of 60 seconds?](https://groups.google.com/a/chromium.org/g/chromium-html5/c/s2XhT-Y5qAc)
-- [chromium-dev — Raise Quota at Speech API?](https://groups.google.com/a/chromium.org/g/chromium-dev/c/TJRsxtxkB_Y)
-- [Chromium issue 444393111 — available({processLocally}) broken on macOS](https://issues.chromium.org/issues/444393111)
-- [Chromium issue 40324711 — continuous recognition broken on Android](https://issues.chromium.org/issues/40324711)
-- [brave-browser#55414 — on-device SpeechRecognition hangs "downloading"](https://github.com/brave/brave-browser/issues/55414)
-- [WebKit/Documentation#120 — interimResults on iOS](https://github.com/WebKit/Documentation/issues/120)
-- [lilting.ch — How to Stabilize the WebSpeech API on iOS](https://lilting.ch/en/articles/ios-webspeech-api-tips)
-- [WebKit blog — MediaRecorder API](https://webkit.org/blog/11353/mediarecorder-api/)
-- [transformers.js — repository](https://github.com/huggingface/transformers.js/)
-- [HF blog — Transformers.js v3](https://www.huggingface.co/blog/transformersjs-v3)
-- [transformers.js#894 — Whisper WebGPU vs WASM performance](https://github.com/huggingface/transformers.js/issues/894)
-- [transformers.js#923 — WhisperModel initial_prompt](https://github.com/xenova/transformers.js/issues/923)
-- [transformers.js#1028 — Supports Whisper prompt and prefix](https://github.com/huggingface/transformers.js/issues/1028)
-- [transformers.js PR#1540 — prompt_ids support (open)](https://github.com/huggingface/transformers.js/pull/1540)
-- [transformers.js PR#1099 — Moonshine ASR support](https://github.com/huggingface/transformers.js/pull/1099)
-- [HF — onnx-community/whisper-tiny.en ONNX files](https://huggingface.co/onnx-community/whisper-tiny.en/tree/main/onnx)
-- [HF — onnx-community/whisper-base.en ONNX files](https://huggingface.co/onnx-community/whisper-base.en/tree/main/onnx)
-- [HF — onnx-community/moonshine-base-ONNX](https://huggingface.co/onnx-community/moonshine-base-ONNX)
-- [vad-web — browser user guide](https://docs.vad.ricky0123.com/user-guide/browser/)
+- [blink-dev, Intent to Ship: Web Speech API contextual biasing](https://www.mail-archive.com/blink-dev@chromium.org/msg14350.html)
+- [Chrome Platform Status, Web Speech API contextual biasing](https://chromestatus.com/feature/5225615177023488)
+- [chromium-html5, SpeechGrammarList working?](https://groups.google.com/a/chromium.org/g/chromium-html5/c/wHhkRzshYzw)
+- [chromium-dev, Google Speech API: webkitSpeechGrammarList](https://groups.google.com/a/chromium.org/g/chromium-dev/c/y0TO8MI10LI)
+- [chromium-html5, Web Speech API limit of 60 seconds?](https://groups.google.com/a/chromium.org/g/chromium-html5/c/s2XhT-Y5qAc)
+- [chromium-dev, Raise Quota at Speech API?](https://groups.google.com/a/chromium.org/g/chromium-dev/c/TJRsxtxkB_Y)
+- [Chromium issue 444393111, available({processLocally}) broken on macOS](https://issues.chromium.org/issues/444393111)
+- [Chromium issue 40324711, continuous recognition broken on Android](https://issues.chromium.org/issues/40324711)
+- [brave-browser#55414, on-device SpeechRecognition hangs "downloading"](https://github.com/brave/brave-browser/issues/55414)
+- [WebKit/Documentation#120, interimResults on iOS](https://github.com/WebKit/Documentation/issues/120)
+- [lilting.ch, How to Stabilize the WebSpeech API on iOS](https://lilting.ch/en/articles/ios-webspeech-api-tips)
+- [WebKit blog, MediaRecorder API](https://webkit.org/blog/11353/mediarecorder-api/)
+- [transformers.js, repository](https://github.com/huggingface/transformers.js/)
+- [HF blog, Transformers.js v3](https://www.huggingface.co/blog/transformersjs-v3)
+- [transformers.js#894, Whisper WebGPU vs WASM performance](https://github.com/huggingface/transformers.js/issues/894)
+- [transformers.js#923, WhisperModel initial_prompt](https://github.com/xenova/transformers.js/issues/923)
+- [transformers.js#1028, Supports Whisper prompt and prefix](https://github.com/huggingface/transformers.js/issues/1028)
+- [transformers.js PR#1540, prompt_ids support (open)](https://github.com/huggingface/transformers.js/pull/1540)
+- [transformers.js PR#1099, Moonshine ASR support](https://github.com/huggingface/transformers.js/pull/1099)
+- [HF, onnx-community/whisper-tiny.en ONNX files](https://huggingface.co/onnx-community/whisper-tiny.en/tree/main/onnx)
+- [HF, onnx-community/whisper-base.en ONNX files](https://huggingface.co/onnx-community/whisper-base.en/tree/main/onnx)
+- [HF, onnx-community/moonshine-base-ONNX](https://huggingface.co/onnx-community/moonshine-base-ONNX)
+- [vad-web, browser user guide](https://docs.vad.ricky0123.com/user-guide/browser/)
 - [snakers4/silero-vad](https://github.com/snakers4/silero-vad)
-- [Cloudflare — Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
-- [Cloudflare — whisper-large-v3-turbo model](https://developers.cloudflare.com/workers-ai/models/whisper-large-v3-turbo/)
-- [Deepgram — pricing](https://deepgram.com/pricing)
-- [Deepgram — Keyterm Prompting](https://developers.deepgram.com/docs/keyterm)
-- [AssemblyAI — pricing](https://www.assemblyai.com/pricing)
-- [OpenAI — API pricing](https://developers.openai.com/api/docs/pricing)
-- [OpenAI — Create transcription reference](https://developers.openai.com/api/reference/resources/audio/subresources/transcriptions/methods/create)
-- [arXiv:2410.18363 — Contextual Biasing for Whisper without fine-tuning](https://arxiv.org/html/2410.18363)
+- [Cloudflare, Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)
+- [Cloudflare, whisper-large-v3-turbo model](https://developers.cloudflare.com/workers-ai/models/whisper-large-v3-turbo/)
+- [Deepgram, pricing](https://deepgram.com/pricing)
+- [Deepgram, Keyterm Prompting](https://developers.deepgram.com/docs/keyterm)
+- [AssemblyAI, pricing](https://www.assemblyai.com/pricing)
+- [OpenAI, API pricing](https://developers.openai.com/api/docs/pricing)
+- [OpenAI, Create transcription reference](https://developers.openai.com/api/reference/resources/audio/subresources/transcriptions/methods/create)
+- [arXiv:2410.18363, Contextual Biasing for Whisper without fine-tuning](https://arxiv.org/html/2410.18363)

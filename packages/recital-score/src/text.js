@@ -15,7 +15,7 @@
  * "eagle's" are one word here. That is not a leniency so much as the only
  * defensible reading: a member reciting a passage aloud does not pronounce an
  * apostrophe, and one typing it cannot tell from the sound of the verse where
- * it belongs. It also closes a straight-vs-curly trap — ESV text carries the
+ * it belongs. It also closes a straight-vs-curly trap, ESV text carries the
  * typographic ’ (already stripped), while a keyboard produces ', so "eagles’"
  * and "eagles'" used to grade as different words. */
 export const norm = (s) =>

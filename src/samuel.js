@@ -1,8 +1,8 @@
 /* Samuel mode: getting ready for the 1 and 2 Samuel test.
  *
  * This is the one part of the app that is not about memorizing a verse. The
- * test on the thirtieth of September is over the *books* — who did what, where
- * it happened, and in which chapter — so what it drills is a question bank
+ * test on the thirtieth of September is over the *books*, who did what, where
+ * it happened, and in which chapter, so what it drills is a question bank
  * (data/samuel.js) rather than the passage set, and what it tracks is which
  * questions a member keeps getting wrong.
  *
@@ -36,7 +36,7 @@ export function daysUntil(dateStr = TEST_DATE, now = Date.now()) {
  *
  * A round is drawn from the bank rather than walked through it in order, and
  * the draw is weighted by what the member has got wrong before. `record` is a
- * map of question id to `{ right, wrong, last }` — small enough to keep in
+ * map of question id to `{ right, wrong, last }`, small enough to keep in
  * localStorage beside the passage progress, and never merged into it. */
 
 export const ROUND_SIZE = 10;
@@ -44,7 +44,7 @@ export const ROUND_SIZE = 10;
 /* Scoring a question's claim on the next round.
  *
  * A question answered wrongly is worth asking again; one answered rightly three
- * times running is not, at least not yet. The weight is deliberately simple —
+ * times running is not, at least not yet. The weight is deliberately simple,
  * misses count double what hits discount, and an unseen question sits between
  * the two, so a first pass covers new ground before it starts drilling. */
 export function weightOf(stat) {
@@ -134,7 +134,7 @@ export function readiness(record = {}, bank = SAMUEL_QUESTIONS) {
   return { held, seen, total: bank.length, pct: bank.length ? Math.round((held / bank.length) * 100) : 0 };
 }
 
-/* The chapters a member is weakest on, worst first — what to read tonight.
+/* The chapters a member is weakest on, worst first, what to read tonight.
  * Only chapters actually asked about are ranked, and a chapter nobody has been
  * asked about yet is not a weakness, it is simply unmet. */
 export function weakChapters(record = {}, bank = SAMUEL_QUESTIONS, limit = 5) {

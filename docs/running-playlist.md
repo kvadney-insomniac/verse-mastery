@@ -1,15 +1,15 @@
-# Running Playlist — Scripture Songs for Verse Mastery
+# Running Playlist, Scripture Songs for Verse Mastery
 
 Word-for-word (or near word-for-word) Spotify scripture songs matched to the app's
 memory passages (`data/passages.js`), picked for memorizing while running or driving.
 Machine-readable version: `data/run-playlist.js` (`RUN_PLAYLIST`).
 
 **Headline entry:** Emily's [Psalm Scripture Memory Songs playlist](https://open.spotify.com/playlist/2J256T9x2D6ysT1zOwpNyE)
-(verified) — it already covers all six psalms-category passages (Psalm 1, 8, 16, 23, 32,
+(verified), it already covers all six psalms-category passages (Psalm 1, 8, 16, 23, 32,
 37:1-9) plus Isaiah 9 from the deep-track category, in multiple styles per psalm.
 
 **Link policy:** `verified` entries are real Spotify URLs seen during research. Everything
-else uses a Spotify search URL (`open.spotify.com/search/...`) — those always resolve and
+else uses a Spotify search URL (`open.spotify.com/search/...`), those always resolve and
 avoid guessing track IDs.
 
 ## The playlist
@@ -32,7 +32,7 @@ avoid guessing track IDs.
 | Psalm 37:1-9            | Psalm 37:1-6                                              | Scripture to Music                          | mellow | [search](https://open.spotify.com/search/Scripture%20to%20Music%20Psalm%2037)                                          |
 | Isaiah 9:1-7            | Unto Us a Son is Given (Isaiah 9:6)                       | The Life Verse Project                      | upbeat | [search](https://open.spotify.com/search/The%20Life%20Verse%20Project%20Unto%20Us%20a%20Son%20is%20Given%20Isaiah%209) |
 | Isaiah 9:1-7            | Isaiah 9:6-7                                              | The Corner Room                             | mellow | [search](https://open.spotify.com/search/The%20Corner%20Room%20Isaiah%209)                                             |
-| Psalm 46:10             | Psalm 46 (Lord of Hosts) — Psalms, Vol. 2                 | Shane & Shane                               | upbeat | [verified](https://open.spotify.com/album/6pwAGIb6tyzhbsxmEeoTYu)                                                      |
+| Psalm 46:10             | Psalm 46 (Lord of Hosts), Psalms, Vol. 2                  | Shane & Shane                               | upbeat | [verified](https://open.spotify.com/album/6pwAGIb6tyzhbsxmEeoTYu)                                                      |
 | Psalm 34:8-9            | Psalm 34 (Taste and See)                                  | Shane & Shane                               | upbeat | [search](https://open.spotify.com/search/Shane%20and%20Shane%20Psalm%2034%20Taste%20and%20See)                         |
 | Proverbs 3:5-6          | Trust in the Lord (Proverbs 3:5-6)                        | Seeds Family Worship                        | upbeat | [search](https://open.spotify.com/search/Seeds%20Family%20Worship%20Trust%20in%20the%20Lord%20Proverbs%203)            |
 | Joshua 1:7-9            | Be Strong (Joshua 1:9)                                    | Seeds Family Worship                        | hype   | [search](https://open.spotify.com/search/Seeds%20Family%20Worship%20Be%20Strong%20Joshua%201%209)                      |
@@ -61,35 +61,35 @@ avoid guessing track IDs.
 
 ## Who covers what (against the app's actual refs)
 
-- **Emily's playlist (Emily Kim)** — all 6 psalms-category passages + Isaiah 9:1-7 (dt).
+- **Emily's playlist (Emily Kim)**, all 6 psalms-category passages + Isaiah 9:1-7 (dt).
   Mines tracks from Bible Memory Songs, The Life Verse Project, Zac Fitzsimmons,
   The Corner Room, Eden Scripture Songs, See What Love!, Whole Word Music,
   Seeds Kids Worship, Scripture to Music.
-- **Whole Word Music** — whole chapters, ESV, word-for-word, in multiple genres per
+- **Whole Word Music**, whole chapters, ESV, word-for-word, in multiple genres per
   chapter (Rap / Lo-Fi / 90's Alternative / Acoustic). The **Psalm 32 Rap** version is the
   best genuine "hype while running" find of the research.
-- **Seeds Family Worship / Seeds Kids Worship** — the largest word-for-word catalog;
+- **Seeds Family Worship / Seeds Kids Worship**, the largest word-for-word catalog;
   confirmed titles include "Do Not Be Anxious" (Phil 4:6-7), "Be Strong" (Josh 1:9),
   "Hope And A Future" (Jer 29:11), plus Psalm 23. Their site has a searchable
   Scripture Reference Song List (seedskidsworship.com/scripture-reference-song-list/)
   worth mining for more core refs. Mostly upbeat, kid-energy but very runnable.
-- **The Corner Room** — verse-perfect ESV settings; verified tracks for Psalm 32,
+- **The Corner Room**, verse-perfect ESV settings; verified tracks for Psalm 32,
   Philippians 4:8-9, Romans 8:38-39. Their _Remember and Proclaim Vol. 2_ album also
-  covers Isaiah 40, Jeremiah 29, Zephaniah 3, Psalm 51, Hebrews 12 — all app refs.
+  covers Isaiah 40, Jeremiah 29, Zephaniah 3, Psalm 51, Hebrews 12, all app refs.
   Vibe is acoustic/mellow: better for driving than sprinting.
-- **Shane & Shane** — _Psalms_ / _Psalms, Vol. 2_ / _Psalms Live_ albums (verified album
+- **Shane & Shane**, _Psalms_ / _Psalms, Vol. 2_ / _Psalms Live_ albums (verified album
   links). "Psalm 46 (Lord of Hosts)" is anthemic and matches Psalm 46:10; Psalm 23 and
   Psalm 34 also match app refs. Near word-for-word choruses rather than strict settings.
-- **The Verses Project** — word-for-word memory songs (Romans 12:1-2, Galatians 2:20
+- **The Verses Project**, word-for-word memory songs (Romans 12:1-2, Galatians 2:20
   match app refs); catalog patchy on Spotify, hence search links.
-- **Slugs & Bugs** — Sing the Bible series; Deuteronomy 6:4-5 and other core refs.
-- **Skipped:** Hidden In My Heart (Scripture Lullabies) — word-for-word but lullaby
-  tempo, wrong vibe for running. Isaiah 41:10 songs — that ref is not in the app's data.
+- **Slugs & Bugs**, Sing the Bible series; Deuteronomy 6:4-5 and other core refs.
+- **Skipped:** Hidden In My Heart (Scripture Lullabies), word-for-word but lullaby
+  tempo, wrong vibe for running. Isaiah 41:10 songs, that ref is not in the app's data.
 
 ## Suggested next steps
 
 1. Build a real Spotify playlist: start from Emily's playlist, then resolve each search
-   URL to a concrete track and "Add to playlist" — 15 minutes of manual work.
+   URL to a concrete track and "Add to playlist", 15 minutes of manual work.
 2. Once track IDs are pinned, flip `verified` to `true` in `data/run-playlist.js` and swap
    search URLs for track URLs (or add a `spotifyId` field for embedding).
 3. Consider the Spotify Web API (search endpoint) to resolve search queries to track IDs

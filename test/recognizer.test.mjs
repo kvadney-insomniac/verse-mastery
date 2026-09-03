@@ -3,7 +3,7 @@
  * Everything createRecognizer() does is wiring: it reports settled phrases apart
  * from ones the browser is still revising, and it keeps the session alive across
  * the pauses Chrome ends it on. Both are worth pinning, and neither needs a
- * microphone — a stub with the same four events is enough. */
+ * microphone, a stub with the same four events is enough. */
 
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -18,7 +18,7 @@ class FakeSpeechRecognition {
   start() {
     this.started++;
     // `neverOpens` is an engine that accepts start() and then ends without ever
-    // reporting itself listening — which is exactly what Chrome's restart
+    // reporting itself listening, which is exactly what Chrome's restart
     // limiter looks like from the outside, and the only case the backoff has to
     // survive. An engine that really opens resets the backoff, as it should.
     if (this.onstart && !this.neverOpens) this.onstart();
@@ -123,7 +123,7 @@ test("settled phrases are marked as such; ones still being revised are not", () 
   });
 });
 
-test("a pause does not end the session — the member does", () => {
+test("a pause does not end the session, the member does", () => {
   withSpeech(() => {
     const clock = fakeClock();
     const { rec, engine } = wired(clock);
@@ -131,12 +131,12 @@ test("a pause does not end the session — the member does", () => {
     assert.equal(engine.started, 1);
 
     /* Chrome ends a continuous session of its own accord after silence. The
-     * member is still mid-passage, so it is started again — but never in the
+     * member is still mid-passage, so it is started again, but never in the
      * same breath. Restarting inside `onend` is the pattern Chrome's
      * rate-limiter watches for, and a session that trips it thereafter ends the
      * instant it opens, which reads as a microphone that has died. */
     engine.onend();
-    assert.equal(engine.started, 1, "not restarted synchronously — that is what trips the limiter");
+    assert.equal(engine.started, 1, "not restarted synchronously, that is what trips the limiter");
 
     clock.tick(300);
     assert.equal(engine.started, 2, "an unasked-for end is restarted, after a beat");

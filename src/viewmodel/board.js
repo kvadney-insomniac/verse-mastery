@@ -29,7 +29,7 @@ function activityDays(log, today) {
   return out;
 }
 
-/* One row of either queue: number, reference, opening words, status — the same
+/* One row of either queue: number, reference, opening words, status, the same
  * passages seen at two stages of the same journey.
  *
  * The freshness readout is the exception, and it is review's alone. A verse in

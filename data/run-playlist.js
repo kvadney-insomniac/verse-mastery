@@ -1,4 +1,4 @@
-// Generated: scripture songs for running — see docs/running-playlist.md. Search
+// Generated: scripture songs for running, see docs/running-playlist.md. Search
 // URLs are used where an exact track could not be verified on Spotify.
 export const RUN_PLAYLIST = [
   { ref: "Psalms", title: "Psalm Scripture Memory Songs (Emily's playlist)", artist: "Emily Kim", url: "https://open.spotify.com/playlist/2J256T9x2D6ysT1zOwpNyE", verified: true, vibe: "upbeat" },
@@ -17,7 +17,7 @@ export const RUN_PLAYLIST = [
   { ref: "Psalm 37:1-9", title: "Psalm 37:1-6", artist: "Scripture to Music", url: "https://open.spotify.com/search/Scripture%20to%20Music%20Psalm%2037", verified: false, vibe: "mellow" },
   { ref: "Isaiah 9:1-7", title: "Unto Us a Son is Given (Isaiah 9:6)", artist: "The Life Verse Project", url: "https://open.spotify.com/search/The%20Life%20Verse%20Project%20Unto%20Us%20a%20Son%20is%20Given%20Isaiah%209", verified: false, vibe: "upbeat" },
   { ref: "Isaiah 9:1-7", title: "Isaiah 9:6-7", artist: "The Corner Room", url: "https://open.spotify.com/search/The%20Corner%20Room%20Isaiah%209", verified: false, vibe: "mellow" },
-  { ref: "Psalm 46:10", title: "Psalm 46 (Lord of Hosts) — Psalms, Vol. 2", artist: "Shane & Shane", url: "https://open.spotify.com/album/6pwAGIb6tyzhbsxmEeoTYu", verified: true, vibe: "upbeat" },
+  { ref: "Psalm 46:10", title: "Psalm 46 (Lord of Hosts), Psalms, Vol. 2", artist: "Shane & Shane", url: "https://open.spotify.com/album/6pwAGIb6tyzhbsxmEeoTYu", verified: true, vibe: "upbeat" },
   { ref: "Psalm 34:8-9", title: "Psalm 34 (Taste and See)", artist: "Shane & Shane", url: "https://open.spotify.com/search/Shane%20and%20Shane%20Psalm%2034%20Taste%20and%20See", verified: false, vibe: "upbeat" },
   { ref: "Proverbs 3:5-6", title: "Trust in the Lord (Proverbs 3:5-6)", artist: "Seeds Family Worship", url: "https://open.spotify.com/search/Seeds%20Family%20Worship%20Trust%20in%20the%20Lord%20Proverbs%203", verified: false, vibe: "upbeat" },
   { ref: "Joshua 1:7-9", title: "Be Strong (Joshua 1:9)", artist: "Seeds Family Worship", url: "https://open.spotify.com/search/Seeds%20Family%20Worship%20Be%20Strong%20Joshua%201%209", verified: false, vibe: "hype" },

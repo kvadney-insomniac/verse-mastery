@@ -67,7 +67,7 @@ const MANIFEST = join(ROOT, "tools", "new-passages.json");
 const THROTTLE_MS = 1100;
 const BIBLE_API_THROTTLE_MS = 1200;
 /* How many times a rate-limited request is asked again before giving up, and
- * the first wait — doubling each time, so the last is around a minute. */
+ * the first wait, doubling each time, so the last is around a minute. */
 const RETRY_LIMIT = 6;
 const RETRY_BASE_MS = 2000;
 
@@ -189,7 +189,7 @@ async function fetchEsv(ref, key) {
  * data layer rests on: `text` is indexed by text.split(" "), so a newline or a
  * double space is an empty token sitting in the middle of the passage that
  * data/keywords.js, blanks.js and the recital scorer all count as a word. */
-/* A reference naming half a verse — "Isaiah 55:1-3a", "Zechariah 4:6b" — is a
+/* A reference naming half a verse, "Isaiah 55:1-3a", "Zechariah 4:6b", is a
  * convention the ESV API understands and bible-api.com does not: it answers a
  * trailing letter with a 404. Four of the shipped passages are written that
  * way, and there is no honest way to ask a service for half a verse it has no
@@ -204,7 +204,10 @@ const wholeVerses = (ref) => ref.replace(PARTIAL_VERSE, "$1");
 
 async function fetchBibleApi(ref, translation) {
   const asked = wholeVerses(ref);
-  const query = asked.trim().replace(/[–—]/g, "-").replace(/\s+/g, "+");
+  const query = asked
+    .trim()
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/\s+/g, "+");
   const url = `${BIBLE_API}/${encodeURI(query)}?translation=${encodeURIComponent(translation.id)}`;
 
   /* bible-api.com is one person's free service and it rate-limits, which a
@@ -216,7 +219,7 @@ async function fetchBibleApi(ref, translation) {
    *
    * So a 429 is not a failure, it is the service asking for room: wait, and
    * wait longer each time, and only give up once it has been asked for and
-   * refused several times over. The waits are deliberately generous — a
+   * refused several times over. The waits are deliberately generous, a
    * translation switch is a thing somebody does once, and being slow and
    * certain beats being quick and half-finished. */
   let res;
@@ -256,7 +259,7 @@ async function fetchBibleApi(ref, translation) {
     )
     .filter(Boolean);
   if (!verses.length) throw new Error(`${ref}: no verses in response`);
-  if (asked !== ref) console.log(`  … ${ref}: fetched as ${asked} — this build carries the whole verse`);
+  if (asked !== ref) console.log(`  … ${ref}: fetched as ${asked}, this build carries the whole verse`);
 
   return {
     canonical: body.reference || ref,
@@ -426,7 +429,7 @@ async function main() {
   const switching = shipped !== translation.id;
 
   console.log(
-    `Translation: ${translation.name} (${translation.abbrev})${translation.publicDomain ? "" : " — licensed"}`,
+    `Translation: ${translation.name} (${translation.abbrev})${translation.publicDomain ? "" : ", licensed"}`,
   );
   if (switching) {
     /* Said before a single request goes out, because this is the point at
@@ -434,7 +437,7 @@ async function main() {
      * descriptive on purpose: which translation a congregation recites is
      * theirs to decide, and the tool's only job is to make sure the decision
      * is made with the difference in view rather than discovered on a card. */
-    console.log(`Switching the whole set from ${shipped} — every ref will be refetched.`);
+    console.log(`Switching the whole set from ${shipped}, every ref will be refetched.`);
     console.log("The wording is what members memorize, so this changes the verses themselves, not just the source.");
     console.log('The WEB prints "Yahweh" where the ESV and KJV print "the LORD"; the ASV prints "Jehovah".');
     console.log("");
@@ -515,7 +518,7 @@ async function main() {
   console.log(`\nWrote data/passages.js: ${passages.length} passages (${added} added, ${refreshed} refreshed).`);
 
   await writeFile(TRANSLATION_JS, emitTranslation(translation, new Date().toISOString()), "utf8");
-  console.log(`Wrote data/translation.js: ${translation.id} — the footer's notice now comes from there.`);
+  console.log(`Wrote data/translation.js: ${translation.id}, the footer's notice now comes from there.`);
 
   await settleKeywords(rewritten, new Set(passages.map((p) => String(p.id))));
 }

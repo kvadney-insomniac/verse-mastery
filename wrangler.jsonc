@@ -1,10 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "verse-memory",
+  "name": "verse-mastery",
   "compatibility_date": "2026-08-14",
   // Almost a static-assets-only Worker, and deliberately still shaped like one.
   // `npm run build` assembles ./dist from index.html, src/, data/, config.js,
-  // and that tree is served untouched — every path but /api/* is answered by
+  // and that tree is served untouched, every path but /api/* is answered by
   // Cloudflare's asset layer without running a line of script.
   //
   // The one exception is the transcription route (worker/transcribe.js), which
@@ -13,7 +13,7 @@
   // static behaviour of every other path is exactly what it was, and the
   // `ASSETS` binding is how the script hands anything else straight back.
   //
-  // The worker script is NOT copied into dist/ and must not be — wrangler
+  // The worker script is NOT copied into dist/ and must not be, wrangler
   // bundles `main` from the repo itself, quite separately from
   // `assets.directory`, so scripts/build.mjs stays the static-site assembler it
   // has always been.
@@ -23,11 +23,28 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"],
   },
-  // Speech-to-text with no secret anywhere: the model is a binding rather than
-  // a key, so there is nothing in this repo, and nothing in a Worker secret,
-  // for a scanner to find at a public endpoint. That is why it is the default
-  // provider. The alternative is Groq — set TRANSCRIBE_PROVIDER=groq and
-  // `wrangler secret put GROQ_API_KEY` — and the route supports both.
+  // Which provider answers /api/transcribe, stated here rather than passed to a
+  // deploy. `--var TRANSCRIBE_PROVIDER:assemblyai` lasts exactly one deploy,
+  // and the code's own default is Workers AI whenever the `AI` binding exists
+  // (worker/transcribe.js, providerFor), so a deploy typed without the flag
+  // silently returns this Worker to Whisper. That is a difference nobody can
+  // see from the outside and nobody would think to check, which is the whole
+  // argument for it living in the file that gets committed.
+  //
+  // This deploy needs ASSEMBLYAI_API_KEY as a Worker secret, and needs it under
+  // exactly that name: `wrangler secret put ASSEMBLYAI_API_KEY`. The route
+  // refuses with `no ASSEMBLYAI_API_KEY binding` when it is missing, rather
+  // than sending nothing and reading back the 401 that gets for it.
+  "vars": {
+    "TRANSCRIBE_PROVIDER": "assemblyai",
+  },
+  // Workers AI stays the binding and stays the code's default, and the reason
+  // is worth keeping: the model is a binding rather than a key, so there is
+  // nothing in this repo, and nothing in a Worker secret, for a scanner to find
+  // at a public endpoint. It is what this Worker falls back to by deleting one
+  // line above, and it is what `npm run dev` gets. The third provider is
+  // selected the same way as the second: TRANSCRIBE_PROVIDER=groq with
+  // `wrangler secret put GROQ_API_KEY`. The route supports all three.
   "ai": {
     "binding": "AI",
   },

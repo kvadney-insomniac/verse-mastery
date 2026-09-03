@@ -2,7 +2,7 @@
  *
  * Built to be glanced at from a car dashboard, not worked: the reference and
  * the score are set very large and high-contrast, and once the session runs
- * the only control on offer is Stop. Everything else — mode, queue, start —
+ * the only control on offer is Stop. Everything else, mode, queue, start,
  * is chosen before the first press. */
 
 import { html, sx } from "../dom.js";

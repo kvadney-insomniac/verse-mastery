@@ -19,8 +19,8 @@ test("the queue is the committed verses, stalest first", () => {
   const day = 24 * 60 * 60 * 1000;
   const progress = {
     1: committedRec(NOW - 1 * day), // fresh
-    2: committedRec(NOW - 20 * day), // stale — comes first
-    3: learningRec(), // not committed — not on a run
+    2: committedRec(NOW - 20 * day), // stale, comes first
+    3: learningRec(), // not committed, not on a run
   };
   const q = calloutQueue(passages, progress, NOW);
   assert.deepEqual(

@@ -51,8 +51,8 @@ test("same() forgives a spelling, never a word", () => {
 
 /* ── Double Metaphone ─────────────────────────────────────────────────────── */
 
-/* The keys *this* port emits. The reduction is per-implementation — this
- * alphabet keeps B and P apart where Philips' own reference folds them — so a
+/* The keys *this* port emits. The reduction is per-implementation, this
+ * alphabet keeps B and P apart where Philips' own reference folds them, so a
  * change to any of these is a change to what the phonetic tier credits, which is
  * exactly why they are pinned rather than described. */
 test("Double Metaphone keys are pinned", () => {

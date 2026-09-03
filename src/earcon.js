@@ -2,7 +2,7 @@
  *
  * A hands-free session is a conversation, and a conversation nobody can see
  * needs the one thing a screen gives for free: knowing when it is your turn.
- * Speak mode had no such signal at all — the app stopped talking, the
+ * Speak mode had no such signal at all, the app stopped talking, the
  * microphone opened silently, and the member was left to guess. Guessing late
  * means the first words of the verse are said into a microphone that is already
  * listening but to a member who has not started, and guessing early means they
@@ -10,13 +10,13 @@
  * the mark is wrong, which the member reads as the app being bad at listening.
  *
  * So: a rising two-tone when the microphone opens, and a single soft low tone
- * when it closes. Rising for "go", falling for "got it" — the direction is the
+ * when it closes. Rising for "go", falling for "got it", the direction is the
  * message, and it is the same direction every telephone system has used for the
  * same two meanings for fifty years.
  *
  * They are synthesized rather than played from files for the reason the beat is
  * (see beat.js): nothing to ship, nothing to fetch, nothing to fail. This is a
- * separate module from beat.js because Speak mode has no beat — borrowing run
+ * separate module from beat.js because Speak mode has no beat, borrowing run
  * mode's audio engine to make two beeps would tie the two features together at
  * the one place they have nothing in common. */
 
@@ -27,8 +27,8 @@ export const earconSupported = () =>
  * be heard over one. Tuned by ear against the beat's own gain. */
 const GAIN = 0.22;
 
-/* The two calls, as (frequency, start offset, length) triples. Kept short —
- * a quarter of a second in total — because every millisecond of an earcon is a
+/* The two calls, as (frequency, start offset, length) triples. Kept short,
+ * a quarter of a second in total, because every millisecond of an earcon is a
  * millisecond the member is waiting to speak. */
 const OPEN = [
   { hz: 660, at: 0, dur: 0.09 },

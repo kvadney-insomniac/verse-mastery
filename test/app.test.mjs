@@ -2,7 +2,7 @@
  * reach: a review session card by card, and a test from setup to summary.
  *
  * Every other screen is a function of state that test/views.test.mjs renders
- * directly, but a sitting is a sequence — answer, advance, finish, and the
+ * directly, but a sitting is a sequence, answer, advance, finish, and the
  * progress map written at the end. Nothing is mounted here either: the instance
  * is given a synchronous stand-in for React's update queue, so an action's
  * setState lands on `state` immediately and the next action can read it. */
@@ -34,7 +34,7 @@ Object.defineProperty(globalThis, "localStorage", {
 /* A few actions reach for the DOM on purpose: App.focusBlank, following the
  * transcript down as a recitation lands, and returning focus to the recall box
  * after the voice or first-letter toggle steals it. Nothing is mounted here, so
- * there are no elements to find — a document that finds none is exactly right. */
+ * there are no elements to find, a document that finds none is exactly right. */
 Object.defineProperty(globalThis, "document", {
   configurable: true,
   value: { getElementById: () => null },
@@ -156,7 +156,7 @@ test("the latch lasts the sitting, and every card it opens is a card peeked at",
 
   assert.equal(a.state.peekStick, true, "how the member wants to work outlives the verse");
   assert.equal(a.state.showHelp, true, "so the next verse opens with its passage on screen");
-  assert.equal(a.state.peeks, 1, "which is a peek, and is charged as one — not a free read of the set");
+  assert.equal(a.state.peeks, 1, "which is a peek, and is charged as one, not a free read of the set");
 });
 
 test("switching the latch off mid-sitting leaves the rest of the cards clean", () => {
@@ -341,7 +341,7 @@ test("another exercise on a handed-in card is a live exercise", () => {
   a.actions.submitCard(1);
   const marked = a.state.progress[1];
 
-  // A review card is a committed verse, so its mark stands — but the exercise
+  // A review card is a committed verse, so its mark stands, but the exercise
   // switched to has no paper of its own and has to take answers.
   a.actions.setMode("type");
   a.actions.setTyped("late words");
@@ -362,7 +362,7 @@ test("switching exercise reopens a learn card that fell short", () => {
   assert.equal(a.state.progress[4].status, "learning", "the first attempt fell short");
 
   // What the sitting is for is still open, so the exercise switched to can be
-  // handed in — the same relaxation "Try again" makes.
+  // handed in, the same relaxation "Try again" makes.
   a.actions.setMode("scramble");
   assert.equal(a.state.results[4], undefined, "the mark is cleared so Submit is live again");
   a.actions.placeChunk(0);
@@ -453,7 +453,7 @@ test("a passage that was peeked at was not written from memory", () => {
   assert.equal(peeked.state.progress[4].status, "learning", "a passage read is not a passage recalled");
 });
 
-test("the first-letter scaffold still commits a verse in Learn — that is what Learn is for", () => {
+test("the first-letter scaffold still commits a verse in Learn, that is what Learn is for", () => {
   const scaffolded = learnSession("type", { typeFirstLetter: true });
   scaffolded.actions.submitCard(1);
   assert.equal(scaffolded.state.progress[4].status, "memorized");
@@ -493,7 +493,7 @@ test("a session remembers which kind it is", () => {
 
 test("what commits a verse is the attempt, not the kind of session it happened in", () => {
   // A review session cannot reach an uncommitted verse, so this is unreachable
-  // rather than special-cased — but the rule is about what the member
+  // rather than special-cased, but the rule is about what the member
   // demonstrated, and pinning that here keeps it from quietly acquiring a
   // dependency on which menu they came from.
   const a = app(baseState());
@@ -799,7 +799,7 @@ test("the verse is handed over, so what is recited comes out as the verse reads"
     .join(" ");
 
   say(a, spoken);
-  // Every word was right, so the box holds the verse itself — bar the closing
+  // Every word was right, so the box holds the verse itself, bar the closing
   // punctuation, which has no following word to earn it.
   assert.equal(a.state.typed, verse.text.replace(/[^\p{L}\p{N}]+$/u, ""));
 });
@@ -887,7 +887,7 @@ test("the transcript and the microphone belong to the card, not the session", ()
   const a = reciting();
   say(a, "hear O Israel");
   // An unsubmitted card is confirmed before it is walked off, recited or typed
-  // — the attempt is thrown away either way.
+  //, the attempt is thrown away either way.
   a.actions.nextCard();
   assert.equal(a.state.reviewMoveAsk, "next");
   assert.equal(a.state.typed, "Hear O Israel", "and it is still there until they say so");
@@ -929,7 +929,7 @@ test("the learn button dismisses the prompt and heads straight into learn setup"
 
 /* ── resetting the record ─────────────────────────────────────────────────── */
 
-test("resetting clears the record — in state and in storage — and only the record", () => {
+test("resetting clears the record, in state and in storage, and only the record", () => {
   const a = app(baseState({ editingProfile: true, profileDraft: { ...PROFILE }, selection: [1, 2] }));
   saved.set("mv.progress", JSON.stringify(a.state.progress));
   saved.set("mv.log", JSON.stringify(a.state.log));

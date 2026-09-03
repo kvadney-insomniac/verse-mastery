@@ -19,7 +19,7 @@ import { mulberry32 } from "../src/review.js";
 import { HOMOPHONES, MIN_FUZZY_LEN, MIN_PHONETIC_LEN, wordMatch } from "../src/wordmatch.js";
 import { passages } from "../data/passages.js";
 
-/* The fixtures below are all real passage text — the whole point of the design
+/* The fixtures below are all real passage text, the whole point of the design
  * document is that it was measured against the shipped data rather than reasoned
  * about in the abstract, and a fixture that invents a passage would be a test
  * protecting nothing. */
@@ -47,13 +47,13 @@ const COMMIT = 0.95;
  * the very same test files ship beside the ESV set the congregation uses. So
  * nothing below quotes a word of scripture. A false start is built from the
  * passage's own opening words, a dropped word is a word the passage actually
- * has, and a misremembered word is manufactured out of the spelling in hand —
+ * has, and a misremembered word is manufactured out of the spelling in hand,
  * which is a better test than a quoted string ever was, because what is being
  * asserted is the mechanism rather than one publisher's phrasing.
  *
- * Where a fixture needs a *feature* the shipped text may genuinely not have —
+ * Where a fixture needs a *feature* the shipped text may genuinely not have,
  * a contraction the recognizer can write, a fused word left by the fetcher, a
- * proper noun only the phonetic tier can reach — it searches the shipped set
+ * proper noun only the phonetic tier can reach, it searches the shipped set
  * for one and skips itself with a reason rather than quietly asserting
  * nothing. Every derivation below also asserts that it found what it went
  * looking for, because a mangle that silently failed to apply is a fixture
@@ -66,7 +66,7 @@ const heard = (passage) => spoken(passage).split(" ");
 const length = (passage) => passage.text.split(" ").length;
 
 /* A passage word with its punctuation still on, found by what it normalizes
- * to — which is how a fixture names the diff entry it expects without quoting
+ * to, which is how a fixture names the diff entry it expects without quoting
  * anything. */
 const raw = (passage, key) => passage.text.split(" ").find((w) => norm(w) === key);
 
@@ -83,7 +83,7 @@ const uniqueWords = (passage) => {
 /* Words the member might have said that this passage will not credit against
  * anything. They are picked by asking `wordMatch` rather than by being
  * obviously silly, so no translation can undermine a fixture by happening to
- * use one of them — and the caller is told outright if the passage leaves it
+ * use one of them, and the caller is told outright if the passage leaves it
  * short. */
 const NONSENSE = ["trombone", "penguin", "zucchini", "asteroid", "bicycle", "umbrella"];
 const foreignTo = (passage, n) => {
@@ -121,13 +121,13 @@ const misspeak = (passage, swaps) => {
 
 /* One line, and it is the line that stops a retune from silently turning every
  * substitution into a delete-plus-insert. Both readings cost the same in the
- * score — one uncredited reference word either way — but only the substitution
+ * score, one uncredited reference word either way, but only the substitution
  * reading lets the feedback say "you said *hard* where the verse says *heart*",
  * which is the feedback worth giving. It holds narrowly and deliberately. */
 test("INS + OMIT > SUB, so a one-for-one swap is reported as a substitution", () => {
   assert.ok(COST.INS + COST.OMIT > COST.SUB, `${COST.INS} + ${COST.OMIT} must exceed ${COST.SUB}`);
 
-  /* One word of the passage, said as something the passage cannot credit —
+  /* One word of the passage, said as something the passage cannot credit,
    * whichever word that turns out to be in the translation in hand. */
   const [, word] = uniqueWords(PROVERBS).findLast(([, w]) => w.length >= MIN_FUZZY_LEN);
   const [instead] = foreignTo(PROVERBS, 1);
@@ -152,7 +152,7 @@ test("the graded tiers are priced apart, so a tie prefers the exact reading", ()
 /* Each case names what the member did, what today's grader says about it, and
  * where the new scorer must land. The `today` figures are measured here rather
  * than quoted, so the regression they describe is demonstrated by the suite
- * rather than asserted by a comment — and they are compared against a bound
+ * rather than asserted by a comment, and they are compared against a bound
  * rather than pinned to a percentage, since how badly the positional grader
  * collapses depends on the wording it collapsed on. Where the mark itself can
  * be stated as arithmetic over the words the member did not recall, it is:
@@ -179,13 +179,13 @@ test("3. ★ a three-word false start no longer stalls the grader", () => {
   /* The regression test this whole module exists for, and the one fixture that
    * has to keep both halves: a member runs at the verse, stops, and starts
    * again. Measured on the ESV set the failure was 14%; on the public-domain
-   * set it is 15%. The figure is not the point and is not pinned — what is
+   * set it is 15%. The figure is not the point and is not pinned, what is
    * pinned is that the positional grader still collapses on a word-perfect
    * recital and that this one does not. */
   const opening = heard(PROVERBS).slice(0, 3).join(" ");
   const transcript = `${opening} ${spoken(PROVERBS)}`;
   const before = today(PROVERBS, transcript);
-  assert.ok(before < 0.25, `the failure this module exists to fix — the old grader says ${Math.round(before * 100)}%`);
+  assert.ok(before < 0.25, `the failure this module exists to fix, the old grader says ${Math.round(before * 100)}%`);
 
   const graded = scoreRecital(PROVERBS, transcript);
   assert.ok(graded.score >= 0.98, `scored ${graded.pct}%`);
@@ -207,7 +207,7 @@ test("4. a self-correction is one production, credited once and penalized never"
   const transcript = repair.join(" ");
 
   const before = today(PROVERBS, transcript);
-  assert.ok(before < 0.5, `today a repaired clause costs most of the verse — ${Math.round(before * 100)}%`);
+  assert.ok(before < 0.5, `today a repaired clause costs most of the verse, ${Math.round(before * 100)}%`);
   const graded = scoreRecital(PROVERBS, transcript);
   assert.equal(graded.score, 1);
   assert.equal(graded.counts.ins, repair.length - words.length, "every repeated and every wrong word absorbed");
@@ -264,9 +264,9 @@ test(
   },
 );
 
-test("6. ★ the negative control — wrong words stay wrong", () => {
+test("6. ★ the negative control, wrong words stay wrong", () => {
   /* Enough words said wrong that the commit bar's 5% margin cannot cover them,
-   * and said as words nothing in the passage will credit — the phonetic tier
+   * and said as words nothing in the passage will credit, the phonetic tier
    * included, since these are not proper nouns. Forgiveness has a floor and
    * this is where it is. */
   const wrong = Math.floor(length(PROVERBS) * 0.05) + 1;
@@ -288,7 +288,7 @@ test("6. ★ the negative control — wrong words stay wrong", () => {
 });
 
 test("7. a single dropped conjunction still clears the commit bar", () => {
-  /* One word gone — a word the passage says only once, so the omission cannot
+  /* One word gone, a word the passage says only once, so the omission cannot
    * be papered over by another copy of it further along. */
   assert.ok(length(PROVERBS) >= 20, "a passage this short would fail the bar on one word, which is not the case");
   const [, dropped] = uniqueWords(PROVERBS).find(([, w]) => w.length <= 4);
@@ -304,7 +304,7 @@ test("7. a single dropped conjunction still clears the commit bar", () => {
 });
 
 test("8. genuine recall errors score below commit", () => {
-  /* Not nonsense this time but near neighbours — the passage's own words with
+  /* Not nonsense this time but near neighbours, the passage's own words with
    * two vowels wrong, which is what half-remembering sounds like. Two edits is
    * past the edit tier, and these are ordinary words rather than names, so the
    * phonetic tier is gated shut over them however alike they sound. That gate
@@ -350,7 +350,7 @@ test("10. an empty transcript abstains", () => {
   assert.equal(graded.score, null);
 });
 
-test(`11. length is not the problem — all ${length(PSALM23)} words of Psalm 23`, () => {
+test(`11. length is not the problem, all ${length(PSALM23)} words of Psalm 23`, () => {
   assert.equal(scoreRecital(PSALM23, spoken(PSALM23)).score, 1);
 });
 
@@ -414,7 +414,7 @@ test(
   },
 );
 
-/* The one-edit tier, exercised on a word the passage repeats — the case
+/* The one-edit tier, exercised on a word the passage repeats, the case
  * voice.js documents, where the recognizer spells one word wrong and spells it
  * wrong every time. */
 const misspelling = (() => {
@@ -433,7 +433,7 @@ const misspelling = (() => {
 })();
 
 test(
-  "15. the one-edit tier — a repeated word the engine spelled wrong every time",
+  "15. the one-edit tier, a repeated word the engine spelled wrong every time",
   { skip: misspelling ? false : "the shipped passage repeats no word long enough for the edit tier" },
   () => {
     const { passage, word, said, times } = misspelling;
@@ -446,8 +446,8 @@ test(
   },
 );
 
-/* A word the fetcher left fused — the ESV set carries `eagles;they`, the
- * public-domain sets carry a hyphenated compound — and the recogniser hands
+/* A word the fetcher left fused, the ESV set carries `eagles;they`, the
+ * public-domain sets carry a hyphenated compound, and the recogniser hands
  * back the two halves it hears. `merge` is what puts them back together, so
  * the fixture goes looking for whatever fused word the shipped text has rather
  * than naming one. */
@@ -480,7 +480,7 @@ test(
 test("17. ★ a passage that once carried an embedded reference now scores whole", () => {
   /* This fixture was the sharpest example of the old grader's unfairness: Luke
    * 12:32 shipped with "Luke 12:48b" inside its own text, two words nobody
-   * recites, so a word-perfect recital was capped at 95% — at the commit bar
+   * recites, so a word-perfect recital was capped at 95%, at the commit bar
    * rather than above it. The data has since been fixed upstream, and the
    * fixture is kept because the outcome it asserts is the one that matters:
    * saying the passage correctly scores 100. */
@@ -493,7 +493,7 @@ test("17. ★ a passage that once carried an embedded reference now scores whole
 });
 
 test("18. an adjacent transposition costs one word, not two", () => {
-  /* Two neighbouring words said the other way round — whichever pair the
+  /* Two neighbouring words said the other way round, whichever pair the
    * translation puts next to each other, taken from words the passage says
    * only once so the swap cannot be read as anything else. */
   const philippians = of("Philippians 4:6-7");
@@ -508,7 +508,7 @@ test("18. an adjacent transposition costs one word, not two", () => {
   );
   assert.equal(graded.counts.sub + graded.counts.omit, 1, `swapped "${words[at]}" and "${words[at + 1]}"`);
   assert.equal(graded.score, (graded.total - 1) / graded.total, `scored ${graded.pct}%`);
-  assert.ok(graded.score >= COMMIT, "the gap asymmetry gets this for free — no Damerau term needed");
+  assert.ok(graded.score >= COMMIT, "the gap asymmetry gets this for free, no Damerau term needed");
 });
 
 /* The two proper-noun tiers need a passage carrying two names: one the edit
@@ -550,8 +550,8 @@ test(
     const graded = scoreRecital(passage, misspeak(passage, { [sounded]: heardSounded, [spelled]: heardSpelled }));
 
     assert.equal(graded.score, 1, "the friendly figure credits both");
-    assert.equal(graded.counts.edit, 1, `"${heardSpelled}" for ${spelled} by edit — strict-eligible`);
-    assert.equal(graded.counts.phonetic, 1, `"${heardSounded}" for ${sounded} by phonetics — not`);
+    assert.equal(graded.counts.edit, 1, `"${heardSpelled}" for ${spelled} by edit, strict-eligible`);
+    assert.equal(graded.counts.phonetic, 1, `"${heardSounded}" for ${sounded} by phonetics, not`);
     assert.ok(graded.strictScore < 1, `strict ${graded.strictScore.toFixed(3)}`);
     assert.equal(
       graded.strictScore,
@@ -576,7 +576,7 @@ test("20. ★ reciting twice is flagged, not silently scored", () => {
 test("★ a half-forgotten passage lands near half, not near the commit bar", () => {
   const words = spoken(PROVERBS).split(" ");
   const graded = scoreRecital(PROVERBS, words.slice(0, Math.ceil(words.length / 2)).join(" "));
-  assert.ok(graded.score > 0.45 && graded.score < 0.6, `scored ${graded.pct}% — forgiveness is not amnesty`);
+  assert.ok(graded.score > 0.45 && graded.score < 0.6, `scored ${graded.pct}%, forgiveness is not amnesty`);
   assert.ok(graded.score < COMMIT);
 
   const half = spoken(PSALM23).split(" ");
@@ -625,7 +625,7 @@ test("contractions expand, but a possessive that only looks like one does not", 
   assert.deepEqual(transcriptTokens("don't"), ["do", "not"]);
   assert.deepEqual(transcriptTokens("I'll"), ["i", "will"]);
   assert.deepEqual(transcriptTokens("let’s"), ["let", "us"], "a curly apostrophe is the same apostrophe");
-  // Isaiah 9 has "you have increased its joy" — expanding that would cost a word.
+  // Isaiah 9 has "you have increased its joy", expanding that would cost a word.
   assert.deepEqual(transcriptTokens("its"), ["its"]);
 });
 
@@ -678,7 +678,7 @@ test("optional reference words cost nothing to omit", () => {
 /* The split op has no fixture of its own, and the reason is worth pinning: the
  * contraction table expands `don't` before the aligner ever sees it, so
  * fixture 5 takes the other of the two paths §3e says should both ship. Split
- * is what catches the contractions nobody listed — and it is live code in the
+ * is what catches the contractions nobody listed, and it is live code in the
  * COST table, so it needs a test that reaches it directly or a retune could
  * break it with nothing going red. */
 test("the split op credits two reference words against one heard token", () => {
@@ -722,8 +722,8 @@ test("proper nouns are the words capitalized away from a sentence start", () => 
 });
 
 test("no shipped passage carries a scripture reference inside its own text", () => {
-  /* Four of them once did — Isaiah 54:2-3 carried "Isaiah 55:1-3a", and Luke
-   * 12:32 carried "Luke 12:48b" — a fetch-time leak that capped a perfect
+  /* Four of them once did, Isaiah 54:2-3 carried "Isaiah 55:1-3a", and Luke
+   * 12:32 carried "Luke 12:48b", a fetch-time leak that capped a perfect
    * recital of Luke 12:32 at 95%, below the commit bar. The data was fixed
    * upstream (the trailing references became passages of their own), so this
    * now guards the fix rather than tolerating the bug: if the fetcher ever
@@ -859,7 +859,7 @@ test("data/keywords.js indices stay valid against the diff", async () => {
 });
 
 /* The cross-passage floor. Sampled with the app's own seeded PRNG rather than
- * exhaustively, because 183 × 182 alignments is thirty-three thousand of them —
+ * exhaustively, because 183 × 182 alignments is thirty-three thousand of them,
  * and seeded rather than random so a failure is reproducible.
  *
  * This is what actually stops a scorer this forgiving from crediting the wrong
@@ -883,5 +883,5 @@ test("a passage fed a different passage's text scores low, abstains, or is flagg
     }
   }
   assert.ok(sampled > 200, "the sample really ran");
-  assert.ok(highest < 0.5, `highest unflagged cross-passage score was ${Math.round(highest * 100)}% — ${worst}`);
+  assert.ok(highest < 0.5, `highest unflagged cross-passage score was ${Math.round(highest * 100)}%, ${worst}`);
 });

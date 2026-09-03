@@ -1,8 +1,8 @@
 /* Record the whole recitation, then transcribe it in one shot.
  *
  * Written like recognizer.js: an optional overlay the app runs happily
- * without. `recordingSupported()` coming back false — or `transcribeUrl` never
- * having been configured — just means Speak mode listens the way it always
+ * without. `recordingSupported()` coming back false, or `transcribeUrl` never
+ * having been configured, just means Speak mode listens the way it always
  * has, through the browser's own streaming recognizer. Nothing here is a
  * replacement for that file; it is a second door into the same room, and
  * App.js is where the choice between them is made and visible.
@@ -14,7 +14,7 @@
  *   - Chrome desktop ends a `continuous` session of its own accord after about
  *     a minute, with no error and no ending a caller can tell from a real one.
  *     A sixty-second passage sits exactly on that line.
- *   - On Chrome for Android `continuous` is a documented no-op — MDN's compat
+ *   - On Chrome for Android `continuous` is a documented no-op, MDN's compat
  *     data records "The property can be set, but has no effect". The car is a
  *     phone, so the mode's whole use case is the one where the flag does
  *     nothing.
@@ -24,14 +24,14 @@
  *
  * None of those exist for a recorder. A MediaRecorder holds the microphone for
  * as long as it is asked to, on every platform, and the transcript arrives once
- * rather than in revisions. What is paid for it is a wait — a second or three
- * after the member stops — and Speak mode already pauses to say something after
+ * rather than in revisions. What is paid for it is a wait, a second or three
+ * after the member stops, and Speak mode already pauses to say something after
  * every recital, so the wait lands inside a gap the design had already accepted.
  *
  * **The verse is never sent.** Not from here, and not from the Worker on the
- * other end. Every "bias the recogniser toward the expected text" mechanism —
+ * other end. Every "bias the recogniser toward the expected text" mechanism,
  * Whisper's `initial_prompt` and `prefix`, Chrome's `phrases`, Deepgram's
- * keyterms — makes the engine more likely to return the expected words whether
+ * keyterms, makes the engine more likely to return the expected words whether
  * or not the member said them, which is free accuracy for a dictation app and a
  * validity bug for a scoring one. See the head of worker/transcribe.js, where
  * the rule is enforced rather than merely stated.
@@ -44,14 +44,14 @@
  * is in.
  *
  * And it fails soft, everywhere. A refused microphone reports through
- * `onError`; every other failure — a dead endpoint, a timeout, a malformed
- * body, a blob over the cap — resolves `onDone("")`, which Speak mode already
+ * `onError`; every other failure, a dead endpoint, a timeout, a malformed
+ * body, a blob over the cap, resolves `onDone("")`, which Speak mode already
  * knows how to answer (scoreRecital abstains, and the verse is read out
  * together). A hands-free loop waiting forever for a callback has ended without
  * telling anybody, at the wheel, which is the one place there is nobody free to
  * press a button.
  *
- * The pure parts — `pickMimeType`, `transcriptFrom`, `recordingRejection` — take
+ * The pure parts, `pickMimeType`, `transcriptFrom`, `recordingRejection`, take
  * plain values and are unit-tested without a window, the way speaker.js keeps
  * `pickVoice` apart from its seam. */
 
@@ -63,7 +63,7 @@
  * WebM/Opus is Chrome and Firefox; Ogg/Opus is Firefox's other spelling of it;
  * `audio/mp4` (AAC) is Safari, which supports neither of the first two and
  * costs a few times the bytes for the same speech. Whisper takes all of them.
- * Nothing supported is an honest answer and returns "" — the caller falls back
+ * Nothing supported is an honest answer and returns "", the caller falls back
  * to the streaming recognizer rather than recording something nobody can
  * decode. */
 export const MIME_PREFERENCE = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/webm", "audio/mp4"];
@@ -72,11 +72,11 @@ export const MIME_PREFERENCE = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus
  * upload small enough that the size cap below is a guard rather than a limit:
  * ninety seconds lands near 180 KB, a typical forty-second recitation near 80.
  * Recording a verse at music bitrates would cost a member on cellular real
- * money for no accuracy at all — Whisper resamples to 16 kHz regardless. */
+ * money for no accuracy at all, Whisper resamples to 16 kHz regardless. */
 export const AUDIO_BITS_PER_SECOND = 16000;
 
 /* The hard ceiling on one recording. Nothing a member recites from memory runs
- * to ninety seconds — the longest shipped passage is well under it — so this is
+ * to ninety seconds, the longest shipped passage is well under it, so this is
  * not a limit on the feature, it is the thing that stops a microphone left open
  * by a bug from posting an hour of a car to a paid endpoint. The Worker refuses
  * the same way from its own side, because a client-side cap protects nothing:
@@ -91,7 +91,7 @@ export const MAX_RECORD_MS = 90000;
 export const RECORD_GRACE_MS = 2000;
 
 /* One megabyte, matching the Worker's cap. At 16 kbps this is around eight
- * minutes of audio, so a blob that reaches it is not a long recitation — it is
+ * minutes of audio, so a blob that reaches it is not a long recitation, it is
  * a browser that ignored the bitrate hint, or a bug. Either way it is not worth
  * uploading. */
 export const MAX_UPLOAD_BYTES = 1000000;
@@ -110,7 +110,7 @@ export const STOP_TIMEOUT_MS = 1500;
 /* Is anybody speaking?
  *
  * A recorder produces no transcript while it runs, so the silence timer that
- * ends a turn has nothing to re-arm from — which is what this is for. An
+ * ends a turn has nothing to re-arm from, which is what this is for. An
  * AnalyserNode on the same stream gives a level, and a level over a floor is
  * "the member is still going", which is exactly the signal `onText` gives the
  * streaming path. It is deliberately not a voice-activity model: it cannot tell
@@ -153,8 +153,8 @@ export function pickMimeType(supported) {
  * The Worker normalises both providers to `{ text }`, and `{ result: { text } }`
  * is Workers AI's own envelope, accepted here so that pointing `transcribeUrl`
  * straight at an unwrapped endpoint during a spike still works. Everything else
- * — a string, a null, an error object, a body that was HTML because a proxy
- * returned a login page — is "" rather than a throw, because there is no caller
+ *, a string, a null, an error object, a body that was HTML because a proxy
+ * returned a login page, is "" rather than a throw, because there is no caller
  * for whom a thrown parse is better than an empty recital. */
 export function transcriptFrom(body) {
   if (!body || typeof body !== "object") return "";
@@ -171,7 +171,7 @@ export function transcriptFrom(body) {
  *
  * Pure, and checked on the way out rather than only on the way in: the cap on
  * recording length is a timer and timers can be missed, so the bytes are looked
- * at as well. "empty" is the commonest of these by far and is not a fault — it
+ * at as well. "empty" is the commonest of these by far and is not a fault, it
  * is a member who never said anything, which the loop already answers by
  * reading the verse. */
 export function recordingRejection({ bytes = 0, ms = 0 } = {}) {
@@ -198,8 +198,8 @@ function supportedMimeTypes(win) {
 }
 
 /* Asked once at startup, so no view-model ever has to question the window.
- * Three things have to be true — a recorder, a way to open the microphone, and
- * a container both ends understand — and any of them missing simply means Speak
+ * Three things have to be true, a recorder, a way to open the microphone, and
+ * a container both ends understand, and any of them missing simply means Speak
  * mode listens the way it always has. */
 export function recordingSupported() {
   if (typeof window === "undefined") return false;
@@ -210,7 +210,7 @@ export function recordingSupported() {
 
 /* Watch the level on a live stream and call back while there is sound on it.
  * Returns a function that tears the whole thing down, or null if the browser
- * would not give us an analyser — in which case the caller is on its own timer,
+ * would not give us an analyser, in which case the caller is on its own timer,
  * which is why App.js arms a ceiling per turn regardless of this. */
 function meterSound(win, stream, onSound) {
   const Ctx = win.AudioContext || win.webkitAudioContext;
@@ -257,7 +257,7 @@ function meterSound(win, stream, onSound) {
  * null, which is the same answer an unsupported browser gets and the same
  * fallback either way. `onSound` fires while there is a voice on the microphone
  * and is what the caller's silence timer re-arms from. `onError` is a microphone
- * that was refused or is not there — a failure that cannot resolve itself
+ * that was refused or is not there, a failure that cannot resolve itself
  * mid-session, so the caller stops rather than grading past it. */
 export function createTranscriber({ endpoint, onSound, onError } = {}) {
   if (!endpoint || !recordingSupported()) return null;
@@ -298,7 +298,7 @@ export function createTranscriber({ endpoint, onSound, onError } = {}) {
 
   const blobOf = () => (chunks.length ? new win.Blob(chunks, { type: mimeType }) : null);
 
-  /* POST the recording and resolve with whatever transcript came back — or with
+  /* POST the recording and resolve with whatever transcript came back, or with
    * "" for every way that can fail, which is the whole failure policy of this
    * file in one function. The timeout is the important half: a request that
    * hangs is what strands the loop. */
@@ -324,8 +324,8 @@ export function createTranscriber({ endpoint, onSound, onError } = {}) {
   };
 
   return {
-    /* Open the microphone. Asynchronous by necessity — a permission prompt sits
-     * in the middle of it — so a `stop()` that lands before the stream does
+    /* Open the microphone. Asynchronous by necessity, a permission prompt sits
+     * in the middle of it, so a `stop()` that lands before the stream does
      * still calls back, with nothing. */
     start() {
       token += 1;
@@ -368,7 +368,7 @@ export function createTranscriber({ endpoint, onSound, onError } = {}) {
     },
 
     /* The turn ending: close the recording, send it, and call back exactly once
-     * with the transcript — or with "" for every failure, since the caller is a
+     * with the transcript, or with "" for every failure, since the caller is a
      * loop that must not be left waiting. */
     stop(onDone) {
       if (stopping) return;
@@ -406,7 +406,7 @@ export function createTranscriber({ endpoint, onSound, onError } = {}) {
     },
 
     /* The caller taking control back. Nothing is uploaded and nothing calls
-     * back — see the head of the file. */
+     * back, see the head of the file. */
     cancel() {
       token += 1;
       stopping = true;

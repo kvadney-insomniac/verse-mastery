@@ -1,5 +1,5 @@
 /* The run-mode audio seam: a procedural hype beat (WebAudio) and the voice that
- * calls verses out over it (speechSynthesis). Written like recognizer.js — an
+ * calls verses out over it (speechSynthesis). Written like recognizer.js, an
  * optional overlay, and beatSupported() returning false just means the screen
  * has no beat to offer. All audio-graph code stays in this module.
  *
@@ -8,7 +8,7 @@
  * ahead of the clock with the standard lookahead pattern so a busy main thread
  * cannot stutter the loop. */
 
-/* Three presets tuned to running cadence — steps are 16ths over one bar. */
+/* Three presets tuned to running cadence, steps are 16ths over one bar. */
 export const BEAT_PRESETS = [
   {
     key: "steady",
@@ -51,7 +51,7 @@ export function speechSupported() {
 
 /* The scheduler books far further ahead than a lookahead loop normally would,
  * and that is the whole reason run mode survives being a *run*. A browser
- * throttles a background tab's timers to about once a second — and a phone in
+ * throttles a background tab's timers to about once a second, and a phone in
  * a pocket with the screen off is a background tab. Booking 120ms of audio
  * every 25ms works beautifully on screen and starves into silence the moment
  * the member puts the phone away, which is precisely when the beat matters.
@@ -60,7 +60,7 @@ export function speechSupported() {
 const LOOKAHEAD_MS = 200; // how often the scheduler wakes
 const SCHEDULE_AHEAD_S = 2.0; // how far it books notes each wake
 const BEAT_GAIN = 0.5; // audible over road noise and a pair of earbuds
-const DUCK_GAIN = 0.22; // while the voice is speaking — under it, not gone
+const DUCK_GAIN = 0.22; // while the voice is speaking, under it, not gone
 
 export function createBeat() {
   if (!beatSupported()) return null;
@@ -71,7 +71,7 @@ export function createBeat() {
    * master gain, and the bus is thrown away whenever the beat restarts. With
    * two seconds of music always booked ahead (see SCHEDULE_AHEAD_S), switching
    * preset would otherwise lay the new pattern over two seconds of the old one
-   * — notes already handed to the audio clock cannot be recalled, but a bus
+   *, notes already handed to the audio clock cannot be recalled, but a bus
    * they are playing into can be unplugged. */
   let bus = null;
   let noiseBuf = null;
@@ -165,7 +165,7 @@ export function createBeat() {
       ensure();
       preset = presetByKey(presetKey);
       bpm = wantBpm || preset.bpm;
-      /* A context created outside a gesture — or suspended by a previous Stop —
+      /* A context created outside a gesture, or suspended by a previous Stop,
        * starts silent, and `resume()` is a promise: booking notes against a
        * clock that has not started yet schedules them all in the past, which is
        * a beat that never plays. So the first note is placed once the context
@@ -205,7 +205,7 @@ export function createBeat() {
       });
     },
 
-    /* What the audio hardware actually thinks is going on — "running",
+    /* What the audio hardware actually thinks is going on, "running",
      * "suspended", "closed", or "off" where there is no context at all. It is
      * reported on the screen, because a silent run has no other symptom. */
     state() {
@@ -236,7 +236,7 @@ export function createBeat() {
 
 /* A verse is said in sentence-sized pieces, because Chrome stops speaking part
  * way through an utterance longer than about fifteen seconds and never fires
- * `onend` — which, in a loop that waits for `onend` before moving on, is not a
+ * `onend`, which, in a loop that waits for `onend` before moving on, is not a
  * clipped verse but a session that stops dead. Splitting on sentences keeps
  * every utterance well inside that, and gives the voice its punctuation back. */
 const MAX_CHUNK_CHARS = 180;
@@ -245,7 +245,7 @@ export function chunkForSpeech(text, max = MAX_CHUNK_CHARS) {
   const clean = String(text || "").trim();
   if (!clean) return [];
   if (clean.length <= max) return [clean];
-  // Sentence first, then clause, then a hard split — whichever the text offers.
+  // Sentence first, then clause, then a hard split, whichever the text offers.
   const pieces = clean.match(/[^.!?;:]+[.!?;:]*\s*/g) || [clean];
   const out = [];
   let buf = "";
@@ -280,18 +280,26 @@ export function speechMs(text) {
 }
 
 /* A token so a cancelled recitation cannot go on speaking its later chunks. */
-let speechToken = 0;
+import { networkSpeechSupported, sayOverNetwork } from "./tts.js";
 
-/* Say one line — in pieces if it is long — then call back. `onEnd` fires
+let speechToken = 0;
+/* The stop function of the clip the app's own voice is playing, held for the
+ * same reason speaker.js holds one: stopping a run has to stop the voice, and
+ * a clip left playing over the next verse is the app talking over itself. */
+let stopClip = null;
+
+/* Say one line, in pieces if it is long, then call back. `onEnd` fires
  * exactly once, whatever the browser does: an utterance that errors, or that
  * simply never reports itself finished, still moves the loop along, because a
  * hands-free session has nobody to press anything when it stalls. */
 export function speak(text, handlers = {}) {
-  const { onStart, onEnd } = typeof handlers === "function" ? { onEnd: handlers } : handlers;
+  const { onStart, onEnd, endpoint = "" } = typeof handlers === "function" ? { onEnd: handlers } : handlers;
   const done = () => {
     if (onEnd) onEnd();
   };
-  if (!speechSupported()) return done();
+  /* Either voice will do. The app's own is preferred below; this only asks
+   * whether there is any way at all to say the line. */
+  if (!speechSupported() && !networkSpeechSupported(endpoint)) return done();
 
   const chunks = chunkForSpeech(text);
   if (!chunks.length) return done();
@@ -300,9 +308,41 @@ export function speak(text, handlers = {}) {
   const mine = speechToken;
   let started = false;
 
+  /* The duck. A beat at full height under a voice is the voice lost, and the
+   * run's whole point is hearing the verse over it. Taken once per line,
+   * whichever voice reads it. */
+  const duck = () => {
+    if (started || mine !== speechToken) return;
+    started = true;
+    if (onStart) onStart();
+  };
+
   const sayChunk = (i) => {
     if (mine !== speechToken) return;
     if (i >= chunks.length) return done();
+
+    /* The app's own voice first, the browser's if it could not be reached,
+     * per line rather than per run: see src/tts.js. */
+    if (networkSpeechSupported(endpoint)) {
+      stopClip = sayOverNetwork(window, endpoint, chunks[i], (spoken) => {
+        stopClip = null;
+        if (mine !== speechToken) return;
+        if (spoken) return sayChunk(i + 1);
+        sayWithBrowser(i);
+      });
+      /* The clip starts as soon as it lands, and there is no `onstart` to wait
+       * for, so the beat ducks on the request rather than on the first word.
+       * A quarter second of a quieter beat is not a fault; a beat at full
+       * height over the first clause is. */
+      duck();
+      return;
+    }
+    sayWithBrowser(i);
+  };
+
+  const sayWithBrowser = (i) => {
+    if (mine !== speechToken) return;
+    if (!speechSupported()) return sayChunk(i + 1);
 
     const u = new window.SpeechSynthesisUtterance(chunks[i]);
     u.rate = 0.95;
@@ -315,11 +355,7 @@ export function speak(text, handlers = {}) {
       if (mine !== speechToken) return;
       sayChunk(i + 1);
     };
-    u.onstart = () => {
-      if (started || mine !== speechToken) return;
-      started = true;
-      if (onStart) onStart();
-    };
+    u.onstart = duck;
     u.onend = next;
     u.onerror = next;
     window.speechSynthesis.speak(u);
@@ -339,5 +375,7 @@ export function speak(text, handlers = {}) {
 
 export function stopSpeaking() {
   speechToken += 1;
+  if (stopClip) stopClip();
+  stopClip = null;
   if (speechSupported()) window.speechSynthesis.cancel();
 }

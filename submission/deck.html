@@ -1,0 +1,482 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    />
+    <style>
+      @page {
+        size: 13.333in 7.5in;
+        margin: 0;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        background: #0b1020;
+      }
+      body {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        color: #edeff5;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .slide {
+        width: 1280px;
+        height: 720px;
+        position: relative;
+        overflow: hidden;
+        background: #0b1020;
+        padding: 66px 80px;
+        display: flex;
+        flex-direction: column;
+        page-break-after: always;
+        break-after: page;
+      }
+      .slide:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .glow {
+        position: absolute;
+        width: 1000px;
+        height: 1000px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(240, 168, 104, 0.09) 0%, transparent 62%);
+        top: -520px;
+        left: -260px;
+      }
+      .num {
+        position: absolute;
+        right: 80px;
+        bottom: 44px;
+        font-size: 15px;
+        color: #4a5570;
+        letter-spacing: 0.1em;
+      }
+      .eyebrow {
+        font-size: 16px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #7d8aa3;
+        margin-bottom: 22px;
+        position: relative;
+      }
+      h1 {
+        font-family: "Archivo", system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 86px;
+        letter-spacing: -0.035em;
+        line-height: 0.98;
+        color: #fff;
+        position: relative;
+      }
+      h1 em {
+        font-style: normal;
+        color: #f0a868;
+      }
+      h2 {
+        font-family: "Archivo", system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 52px;
+        letter-spacing: -0.028em;
+        line-height: 1.06;
+        color: #fff;
+        margin-bottom: 28px;
+        position: relative;
+        max-width: 1000px;
+      }
+      .lead {
+        font-size: 25px;
+        line-height: 1.5;
+        color: #aeb8cc;
+        max-width: 940px;
+        position: relative;
+      }
+      .big {
+        font-family: "Archivo", system-ui, sans-serif;
+        font-weight: 800;
+        font-size: 150px;
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .bad {
+        color: #e0644b;
+      }
+      .good {
+        color: #5fbf7f;
+      }
+      .amber {
+        color: #f0a868;
+      }
+      ul {
+        list-style: none;
+        position: relative;
+      }
+      li {
+        font-size: 24px;
+        line-height: 1.5;
+        color: #c6cede;
+        margin-bottom: 20px;
+        padding-left: 34px;
+        position: relative;
+        max-width: 1020px;
+      }
+      li:before {
+        content: "▸";
+        position: absolute;
+        left: 0;
+        color: #f0a868;
+      }
+      li b {
+        color: #fff;
+        font-weight: 600;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+        position: relative;
+        margin-top: 8px;
+      }
+      .card {
+        border: 1px solid #232c46;
+        border-radius: 6px;
+        padding: 28px 30px;
+        background: rgba(255, 255, 255, 0.018);
+      }
+      .card .who {
+        font-size: 16px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #7d8aa3;
+        margin-bottom: 14px;
+      }
+      .card .why {
+        font-size: 19px;
+        line-height: 1.45;
+        color: #aeb8cc;
+        margin-top: 10px;
+      }
+      .said {
+        border-left: 3px solid #2a3350;
+        padding: 14px 0 14px 24px;
+        margin: 6px 0 34px;
+        position: relative;
+      }
+      .said .line {
+        font-size: 26px;
+        line-height: 1.4;
+      }
+      .fs {
+        color: #e0644b;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 44px;
+        position: relative;
+        margin-top: 6px;
+      }
+      .two h3 {
+        font-family: "Archivo", sans-serif;
+        font-weight: 600;
+        font-size: 26px;
+        color: #fff;
+        margin-bottom: 16px;
+      }
+      .yes {
+        color: #5fbf7f;
+      }
+      .no {
+        color: #e0644b;
+      }
+      .foot {
+        margin-top: auto;
+        border-top: 1px solid #1e2740;
+        padding-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+      }
+      .foot .l {
+        font-size: 20px;
+        color: #f0a868;
+      }
+      .pill {
+        border: 1px solid #2a3350;
+        border-radius: 999px;
+        padding: 7px 17px;
+        font-size: 16px;
+        color: #aeb8cc;
+        margin-left: 11px;
+      }
+      .note {
+        border: 1px dashed #e0644b;
+        border-radius: 6px;
+        padding: 22px 26px;
+        color: #e0644b;
+        font-size: 21px;
+        line-height: 1.45;
+        position: relative;
+        max-width: 900px;
+      }
+      .stat {
+        display: flex;
+        gap: 52px;
+        margin-top: 30px;
+        position: relative;
+      }
+      .stat div {
+      }
+      .stat .n {
+        font-family: "Archivo", sans-serif;
+        font-weight: 800;
+        font-size: 60px;
+        color: #f0a868;
+        line-height: 1;
+      }
+      .stat .k {
+        font-size: 17px;
+        color: #7d8aa3;
+        margin-top: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .tight li {
+        font-size: 20px;
+        line-height: 1.4;
+        margin-bottom: 13px;
+      }
+      .tight .stat {
+        margin-top: 20px;
+        gap: 44px;
+      }
+      .tight .stat .n {
+        font-size: 46px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 1 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">AssemblyAI Voice Agent Challenge &middot; September 2026</div>
+      <h1>Verse <em>Mastery</em></h1>
+      <div class="lead" style="margin-top: 26px">
+        A hands-free voice agent that scores what you said,<br />not what it hoped you would say.
+      </div>
+      <div class="foot">
+        <div class="l">github.com/kvadney-insomniac/verse-mastery</div>
+        <div>
+          <span class="pill">AssemblyAI</span><span class="pill">Cloudflare Workers</span><span class="pill">MIT</span>
+        </div>
+      </div>
+      <div class="num">1</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">The moment this is built around</div>
+      <h2>One recitation. Two scores.</h2>
+      <div class="said">
+        <div class="line">
+          <span class="fs">"The Lord is my&hellip;"</span> The Lord is my shepherd, I shall not want.
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="who">Naive comparison</div>
+          <div class="big bad">14%</div>
+          <div class="why">Walks transcript and text in step. Desynchronizes on word one and never recovers.</div>
+        </div>
+        <div class="card">
+          <div class="who">Sequence alignment</div>
+          <div class="big good">100%</div>
+          <div class="why">
+            Omissions expensive, insertions nearly free. Still fails a genuinely incomplete recital at 50%.
+          </div>
+        </div>
+      </div>
+      <div class="num">2</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">What it is</div>
+      <h2>A closed voice loop, with your hands on the wheel</h2>
+      <ul>
+        <li>It <b>speaks a reference</b>. You recite the passage from memory.</li>
+        <li>It <b>scores the recitation</b>, tells you how you did, and moves on.</li>
+        <li>
+          <b>No screen interaction at all.</b> Built for the car and the running trail, the two places a memorization
+          app has your attention and cannot have your hands.
+        </li>
+        <li>
+          Originally written for <b>Acts 2 Network Berkeley</b>; much of the app code is theirs, used under MIT. This
+          submission is about the scorer, the ASR architecture, and the AssemblyAI integration.
+        </li>
+      </ul>
+      <div class="num">3</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">Why not the browser's own recognizer</div>
+      <h2>Three failures nothing tunes around</h2>
+      <ul>
+        <li>
+          Chrome ends a <b>continuous session silently near 60 seconds</b>, with no error a caller can tell from a real
+          ending. A long passage sits exactly on that line.
+        </li>
+        <li>
+          On Chrome for Android <b>continuous is a documented no-op</b>. The car is a phone, so the mode's whole use
+          case is the one where the flag does nothing.
+        </li>
+        <li>Restarting a session that ended gets <b>rate limited permanently</b>.</li>
+      </ul>
+      <div class="lead" style="margin-top: 12px">
+        Record once, transcribe once. All three disappear, and the wait lands inside a gap the design already had.
+      </div>
+      <div class="num">4</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">Application of technology</div>
+      <h2>Using AssemblyAI correctly, not partially</h2>
+      <div class="two">
+        <div>
+          <h3 class="yes">Vocabulary boosting: yes</h3>
+          <div class="lead" style="font-size: 22px">
+            A server-side word list of proper nouns and archaic forms the engine lacks. Melchizedek, Zerubbabel, thy,
+            steadfast. Passed as <b style="color: #fff">word_boost</b> with <b style="color: #fff">boost_param: low</b>.
+            Fixes "cannot spell Habakkuk."
+          </div>
+        </div>
+        <div>
+          <h3 class="no">Sequence biasing: never</h3>
+          <div class="lead" style="font-size: 22px">
+            Biasing toward the expected text makes the engine return it whether or not it was said. In a scoring app
+            that is a validity bug: someone who skipped verse 3 would be told they said it.
+          </div>
+        </div>
+      </div>
+      <div class="lead" style="margin-top: 34px; font-size: 23px">
+        The route accepts audio and has <b style="color: #fff">no field a verse could be put into</b>. A rule enforced
+        by a missing parameter cannot be forgotten by a caller in a hurry.
+      </div>
+      <div class="num">5</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">The core insight</div>
+      <h2>Scoring speech is alignment, not comparison</h2>
+      <ul>
+        <li>A false start is the <b>single most common thing</b> a person does when reciting from memory.</li>
+        <li>
+          Step-wise comparison cannot survive one. <b>Asymmetric gap costs</b> can: omissions expensive, insertions
+          nearly free.
+        </li>
+        <li>
+          Disfluencies become free <b>by construction</b>, not by maintaining a filler-word list that is wrong in a new
+          language the day you ship.
+        </li>
+        <li>Shipped standalone as <b>recital-score</b>, MIT, because the problem is not specific to scripture.</li>
+      </ul>
+      <div class="num">6</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">Business value</div>
+      <h2>"Did they say the thing" is a question no ASR API answers</h2>
+      <div class="lead">
+        Every product below writes the same brittle string comparison we started with, and gets the same 14%.
+      </div>
+      <ul style="margin-top: 26px">
+        <li><b>Language learning.</b> Speaking exercises that must not credit a restart as a failure.</li>
+        <li><b>K-12 reading fluency assessment.</b> Scored aloud, at scale, by people who are not linguists.</li>
+        <li><b>Pronunciation and speech therapy.</b> Progress measured against a known target.</li>
+        <li><b>Voice-agent evals.</b> Regression testing whether an agent said what it was supposed to.</li>
+      </ul>
+      <div class="lead" style="margin-top: 22px; font-size: 22px">
+        Verse Mastery is the reference implementation. <b style="color: #f0a868">recital-score</b> is the product.
+      </div>
+      <div class="num">7</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="slide tight">
+      <div class="glow"></div>
+      <div class="eyebrow">Engineering</div>
+      <h2>One Worker, two routes, no bundler</h2>
+      <ul>
+        <li>
+          Static files, React and htm off a CDN. The <b>only server is one Cloudflare Worker</b>, because a browser
+          cannot hold an API key.
+        </li>
+        <li>
+          <b>/api/transcribe</b> is a one-line provider swap: Workers AI, Groq, or AssemblyAI, by environment variable.
+        </li>
+        <li>
+          <b>/api/speak</b> is the agent's voice, Deepgram Aura 2 on the same binding. The browser's own
+          <b>speechSynthesis</b> is a 1990s formant voice, and in a mode whose only output is a voice, that is the
+          product.
+        </li>
+        <li>
+          Both routes are POST-only, capped, and raced against a deadline. An uncontrolled proxy in front of a paid API
+          publishes the key with your billing attached.
+        </li>
+        <li>
+          Client records <b>Opus at 16 kbps</b>: a 40 second recitation is about 80 KB. Hence the pre-recorded API, not
+          the WAV-only sync endpoint.
+        </li>
+      </ul>
+      <div class="stat">
+        <div>
+          <div class="n">1,040</div>
+          <div class="k">unit tests</div>
+        </div>
+        <div>
+          <div class="n">~80 KB</div>
+          <div class="k">per recitation</div>
+        </div>
+        <div>
+          <div class="n">0</div>
+          <div class="k">accounts required</div>
+        </div>
+      </div>
+      <div class="num">8</div>
+    </div>
+
+    <!-- 9 -->
+    <div class="slide">
+      <div class="glow"></div>
+      <div class="eyebrow">Demo</div>
+      <h2>Live</h2>
+      <div class="note">
+        PLACEHOLDER. Replace with a screenshot of the deployed app mid-recital, or drop this slide and let the video
+        carry it. This is the only slide that needs the deploy.
+      </div>
+      <div class="lead" style="margin-top: 34px">
+        Repository: github.com/kvadney-insomniac/verse-mastery<br />Scorer: npm i recital-score<br />Demo: pending
+        deploy
+      </div>
+      <div class="num">9</div>
+    </div>
+  </body>
+</html>

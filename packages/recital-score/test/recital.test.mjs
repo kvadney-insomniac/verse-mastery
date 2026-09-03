@@ -56,7 +56,7 @@ const COMMIT = 0.95;
 const NONSENSE = ["trombone", "penguin", "zucchini", "asteroid", "bicycle"];
 
 /* Substituting a map of said-instead words into the transcript, asserting that
- * every one of them applied — a mangle that silently failed to apply is a
+ * every one of them applied, a mangle that silently failed to apply is a
  * fixture that passes while testing air. */
 const misspeak = (passage, swaps) => {
   const words = heard(passage);
@@ -68,7 +68,7 @@ const misspeak = (passage, swaps) => {
 
 /* One line, and it is the line that stops a retune from silently turning every
  * substitution into a delete-plus-insert. Both readings cost the same in the
- * score — one uncredited reference word either way — but only the substitution
+ * score, one uncredited reference word either way, but only the substitution
  * reading lets the feedback say "you said *hard* where the text says *heart*",
  * which is the feedback worth giving. It holds narrowly and deliberately. */
 test("★ INS + OMIT > SUB, so a one-for-one swap is reported as a substitution", () => {
@@ -135,7 +135,7 @@ test("★ a self-correction is one production, credited once and penalized never
   assert.equal(graded.counts.omit + graded.counts.sub, 0, "and nothing charged for the repair");
 });
 
-test("a leading filler is free — and it is the gap costs doing it, not the word list", () => {
+test("a leading filler is free, and it is the gap costs doing it, not the word list", () => {
   const graded = scoreRecital(SHEPHERD, `um uh ${spoken(SHEPHERD)}`);
   assert.equal(graded.score, 1);
   assert.equal(graded.heardCount, heard(SHEPHERD).length, "the disfluency is not even a token");
@@ -150,7 +150,7 @@ test("a leading filler is free — and it is the gap costs doing it, not the wor
 test("★ a genuinely half-remembered recitation lands near half, not near the bar", () => {
   const words = heard(SHEPHERD);
   const graded = scoreRecital(SHEPHERD, words.slice(0, Math.ceil(words.length / 2)).join(" "));
-  assert.ok(graded.score > 0.45 && graded.score < 0.6, `scored ${graded.pct}% — forgiveness is not amnesty`);
+  assert.ok(graded.score > 0.45 && graded.score < 0.6, `scored ${graded.pct}%, forgiveness is not amnesty`);
   assert.ok(graded.score < COMMIT);
 });
 
@@ -166,7 +166,7 @@ test("★ a forgotten clause costs exactly the words that were forgotten", () =>
   assert.ok(graded.score < COMMIT, "the whole point: forgiveness has a floor");
 });
 
-test("★ the negative control — wrong words stay wrong", () => {
+test("★ the negative control, wrong words stay wrong", () => {
   /* Enough words said wrong that the commit bar's 5% margin cannot cover them,
    * and said as words nothing in the text will credit, the phonetic tier
    * included, since none of these are proper nouns. */
@@ -220,7 +220,7 @@ test("a curated homophone is credited, and credited strictly", () => {
 /* ── the proper-noun gate on the phonetic tier ────────────────────────────── */
 
 test("★ the phonetic tier is reachable only when the reference word is a name", () => {
-  /* Ungated, key equality at two edits credits `love` for `life` — 194 such
+  /* Ungated, key equality at two edits credits `love` for `life`, 194 such
    * pairs, measured over the source app's vocabulary. Gated to proper nouns
    * there is no near neighbour for a false positive to land on: the speaker
    * either has the name or does not. */

@@ -13,15 +13,24 @@ import {
   reviewSettings,
 } from "../src/profile.js";
 
-test("isProfileComplete requires name, ministry group, gender, and class", () => {
+test("isProfileComplete requires name and ministry group, and nothing else", () => {
   assert.equal(isProfileComplete(null), false);
   assert.equal(isProfileComplete({}), false);
   assert.equal(isProfileComplete({ ministryGroup: "Kairos", gender: "Male", gradClass: 2026 }), false, "name required");
-  assert.equal(isProfileComplete({ name: "Ada Lovelace", gender: "Male", gradClass: 2026 }), false);
+  assert.equal(isProfileComplete({ name: "Ada Lovelace", gender: "Male", gradClass: 2026 }), false, "group required");
+  assert.equal(isProfileComplete({ name: "Ada Lovelace", ministryGroup: "Kairos" }), true, "the two are enough");
   assert.equal(
     isProfileComplete({ name: "Ada Lovelace", ministryGroup: "Kairos", gender: "Male", gradClass: 2026 }),
     true,
   );
+});
+
+/* The wall this took down: a stranger had to declare a gender and name a
+ * graduating class before the app would show them a verse. */
+test("gender and graduating class are optional", () => {
+  assert.equal(isProfileComplete({ name: "Ada", ministryGroup: "Small group", gender: "", gradClass: "" }), true);
+  assert.equal(isProfileComplete({ name: "Ada", ministryGroup: "Small group", gradClass: 2026 }), true, "no gender");
+  assert.equal(isProfileComplete({ name: "Ada", ministryGroup: "Small group", gender: "Female" }), true, "no class");
 });
 
 test("cleanDisplayName strips a trailing (Berk) tag", () => {
@@ -34,7 +43,8 @@ test("cleanDisplayName strips a trailing (Berk) tag", () => {
 });
 
 test("profile option lists are well-formed", () => {
-  assert.ok(MINISTRY_GROUPS.includes("Kairos") && MINISTRY_GROUPS.includes("ECM"));
+  assert.ok(MINISTRY_GROUPS.length > 1, "the picker has suggestions to offer");
+  assert.equal(MINISTRY_GROUPS.at(-1), "Other", "the catch-all stays pinned last");
   assert.equal(new Set(MINISTRY_GROUPS).size, MINISTRY_GROUPS.length, "no duplicate groups");
   assert.deepEqual(GENDERS, ["Male", "Female"]);
 });
@@ -68,7 +78,7 @@ test("mergeProfile keeps the most recently edited profile", () => {
  *
  * The rule these pin down is "a real profile is never lost to a lesser one".
  * An empty object is what both an unseeded device and a cloud document with no
- * profile field look like, and it is truthy — so it used to survive the merge
+ * profile field look like, and it is truthy, so it used to survive the merge
  * against a real profile that happened to tie on `updatedAt`, which reads to
  * the member as being asked to set up a profile they already have. */
 
@@ -82,7 +92,7 @@ test("an empty profile never displaces a real one, in either direction", () => {
 });
 
 test("a complete profile beats an incomplete one, however recently edited", () => {
-  const halfFilled = { name: "Half", ministryGroup: "Kairos", updatedAt: 9_000_000_000_000 };
+  const halfFilled = { name: "Half", updatedAt: 9_000_000_000_000 };
   assert.equal(mergeProfile(halfFilled, { ...REAL, updatedAt: 1 }).name, "Ada");
   assert.equal(mergeProfile({ ...REAL, updatedAt: 1 }, halfFilled).name, "Ada");
 });

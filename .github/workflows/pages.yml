@@ -1,4 +1,4 @@
-# Deploy the public edition to GitHub Pages — free, and with no credentials
+# Deploy the public edition to GitHub Pages, free, and with no credentials
 # beyond the repository itself.
 #
 # This build is deliberately two things at once, and both are deliberate:
@@ -7,13 +7,13 @@
 #   the public domain in the United States and needs no key, no account and
 #   nobody's permission to redistribute. The upstream project ships the ESV
 #   under Crossway's API terms, which cap what may be stored and which a fork
-#   has no licence to hand out — see README.md.
+#   has no licence to hand out, see README.md.
 #
 #   Local-only. There is no sign-in and no cloud sync. Firebase refuses an
 #   origin that is not on its authorized-domains list, and a fork's github.io
 #   address will never be on one, so rather than ship a sign-in button that
 #   cannot work, cloud sync is switched off outright. Progress lives in the
-#   visitor's own browser and goes nowhere else — which for a public demo is
+#   visitor's own browser and goes nowhere else, which for a public demo is
 #   the honest arrangement anyway: nobody signs into a stranger's app to find
 #   out whether they like it.
 #
@@ -35,8 +35,8 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
-# This branch lives in two repositories — the fork it was developed in, and the
-# public edition it was made for — and only one of them should ever publish it.
+# This branch lives in two repositories, the fork it was developed in, and the
+# public edition it was made for, and only one of them should ever publish it.
 # The fork's Pages site is somebody's private ESV instance; a KJV build landing
 # there would quietly replace the very text they are memorizing. The repository
 # check below is what makes that impossible rather than merely unlikely, and it
@@ -63,7 +63,7 @@ jobs:
           cat > config.js <<'EOF'
           /* The public edition: no church, no cloud, public-domain text. */
           window.__APP_CONFIG__ = {
-            groupName: "Public edition — King James Version",
+            groupName: "Public edition, King James Version",
             motto: "",
           };
           window.__FIREBASE_CONFIG__ = null;

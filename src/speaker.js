@@ -2,7 +2,7 @@
  *
  * Written like recognizer.js: an optional overlay the app runs happily
  * without. `speechSupported()` coming back false just means Speak mode is not
- * offered on this browser. Kept thin on purpose — what is said, and when,
+ * offered on this browser. Kept thin on purpose, what is said, and when,
  * lives with the callers; this file only knows how to say it.
  *
  * `onDone` still fires whether the utterance finished, failed, or simply went
@@ -12,21 +12,30 @@
  * mid-utterance reports `onerror` with `error: "interrupted"` rather than
  * `onend` (measured in Chromium on macOS, docs/research/tts.md §4.3), so a
  * speaker that treats every error as an ending calls back the very callback
- * that reopens the microphone and advances the queue — a Stop, or a walk off
+ * that reopens the microphone and advances the queue, a Stop, or a walk off
  * the screen, silently moved the session on with nobody there. A cancel is the
  * caller taking control back, so every callback still in flight is made inert
  * by a generation token, exactly as beat.js's `stopSpeaking()` guards run mode.
  *
  * The rest of the file is docs/research/tts.md recommendation #1: a curated
  * voice, `rate = 0.9`, an explicit `lang`, sentence-sized chunks, and a real
- * pause between them. The pure parts — `pickVoice`, `chunkForSpeech`,
- * `speechMs` — take plain values and are unit-tested without a window, the way
+ * pause between them. The pure parts, `pickVoice`, `chunkForSpeech`,
+ * `speechMs`, take plain values and are unit-tested without a window, the way
  * device.js and theme.js keep their rule apart from their seam. */
 
-export const speechSupported = () => typeof window !== "undefined" && !!window.speechSynthesis;
+/* Is there any voice at all, the app's own or the browser's?
+ *
+ * `endpoint` is `appConfig.speakUrl`. It is a parameter rather than an import
+ * because this module has never known about config, and because App.js already
+ * passes the transcriber its endpoint the same way. Called with nothing, this
+ * answers exactly what it always answered: whether the browser can speak. */
+import { networkSpeechSupported, sayOverNetwork } from "./tts.js";
+
+export const speechSupported = (endpoint) =>
+  (typeof window !== "undefined" && !!window.speechSynthesis) || networkSpeechSupported(endpoint);
 
 /* Ten per cent under the default. Scripture is syntactically strange, dense in
- * proper nouns, and — the point of the app — being memorised rather than
+ * proper nouns, and, the point of the app, being memorised rather than
  * skimmed, by a member who is driving or running. Slowing it puts the reading
  * near an audiobook narrator's 130–150 wpm. Not slower: Apple's engine
  * compresses the low end of the range so hard that 0.85 and 0.9 are
@@ -55,13 +64,13 @@ export const MAX_CHUNK_CHARS = 180;
 /* The only pause lever that actually works. Punctuation buys a flat ~400ms
  * whatever mark is used and does not stack, extra dots do nothing, and
  * splitting an utterance in two is *faster* than leaving it whole because the
- * inter-utterance gap is effectively zero (§3.2, §3.3 — all measured). So the
+ * inter-utterance gap is effectively zero (§3.2, §3.3, all measured). So the
  * space a lector leaves between clauses has to be put back by hand. 250ms is
  * the within-a-verse figure; a caller wanting the longer beat between verses
  * passes `gapMs` and gets it. */
 export const CHUNK_PAUSE_MS = 250;
 
-/* How long a line ought to take to say, with a floor for the short ones — the
+/* How long a line ought to take to say, with a floor for the short ones, the
  * ceiling the watchdog below is armed with. It is a second copy of the estimate
  * in beat.js rather than a shared import, because this file is the seam Speak
  * mode is written against and run mode's beat is not part of that contract. */
@@ -80,7 +89,7 @@ export function chunkForSpeech(text, max = MAX_CHUNK_CHARS) {
   const clean = String(text || "").trim();
   if (!clean) return [];
   if (clean.length <= max) return [clean];
-  // Sentence first, then clause, then a hard split — whichever the text offers.
+  // Sentence first, then clause, then a hard split, whichever the text offers.
   const pieces = clean.match(/[^.!?;:]+[.!?;:]*\s*/g) || [clean];
   const out = [];
   let buf = "";
@@ -107,24 +116,24 @@ export function chunkForSpeech(text, max = MAX_CHUNK_CHARS) {
 /* ------------------------------------------------------------------ voices */
 
 /* There is no quality signal anywhere on a SpeechSynthesisVoice. The object
- * carries exactly five properties — name, lang, localService, voiceURI,
- * default — and not one of them correlates with how the voice sounds. `default`
+ * carries exactly five properties, name, lang, localService, voiceURI,
+ * default, and not one of them correlates with how the voice sounds. `default`
  * is actively misleading: on this Mac it points at Samantha, which Readium
  * rates no better than *normal*. So quality has to come from a curated list of
  * names, which is what Readium's own project concluded after surveying every
- * platform: "Quality isn't algorithmically determined — it's manually curated."
+ * platform: "Quality isn't algorithmically determined, it's manually curated."
  *
  * The order below is Readium's, read out of docs/research/tts.md §1.4, with one
  * reconciliation. The table ranks Chrome desktop's network voices (`Google US
  * English` and friends) above the Apple locals on sound alone, but the prose
- * under it recommends the opposite for this app — "prefer localService: true
- * and use the network voices as a mid-tier fallback" — because those voices
+ * under it recommends the opposite for this app, "prefer localService: true
+ * and use the network voices as a mid-tier fallback", because those voices
  * need the network (a run in a canyon is silence), cut off around 200
  * characters, and fire no boundary events at all. A member memorising verses on
  * a phone is exactly who that costs, so they sit below the Apple voices that
  * always work and above the compacts nobody enjoys. */
 export const PREFERRED_VOICES = [
-  // Edge's Natural voices — the best on the web, and only ever on Edge.
+  // Edge's Natural voices, the best on the web, and only ever on Edge.
   "Microsoft AvaMultilingual Online",
   "Microsoft EmmaMultilingual Online",
   "Microsoft AndrewMultilingual Online",
@@ -144,7 +153,7 @@ export const PREFERRED_VOICES = [
   "Microsoft Libby Online",
   "Microsoft Ryan Online",
   "Microsoft Thomas Online",
-  // Google's Natural voices, on Android and ChromeOS — the system's own.
+  // Google's Natural voices, on Android and ChromeOS, the system's own.
   "Google US English 5",
   "Google US English 1",
   "Google US English 2",
@@ -188,7 +197,7 @@ export const PREFERRED_VOICES = [
   "Microsoft Hazel",
   "Microsoft Susan",
   "Microsoft George",
-  // Apple's compact Siri voices — rated *low*, but they are real speech.
+  // Apple's compact Siri voices, rated *low*, but they are real speech.
   "Aaron",
   "Martha",
   "Arthur",
@@ -197,7 +206,7 @@ export const PREFERRED_VOICES = [
   "Chrome OS UK English 7",
 ];
 
-/* Apple's joke voices. They are not bad voices, they are not voices — "Bells"
+/* Apple's joke voices. They are not bad voices, they are not voices, "Bells"
  * chimes the words and "Bad News" reads them over a funeral march. A naive
  * "first English voice" picker can and does land on one of these, which is why
  * the exclusion is absolute rather than a low rank: there is no state of the
@@ -223,7 +232,7 @@ export const NOVELTY_VOICES = [
 /* Readium's *veryLow* tier: Apple's Eloquence set and the legacy voices from
  * the era before Samantha. They speak English, and that is the most that can be
  * said for them. Between these two lists, 35 of the 47 English voices this Mac
- * exposes are ruled out (measured, §1.1) — three quarters of what a naive
+ * exposes are ruled out (measured, §1.1), three quarters of what a naive
  * picker would be choosing from. */
 export const LOW_QUALITY_VOICES = [
   "Eddy",
@@ -243,8 +252,8 @@ export const LOW_QUALITY_VOICES = [
 
 const EXCLUDED = new Set([...NOVELTY_VOICES, ...LOW_QUALITY_VOICES].map((n) => n.toLowerCase()));
 
-/* macOS hangs the locale off the end of the name — "Eddy (English (United
- * States))", and the same Eddy again for the UK — so both lists above are
+/* macOS hangs the locale off the end of the name, "Eddy (English (United
+ * States))", and the same Eddy again for the UK, so both lists above are
  * matched against the name *before* the first bracket rather than against the
  * whole of it. */
 const baseName = (name) =>
@@ -263,9 +272,9 @@ const primaryLang = (lang) => normLang(lang).split("-")[0].toLowerCase();
 
 /* Where a voice sits in the preference list, or past the end of it if it is not
  * named there. The match is a prefix rather than an equality because platforms
- * decorate the names they return in their own way — Windows appends
+ * decorate the names they return in their own way, Windows appends
  * " - English (United States)", macOS appends " (English (United Kingdom))",
- * Edge appends both — and the decoration is never the part worth ranking. The
+ * Edge appends both, and the decoration is never the part worth ranking. The
  * character after the match has to be punctuation or a space, so "Daniel"
  * cannot claim a "Danielle". */
 function preferenceRank(name) {
@@ -278,7 +287,7 @@ function preferenceRank(name) {
   return PREFERRED_VOICES.length;
 }
 
-/* Two sort keys, compared position by position — the first difference decides. */
+/* Two sort keys, compared position by position, the first difference decides. */
 function better(a, b) {
   for (let i = 0; i < a.length; i++) {
     if (a[i] !== b[i]) return a[i] < b[i];
@@ -289,7 +298,7 @@ function better(a, b) {
 /* The best voice on offer for a language, or null to let the platform choose.
  *
  * Pure: it takes plain objects shaped like a SpeechSynthesisVoice and returns
- * one of them — the array's own element, never a copy, because Chrome ignores
+ * one of them, the array's own element, never a copy, because Chrome ignores
  * an utterance whose `voice` is not an object it handed out itself.
  *
  * Four tie-breaks under the curated rank, in the order they matter. Local
@@ -300,7 +309,7 @@ function better(a, b) {
  * to second-guess. Then the order the browser listed them in, so the answer is
  * stable across calls.
  *
- * Returning null is a supported outcome and not a failure — a browser with
+ * Returning null is a supported outcome and not a failure, a browser with
  * nothing but novelty voices, or no voices at all yet, should be left to speak
  * in its own default rather than handed something worse than it. */
 export function pickVoice(voices, { lang = SPEECH_LANG } = {}) {
@@ -333,7 +342,7 @@ export function pickVoice(voices, { lang = SPEECH_LANG } = {}) {
 /* --------------------------------------------------------- the voice list */
 
 /* `getVoices()` is empty on the first synchronous call at page load and fills
- * in some time later, and the received wisdom — wait for `voiceschanged` — is
+ * in some time later, and the received wisdom, wait for `voiceschanged`, is
  * wrong in both directions. Measured (§2.1): the event did not arrive inside
  * three seconds on this machine, yet the list was fully populated by then; and
  * Safari fires it inconsistently or not at all. Code that gates on the event
@@ -341,14 +350,14 @@ export function pickVoice(voices, { lang = SPEECH_LANG } = {}) {
  * other.
  *
  * So the event is treated as an accelerator, never as a gate: poll alongside
- * it, give up after a deadline, and carry on with whatever arrived — including
+ * it, give up after a deadline, and carry on with whatever arrived, including
  * nothing. Speech is never blocked on this; a missing voice only means the
  * browser's own default speaks the line. */
 const VOICE_POLL_MS = 100;
 const VOICE_DEADLINE_MS = 2000;
 
 /* The cache is keyed to the window it was read from, because voices belong to a
- * browsing context — which also means a test can hand over a second window and
+ * browsing context, which also means a test can hand over a second window and
  * get a clean answer rather than the first one's leftovers. */
 let cache = null;
 
@@ -360,7 +369,7 @@ function cacheFor(win) {
 }
 
 /* Re-read the list. A non-empty answer replaces what we had and throws away the
- * pick made from the old one — Chrome adds its network voices late and Android
+ * pick made from the old one, Chrome adds its network voices late and Android
  * adds engine voices when a language pack finishes installing, so a list that
  * has already settled once can still get better. */
 function refresh(c) {
@@ -391,7 +400,7 @@ export function warmVoices(win = typeof window === "undefined" ? null : window) 
   const synth = win.speechSynthesis;
   /* The property rather than addEventListener: it is what every browser
    * supports and what the research reproduced with. It stays attached after the
-   * list settles, so a late arrival is picked up — the point is only never to
+   * list settles, so a late arrival is picked up, the point is only never to
    * *wait* on it. */
   synth.onvoiceschanged = () => refresh(c);
   if (refresh(c)) return;
@@ -421,15 +430,18 @@ function voiceFor(win, lang) {
 /* ---------------------------------------------------------------- speaking */
 
 export function createSpeaker(options = {}) {
-  if (!speechSupported()) return null;
+  const endpoint = options.endpoint || "";
+  if (!speechSupported(endpoint)) return null;
   const win = window;
+  /* Undefined on a browser with no speech engine, which is now a browser this
+   * speaker can still work on, because the app's own voice does not need one. */
   const synth = win.speechSynthesis;
   const defaults = { rate: RATE, lang: SPEECH_LANG, gapMs: CHUNK_PAUSE_MS, maxChars: MAX_CHUNK_CHARS, ...options };
   warmVoices(win);
 
-  /* The generation counter. Every callback that could reach the caller — an
+  /* The generation counter. Every callback that could reach the caller, an
    * `onend`, an `onerror`, a watchdog, the timer holding the pause between two
-   * chunks — checks it first, so bumping it is what makes a whole utterance
+   * chunks, checks it first, so bumping it is what makes a whole utterance
    * inert without having to find and unpick each of its handlers. */
   let token = 0;
   /* Every timer this speaker armed, so a cancel leaves nothing ticking. The
@@ -453,20 +465,28 @@ export function createSpeaker(options = {}) {
   };
 
   /* Abandon whatever is in flight. Bumping the token first is the order that
-   * matters — `synth.cancel()` fires the interrupted-utterance's `onerror`
+   * matters, `synth.cancel()` fires the interrupted-utterance's `onerror`
    * synchronously on some browsers, so the guard has to already be true. */
+  /* The stop function of whatever the network voice is playing. It is held
+   * separately from `timers` because stopping a clip is not clearing a timer,
+   * and because leaving one playing over the next line is the one failure a
+   * member would describe as the app talking over itself. */
+  let stopClip = null;
+
   const abandon = () => {
     token += 1;
     for (const t of timers) win.clearTimeout(t);
     timers.clear();
     live.clear();
+    if (stopClip) stopClip();
+    stopClip = null;
   };
 
   return {
     /* Say a line, in pieces if it is long, then call back exactly once.
      *
      * `onDone` fires whether the utterance finished, failed, or simply went
-     * quiet without saying so — the last of those is not hypothetical, and a
+     * quiet without saying so, the last of those is not hypothetical, and a
      * hands-free session that waits forever for a callback has ended without
      * telling anybody, at the wheel, which is the one place there is nobody
      * free to press a button. So every piece carries a generous ceiling and the
@@ -477,7 +497,7 @@ export function createSpeaker(options = {}) {
      * calling `onDone` at it would reopen a microphone for a session nobody is
      * in.
      *
-     * The third argument is optional and the two-argument call is unchanged —
+     * The third argument is optional and the two-argument call is unchanged,
      * App.js's `speak(text, () => …)` means what it always meant. */
     speak(text, onDone, opts = {}) {
       const cfg = { ...defaults, ...opts };
@@ -496,6 +516,35 @@ export function createSpeaker(options = {}) {
       const sayChunk = (i) => {
         if (mine !== token) return;
         if (i >= chunks.length) return done();
+
+        /* Where the chunk goes when it is finished, whichever voice read it. */
+        const after = () => {
+          if (mine !== token) return;
+          if (i + 1 >= chunks.length) return done();
+          arm(() => sayChunk(i + 1), cfg.gapMs);
+        };
+
+        /* The app's own voice first, the browser's only if it could not be
+         * reached. The fallback is per chunk rather than per session: one
+         * dropped request should not sentence the rest of a drive to the
+         * robot. */
+        if (networkSpeechSupported(endpoint, win)) {
+          stopClip = sayOverNetwork(win, endpoint, chunks[i], (spoken) => {
+            stopClip = null;
+            if (mine !== token) return;
+            if (spoken) return after();
+            sayWithBrowser(i, after);
+          });
+          return;
+        }
+        sayWithBrowser(i, after);
+      };
+
+      const sayWithBrowser = (i, after) => {
+        if (mine !== token) return;
+        /* No engine and no route: there is no way to say this line, and a
+         * caller waiting on a callback must still be released. */
+        if (!synth) return after();
 
         const u = new win.SpeechSynthesisUtterance(chunks[i]);
         const voice = voiceFor(win, cfg.lang);
@@ -519,11 +568,10 @@ export function createSpeaker(options = {}) {
             timers.delete(watchdog);
           }
           if (mine !== token) return;
-          if (i + 1 >= chunks.length) return done();
-          /* The pause a lector leaves. It has to be a real timer because the
-           * gap the browser leaves between two utterances is zero — see
-           * CHUNK_PAUSE_MS. */
-          arm(() => sayChunk(i + 1), cfg.gapMs);
+          /* The pause a lector leaves is armed by `after`, which both voices
+           * share; the gap the browser leaves between two utterances is zero,
+           * see CHUNK_PAUSE_MS. */
+          after();
         };
         u.onend = next;
         u.onerror = next;
@@ -539,7 +587,7 @@ export function createSpeaker(options = {}) {
     cancel() {
       abandon();
       try {
-        synth.cancel();
+        if (synth) synth.cancel();
       } catch {
         /* a browser with no voice engine behind the API */
       }
@@ -547,7 +595,7 @@ export function createSpeaker(options = {}) {
   };
 }
 
-/* Warm the list as soon as the module is imported, which is app start — see
+/* Warm the list as soon as the module is imported, which is app start, see
  * warmVoices. Guarded, so importing this file in node (the test suite) does
  * nothing at all. */
 warmVoices();

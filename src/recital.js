@@ -8,7 +8,7 @@
  * further ahead than the lookahead reaches, misses, and so fails to advance the
  * cursor, which guarantees the next word misses too. Measured on the real data,
  * a word-perfect recital of Proverbs 3:5-6 preceded by the three-word false
- * start "trust in the…" — which is simply what recitation sounds like — scores
+ * start "trust in the…", which is simply what recitation sounds like, scores
  * **14%**. That is not a tuning problem, it is a cliff at exactly LOOKAHEAD,
  * and it is why this module exists.
  *
@@ -16,7 +16,7 @@
  * sequences, and **the asymmetry of its gap costs is the whole design**: a
  * reference word the member failed to produce costs a full point, while a heard
  * word the passage never wanted costs almost nothing. Run the false start
- * through it — three repeated words absorbed as insertions cost 3 × 0.20 =
+ * through it, three repeated words absorbed as insertions cost 3 × 0.20 =
  * 0.60, against 3 × 1.00 = 3.00 for the alternative of substituting them
  * against `Lord with all` and then shifting back. The cheap path wins by a
  * factor of five, and it wins for every disfluency of every length. Fillers,
@@ -24,7 +24,7 @@
  * become free *by construction*. **No filler word-list is doing that work.**
  *
  * Global, not local, and that matters: Smith–Waterman would find the
- * best-matching *substring*, which is precisely wrong here — a member who
+ * best-matching *substring*, which is precisely wrong here, a member who
  * recites the first third of Psalm 23 beautifully and then stops must not score
  * 100% on a well-aligned fragment. The denominator is the whole passage, so the
  * alignment has to span the whole passage.
@@ -37,14 +37,14 @@
  * the alignment, discard the metric.
  *
  * Two things the score is not allowed to be. It is never a number about a
- * transcript that carries no signal — a three-token transcript scoring 3% is a
+ * transcript that carries no signal, a three-token transcript scoring 3% is a
  * microphone that cut out, not a failure, and asserting a figure about it is a
  * lie (see the abstention rule below). And it is never inflated by talking
  * more: each reference word can be credited at most once, so no amount of extra
  * speech can push the score past what was actually produced. A recital carrying
  * half again as many tokens as the passage has words is flagged `verbose`
- * rather than adjusted, and it is the *caller's* business — a commit gate's,
- * say — to decide that such a transcript is not evidence.
+ * rather than adjusted, and it is the *caller's* business, a commit gate's,
+ * say, to decide that such a transcript is not evidence.
  *
  * Pure: no DOM, no timers, no data imports. Everything it knows about a passage
  * it works out from `passage.text` at call time. */
@@ -56,7 +56,7 @@ import { wordMatch } from "./wordmatch.js";
  *
  * Substitution and omission cost the same, and that is a judgement rather than
  * an oversight: for a memorization app "said nothing" and "said the wrong
- * thing" are one failure — the word was not recalled — and weighting one above
+ * thing" are one failure, the word was not recalled, and weighting one above
  * the other would need an argument for which is worse, of which there is none.
  * They differ only in what the feedback can say, which is why the diff carries
  * the operation kind.
@@ -67,14 +67,14 @@ import { wordMatch } from "./wordmatch.js";
  *
  * **Insertion is cheap but not free**, for three reasons. A zero would make the
  * aligner indifferent between many equal-cost paths, which makes the traceback
- * — and so the diff the member is shown — arbitrary. It would remove the
+ *, and so the diff the member is shown, arbitrary. It would remove the
  * tie-break that keeps matched runs contiguous, which is what makes a diff
  * readable. And it would let a transcript grow without bound at no cost.
  *
  * One inequality has to hold and `test/recital.test.mjs` pins it:
  * `INS + OMIT > SUB`, i.e. 1.20 > 1.00. Both readings of a genuine one-for-one
- * word swap cost the same in the *score* — one uncredited reference word either
- * way — but only the substitution reading lets the feedback say "you said
+ * word swap cost the same in the *score*, one uncredited reference word either
+ * way, but only the substitution reading lets the feedback say "you said
  * *hard* where the verse says *heart*", and that is the feedback worth giving.
  * It holds narrowly and on purpose; a retune must not quietly break it. */
 export const COST = {
@@ -112,14 +112,14 @@ const CREDIT_TIERS = new Set(["exact", "homophone", "edit", "phonetic"]);
  * them accidentally *matching*. A two-letter "um" is gated out of every loose
  * tier by length alone, but "wait" is four letters and would one-edit-match
  * `want` in "I shall not want", and "right" would reach `night`, `might` and
- * `light`. So real words are deliberately left off it — "wait", "sorry" and
+ * `light`. So real words are deliberately left off it, "wait", "sorry" and
  * "no" are sometimes in the verse, and the aligner absorbs them correctly as
  * insertions anyway.
  *
  * The same reasoning is what makes the strip **passage-aware** rather than
  * absolute: a word the verse itself contains is never an accident. Psalm 34:8
  * opens "Oh, taste and see", and stripping that "oh" cost a word-perfect
- * recital of it two words — which the "every passage recited perfectly scores
+ * recital of it two words, which the "every passage recited perfectly scores
  * 1.00" property test caught. A list of non-words is only a list of non-words
  * until the canon disagrees, and the canon is the authority here. */
 const DISFLUENCIES = new Set(["um", "uh", "umm", "uhh", "er", "erm", "hmm", "mhm", "mm", "ah", "oh"]);
@@ -130,8 +130,8 @@ const DISFLUENCIES = new Set(["um", "uh", "umm", "uhh", "er", "erm", "hmm", "mhm
  * those. What does happen is the recognizer writing `don't` where the ESV has
  * `do not`, which costs a word.
  *
- * The split operation below handles most of these structurally — "donot" and
- * "dont" are within one edit — and this table is for the ones one edit cannot
+ * The split operation below handles most of these structurally, "donot" and
+ * "dont" are within one edit, and this table is for the ones one edit cannot
  * reach, such as `I'll` → `i will`, which is two. Both ship, because the
  * structural fix generalizes to contractions nobody listed and the table
  * catches the ones the structure misses.
@@ -228,12 +228,12 @@ const SCALES = [
 /* Numerals are a one-directional risk and the direction is worth stating,
  * because it is the opposite of what you would guess. Measured: `\d` matches in
  * exactly four shipped passages, and in every one of them the digits are the
- * embedded-reference leak handled further down — **the passage side of this
+ * embedded-reference leak handled further down, **the passage side of this
  * corpus contains no real numerals at all.** Number *words* do appear, all
  * spelled out (`one` fifty-three times, `thousand` three). So the only thing
  * that can go wrong is the member saying "one" and the recognizer writing `1`.
  *
- * Expanded to *tokens* rather than to one token — "32" becomes `thirty` `two` —
+ * Expanded to *tokens* rather than to one token, "32" becomes `thirty` `two`,
  * so the merge and split operations reconcile it against however the reference
  * happens to write it, and this table never has to know which side is which. */
 function cardinalWords(n) {
@@ -271,7 +271,7 @@ function ordinalWords(n) {
  *
  * Hyphens split, which serves both sides of one problem. The four hyphenated
  * words in the set (`self-control`, `sober-minded`, and two more) normalize to
- * a single token that no recognizer will ever produce — the merge operation
+ * a single token that no recognizer will ever produce, the merge operation
  * puts the two heard halves back together.
  *
  * `keep` is the passage's own vocabulary, as `norm` keys: a token in it is
@@ -280,7 +280,7 @@ export function transcriptTokens(transcript, { keep = new Set() } = {}) {
   const pieces = String(transcript || "")
     .replace(/[‘’]/g, "'")
     .toLowerCase()
-    .split(/[\s–—-]+/)
+    .split(/[\s\u2013\u2014-]+/)
     .filter(Boolean);
 
   const out = [];
@@ -326,7 +326,7 @@ const closesSentence = /[.!?][”"’']?$/;
  *
  * Gathered per *type* rather than per position deliberately, so that a name
  * which happens to open a sentence somewhere ("Jesus said…") is still known to
- * be a name. This is the gate on the phonetic tier and nothing else reads it —
+ * be a name. This is the gate on the phonetic tier and nothing else reads it,
  * see `wordmatch.js` for why that tier must not fire on ordinary vocabulary. */
 export function properNouns(text) {
   const found = new Set();
@@ -357,13 +357,13 @@ const VERSE_NUMBER = /^\d{1,3}:\d{1,3}[a-c]?(?:[-–]\d{1,3}[a-c]?)?$/;
  * it costs nothing to omit and leaves the denominator. It stays *in* the diff,
  * flagged, because the one-entry-per-`text.split(" ")`-word invariant is what
  * `perVerseOf`'s slicing, `data/keywords.js` and `blanks.js` all index against
- * — only the denominator changes.
+ *, only the denominator changes.
  *
  * **This is a tolerance, not a fix.** The real repair is in
  * `tools/fetch_passages.mjs` and `data/passages.js`, which is generated and so
  * cannot be hand-edited here; the same is true of the three fused words
  * (`eagles;they`, `footstool;what`, `food,the`) that the merge operation
- * absorbs. Both are known follow-up work — the scorer should tolerate a broken
+ * absorbs. Both are known follow-up work, the scorer should tolerate a broken
  * passage, but it should not be the reason nobody notices one. */
 export function optionalRefWords(words) {
   const optional = new Set();
@@ -410,7 +410,7 @@ const FROM = { START: 0, DIAG: 1, OMIT: 2, INS: 3, MERGE: 4, SPLIT: 5 };
  * first" rather than on an interleaving nobody could read.
  *
  * O(n·m) in time and space, and comfortably so. The worst case in the shipped
- * set — Isaiah 9:1-7, 243 words, against a 283-token transcript — is 68,769
+ * set, Isaiah 9:1-7, 243 words, against a 283-token transcript, is 68,769
  * cells and measures about **42ms** here; the median card is well under one.
  * `SPEAK_SILENCE_MS` is 2,500ms, so the app has already waited two and a half
  * seconds of silence before it calls this at all, which makes even the worst
@@ -431,8 +431,8 @@ export function alignWords(refWords, heardTokens, options = {}) {
 
   const omitCost = (i) => (optional.has(i) ? 0 : COST.OMIT);
 
-  /* Both sides are already normalized, so the overwhelmingly common answer —
-   * two identical keys — is settled here rather than inside wordMatch, which
+  /* Both sides are already normalized, so the overwhelmingly common answer,
+   * two identical keys, is settled here rather than inside wordMatch, which
    * would normalize them a second time to find that out. Memoizing the rest was
    * tried and measured *slower*: building a cache key costs more than the work
    * it saves, because everything below the exact tier bails on a length check.
@@ -578,7 +578,7 @@ const emptyCounts = () => ({
  * `options.sawSpeech` is the one thing the browser knows that the transcript
  * does not: whether the recognizer ever reported anything at all. It belongs in
  * `App.js`, which owns the microphone, and is passed *in* rather than guessed
- * at here — keeping this module free of browser signals is what keeps it
+ * at here, keeping this module free of browser signals is what keeps it
  * runnable under `node --test`. (`SpeechRecognitionAlternative.confidence` is
  * the obvious companion and is deliberately not read yet: there is no measured
  * threshold for it, and a gate nobody calibrated is worse than no gate.)
@@ -587,7 +587,7 @@ const emptyCounts = () => ({
  * transcript scoring 30% is a real, honest failure and is reported as one. A
  * three-token transcript scoring 3% is a microphone that cut out. The two are
  * indistinguishable from the transcript alone, so the only question is which
- * way to be wrong — and the harms are wildly asymmetric. Telling a member who
+ * way to be wrong, and the harms are wildly asymmetric. Telling a member who
  * recited well "I didn't catch that" costs them one retry; telling a member who
  * recited perfectly "23%" is what makes them stop using the feature.
  *
@@ -646,7 +646,7 @@ export function scoreRecital(passage, transcript, options = {}) {
    * knows a third of this verse" from "the recognizer caught a third of what
    * they said", and under genuine indistinguishability the honest move is not
    * to assert. The floor of three tokens is for short passages, where a ratio
-   * alone would score a single stray token — but it is capped by the passage
+   * alone would score a single stray token, but it is capped by the passage
    * itself, since a floor above what the verse even asks for would abstain on a
    * complete recital. "Jesus wept." is two words: two tokens is the whole of
    * it, and refusing to mark that is the app failing, not the member. */

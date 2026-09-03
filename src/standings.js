@@ -1,21 +1,21 @@
 /* The board's own record of a member, and ranking groups instead of people.
  *
  * The leaderboard has always been able to *filter* by the three things a member
- * puts in their profile — ministry group, gender, graduating class. This is the
+ * puts in their profile, ministry group, gender, graduating class. This is the
  * other half: the groups themselves ranked against each other, so a ministry can
  * see where it stands rather than only who inside it is doing well.
  *
  * Everything here is pure and takes the same roster rows viewmodel/leaderboard.js
- * has already assembled and filtered — `{ count, freshnessScore, streak, me }`
- * plus the profile fields — so grouping composes with filtering rather than
+ * has already assembled and filtered, `{ count, freshnessScore, streak, me }`
+ * plus the profile fields, so grouping composes with filtering rather than
  * replacing it: rank the ministries within the class of 2027 and both questions
  * are answered at once.
  *
  * The measure is PER MEMBER, and that is the whole design. Ranking by a total
  * would rank by attendance: the largest ministry wins every week, the smallest
  * can never place, and the board stops telling anyone anything they can act on.
- * An average asks the only question a group can actually answer — how are we
- * doing, each of us — so a group of five holding their verses well outranks
+ * An average asks the only question a group can actually answer, how are we
+ * doing, each of us, so a group of five holding their verses well outranks
  * forty who are not. */
 
 /* The three things a member can be grouped by. `field` is the profile attribute;
@@ -37,7 +37,7 @@ export const rankFieldFor = (key) =>
  * This is the one judgement in here that could reasonably go the other way, so
  * it is worth saying why: the individual board already leaves out anyone with
  * nothing committed, on the grounds that there is nothing to rank. Counting
- * them in a group average would quietly re-admit them — and it would mean a
+ * them in a group average would quietly re-admit them, and it would mean a
  * ministry that recruits well scores worse for it, which is precisely backwards
  * from what the board is for. A group's figure is therefore the average across
  * the members who have started, and `members` says how many that is. */
@@ -50,7 +50,7 @@ const started = (row) => row.count > 0;
  * joined a group that could be ranked, and inventing one to hold them would put
  * a fictional team on the board.
  *
- * Ties break on the number of members, so the larger group is listed first —
+ * Ties break on the number of members, so the larger group is listed first,
  * the same average is a bigger thing to have achieved across more people. */
 export function standingsBy(rows, field) {
   if (!field) return [];
@@ -79,27 +79,27 @@ export function standingsBy(rows, field) {
 
 /* ── what the board reads ─────────────────────────────────────────────────── */
 
-/* The leaderboard used to be built by downloading every member's whole record —
- * their progress map for all 183 verses and their entire daily log — and then
+/* The leaderboard used to be built by downloading every member's whole record,
+ * their progress map for all 183 verses and their entire daily log, and then
  * throwing nearly all of it away to arrive at three numbers each. That is fine
  * for a dozen members and is not fine for a few hundred: it is the one read in
  * the app whose cost grows with the size of the group, and it grows in the
  * worst way, since every member pays it every time they open the board.
  *
- * So each member also keeps a summary of themselves — `standings/{uid}` in
- * Firestore (see firebase.js) — and the board reads those instead. It is the
+ * So each member also keeps a summary of themselves, `standings/{uid}` in
+ * Firestore (see firebase.js), and the board reads those instead. It is the
  * same three numbers, written by the one device that already has the record in
  * hand, rather than recomputed by every other device from the raw material.
  *
  * The one thing a summary cannot be is those three numbers. **Freshness
  * decays**: a score is a claim about a moment, and a stored one is wrong by the
  * time it is read. So the summary keeps the two figures the curve actually runs
- * on — when the verse was last reviewed and how stable it is — for the
+ * on, when the verse was last reviewed and how stable it is, for the
  * committed verses only, and the reader runs the curve at the moment it asks.
  * That is a pair of numbers per committed verse instead of a record per verse
  * in the set, plus a log that grows for as long as the member uses the app.
  *
- * `fresh` holds those pairs flat — last, stability, last, stability — rather
+ * `fresh` holds those pairs flat, last, stability, last, stability, rather
  * than as a list of pairs, because Firestore will not store an array inside an
  * array. Which verse is which is deliberately not in there: the board asks how
  * many and how fresh, never which, so the ids would be a third of the payload
@@ -108,7 +108,7 @@ export function standingsBy(rows, field) {
  *
  * The streak is the same problem in miniature and gets the same treatment: it
  * is stored with the day it was true of, and reads as nothing once that day is
- * older than yesterday. And the email is simply not here — the board never
+ * older than yesterday. And the email is simply not here, the board never
  * needed it, and not sending it is one less thing every member holds about
  * every other. */
 
@@ -131,7 +131,7 @@ const lastLoggedDay = (log) =>
     .pop() || "";
 
 /* One member's record, reduced to what the board asks of it. `name` is the
- * fallback for a member whose profile has none — their Google account's, which
+ * fallback for a member whose profile has none, their Google account's, which
  * firebase.js already holds. */
 export function summarize({ name = "", profile, progress, log, now = Date.now() } = {}) {
   const p = profile || {};
@@ -159,14 +159,14 @@ function yesterdayKey(now) {
   return dayKey(d);
 }
 
-/* A summary read back as the row viewmodel/leaderboard.js ranks — the same
+/* A summary read back as the row viewmodel/leaderboard.js ranks, the same
  * shape App.loadRoster used to build out of a whole record.
  *
  * The freshness is computed here rather than stored, which is the point of the
  * shape: a member who has not opened the app for a fortnight sinks down the
  * board over that fortnight, exactly as they did when the board held their
  * whole record. A streak, being a run of days rather than a curve, cannot be
- * carried forward the same way — so it stands only while the day it was true
+ * carried forward the same way, so it stands only while the day it was true
  * of is today or yesterday, and is nothing after that. */
 export function rowFromSummary(summary, now = Date.now()) {
   const s = summary || {};

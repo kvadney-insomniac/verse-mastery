@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>Seed local test data — Verse Mastery (dev only)</title>
+    <title>Seed local test data, Verse Mastery (dev only)</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -135,9 +135,9 @@
 
       <div class="note">
         <strong>Dev only.</strong> This page writes to <em>this browser's</em> <code>localStorage</code> for
-        <em>this origin</em> (<code id="origin"></code>) — the keys <code>mv.progress</code>, <code>mv.log</code> and
+        <em>this origin</em> (<code id="origin"></code>), the keys <code>mv.progress</code>, <code>mv.log</code> and
         <code>mv.profile</code>. It talks to nothing else: no network, no cloud sync, no other browser or device.
-        <strong>Clear</strong> empties progress and the daily log only — it leaves the profile in place, exactly as the
+        <strong>Clear</strong> empties progress and the daily log only, it leaves the profile in place, exactly as the
         app's own "Reset all progress" does.
       </div>
 
@@ -158,7 +158,7 @@
       <pre id="out">Nothing written yet. Press a button above, then reload the app.</pre>
 
       <footer>
-        <p><a href="/">← Back to the app</a> — reload it after seeding so it reads the new record.</p>
+        <p><a href="/">← Back to the app</a>, reload it after seeding so it reads the new record.</p>
       </footer>
     </main>
 
@@ -167,7 +167,7 @@
        * first earning a hundred reviews by hand.
        *
        * This file can never ship. `scripts/build.mjs` copies exactly four things
-       * into `dist/` — `index.html`, `src/`, `data/` and a runtime `config.js` —
+       * into `dist/`, `index.html`, `src/`, `data/` and a runtime `config.js`,
        * so anything under `tools/` is invisible to every deploy path by
        * construction, not by an .ignore rule someone has to remember. It is
        * reachable only over the dev server (`npm run dev`), which serves the repo
@@ -179,7 +179,7 @@
        * verse the app reads as 40% fresh", and a retune of the interval ladder
        * moves these fixtures with it instead of stranding them. Nothing imported
        * below reaches `dom.js` or React, so this page needs no CDN and no app
-       * boot — `storage`, `profile`, `srs` and `text` import nothing at all, and
+       * boot, `storage`, `profile`, `srs` and `text` import nothing at all, and
        * `progress` reaches only `copy`, `srs` and `text`. */
 
       import { passages } from "../data/passages.js";
@@ -207,7 +207,7 @@
         };
       }
 
-      /* A verse opened but never given back in full — what a Learn sitting draws
+      /* A verse opened but never given back in full, what a Learn sitting draws
        * first, and what makes "whole set" differ from "committed" on the Speak
        * source switch. */
       function started(fresh = 0.5, { step = 0, hits = 1, now = Date.now() } = {}) {
@@ -236,7 +236,7 @@
       /* ── which verses, and how faded ──────────────────────────────────────── */
 
       /* The due threshold is 75% and `reviewPool()` takes a verse at or below it,
-       * so the two buckets stay well clear of the boundary in both directions —
+       * so the two buckets stay well clear of the boundary in both directions,
        * `freshness()` rounds, and a verse seeded at exactly 75 is a verse whose
        * membership depends on arithmetic nobody wants to reason about while
        * looking at a screen. */
@@ -264,7 +264,7 @@
        * slices of the result are still spread over the set, so the three buckets
        * below can be plain `slice()` calls; and the picks are guaranteed
        * distinct, so a passage cannot be seeded twice and quietly cost the batch
-       * a record. It is deterministic besides — seeding twice writes the same
+       * a record. It is deterministic besides, seeding twice writes the same
        * record twice, which is what makes a bug reproducible. */
       const plain = passages.filter((p) => !hasVerses(p));
       const STRIDE = 29;
@@ -288,7 +288,7 @@
 
       /* Every seed folds into whatever is already stored rather than replacing
        * it, so pressing two buttons in turn keeps both batches. Progress and the
-       * log are saved together because `storage` saves them together — they
+       * log are saved together because `storage` saves them together, they
        * change together on a completed review, and the cloud push carries both. */
       function addProgress(records) {
         const merged = { ...storage.loadProgress(), ...records };
@@ -326,8 +326,8 @@
         seedLog();
 
         lines.push(`Wrote mv.progress: ${fresh.length + faded.length} committed verses`);
-        lines.push(`  ${fresh.length} still fresh (88–99%) — above the 75% due mark, so not in the review queue`);
-        lines.push(`  ${faded.length} faded (28–72%) — at or below the mark, so Speak's "Due" queue has real content`);
+        lines.push(`  ${fresh.length} still fresh (88–99%), above the 75% due mark, so not in the review queue`);
+        lines.push(`  ${faded.length} faded (28–72%), at or below the mark, so Speak's "Due" queue has real content`);
         lines.push(`Wrote mv.log: six days of reviews, so the board shows a streak`);
         return lines;
       }
@@ -343,7 +343,7 @@
       }
 
       /* A short run of days with reviews on them, written the way `streakOf()`
-       * reads it — one entry per local day, which is why it goes through
+       * reads it, one entry per local day, which is why it goes through
        * `text.dayKey` rather than through an ISO string. */
       function seedLog() {
         const log = { ...storage.loadLog() };
@@ -360,7 +360,7 @@
 
       /* The figures are read back out of the app's own modules rather than
        * counted from the batch that was just written, so what this page reports
-       * is what the app will say — including the due count, which is computed
+       * is what the app will say, including the due count, which is computed
        * with exactly the expression `viewmodel/speak.js` uses for its "N passages
        * in the queue" label. */
       function summary() {
@@ -393,10 +393,10 @@
           lines.push("Multi-verse passages committed (Speak's verse-by-verse mode has something to say on these):");
           seededVerseBearing.forEach((p) => {
             const state = dueVerseBearing.includes(p) ? "due now" : "still fresh";
-            lines.push(`  ${p.ref} — ${p.verses.length} verses, ${read.freshness(p.id)}% fresh, ${state}`);
+            lines.push(`  ${p.ref}, ${p.verses.length} verses, ${read.freshness(p.id)}% fresh, ${state}`);
           });
         } else {
-          lines.push("No multi-verse passages committed — Speak's verse-by-verse mode has nothing to slice.");
+          lines.push("No multi-verse passages committed, Speak's verse-by-verse mode has nothing to slice.");
         }
         return lines;
       }

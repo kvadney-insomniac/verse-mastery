@@ -1,7 +1,7 @@
 {
   "name": "verse-mastery",
   "version": "1.0.0",
-  "description": "Verse Mastery — a spaced-repetition Bible verse memorization app for Acts 2 Network - Berkeley.",
+  "description": "Verse Mastery, a spaced-repetition Bible verse memorization app for Acts 2 Network - Berkeley.",
   "type": "module",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "test:e2e:report": "playwright show-report",
     "test:all": "npm test && npm run test:e2e",
     "lint": "eslint .",
+    "lint:prose": "node scripts/check-prose.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "icons": "bash tools/gen_icons.sh",

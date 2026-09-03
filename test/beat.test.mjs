@@ -1,5 +1,5 @@
 /* The pure half of the run-mode audio seam. The audio graph itself needs a
- * browser, but how a verse is cut up for the voice does not — and that is the
+ * browser, but how a verse is cut up for the voice does not, and that is the
  * part a stalled session turns on (see the note on MAX_CHUNK_CHARS). */
 
 import test from "node:test";
@@ -27,7 +27,7 @@ test("a long passage is cut into pieces the browser will finish", () => {
   const chunks = chunkForSpeech(long);
   assert.ok(chunks.length > 1, "a long passage is split");
   for (const c of chunks) assert.ok(c.length <= 180, `chunk within the ceiling: ${c.length}`);
-  // Nothing is dropped on the way through — the words come back in order.
+  // Nothing is dropped on the way through, the words come back in order.
   const rejoined = chunks.join(" ").replace(/\s+/g, " ");
   assert.equal(rejoined.replace(/\s+/g, " ").trim(), long.replace(/\s+/g, " ").trim());
 });

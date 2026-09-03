@@ -1,8 +1,8 @@
 /* The drift alarm.
  *
  * deploy/firestore.rules is the authoritative half of the sign-in gate and it
- * cannot read src/config.js — it is uploaded to Firebase, not served with the
- * app — so the domains have to be written out in it. That is the arrangement
+ * cannot read src/config.js, it is uploaded to Firebase, not served with the
+ * app, so the domains have to be written out in it. That is the arrangement
  * that lets the two halves come apart, and coming apart is silent: a client
  * admitting a domain the deployed rules refuse fails every read and write for
  * those members, and the app cannot tell a refused read from an empty record,
@@ -14,7 +14,7 @@
  * file by hand) and the suite says so here, rather than the members finding out.
  *
  * Everything is imported from the generator so nothing is described twice, and
- * nothing here writes — a test that regenerated the file would assert only that
+ * nothing here writes, a test that regenerated the file would assert only that
  * it can call a function. */
 
 import test from "node:test";
@@ -29,7 +29,7 @@ test("the shipped firestore.rules is what the configured domains generate", asyn
   assert.equal(
     onDisk,
     expected,
-    "deploy/firestore.rules is out of step with the configured domains — run `npm run rules`, " +
+    "deploy/firestore.rules is out of step with the configured domains, run `npm run rules`, " +
       "then redeploy with `firebase deploy --only firestore:rules`",
   );
 });

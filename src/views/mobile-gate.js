@@ -1,14 +1,14 @@
 /* The warning a member on a phone or a tablet meets before the app.
  *
- * It stands in front of everything — before the splash, before sign-in — and
+ * It stands in front of everything, before the splash, before sign-in, and
  * it is an interstitial rather than a refusal: the app works on a phone, but
  * it was designed for a desk sitting, and there is a safety line worth saying
  * before every visit (copy.mobileGate). Continue is the one thing to press,
- * and pressing it lets the member through for this visit only — the
+ * and pressing it lets the member through for this visit only, the
  * acknowledgement is never saved, so the warning is heard again next time.
  *
  * The two marks are drawn here rather than named as classes because they are
- * geometry, not motion — nothing on this screen moves except its arrival. They
+ * geometry, not motion, nothing on this screen moves except its arrival. They
  * are `aria-hidden`: the sentences under them already say it, and a reader
  * announcing "phone, monitor" would only say it again. */
 
@@ -20,7 +20,7 @@ import { CALLOUT_ERROR, muted, SCREEN_BODY, SCREEN_CENTERED, SCREEN_SUBTITLE, SC
  * drawings on the blueprint rather than as icons dropped onto it. */
 const STROKE = { fill: "none", strokeWidth: "1.4", strokeLinecap: "square", strokeLinejoin: "miter" };
 
-/* The device in hand: a handset, no longer ruled through — it works here, it
+/* The device in hand: a handset, no longer ruled through, it works here, it
  * is just not where the app is at its best. */
 const phoneMark = () =>
   html`<svg

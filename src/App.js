@@ -1,13 +1,13 @@
-/* Verse Mastery — root component.
+/* Verse Mastery, root component.
  *
  * This is the only stateful module in the app. It owns the member's progress and
  * the running review session, exposes an `actions` table for the UI to call, and
  * dispatches to a view. It deliberately holds no rendering or derivation logic:
  *
  *   viewmodel/  turns (state, actions) into one plain object of strings and
- *               callbacks — all the derivation lives there
- *   views/      turn that object into markup — no state, no imports from here
- *   srs, blanks, grading, progress, exam, text — the pure domain, unit-tested
+ *               callbacks, all the derivation lives there
+ *   views/      turn that object into markup, no state, no imports from here
+ *   srs, blanks, grading, progress, exam, text, the pure domain, unit-tested
  *               in Node
  *
  * So a change to how something looks belongs in views/, a change to what is
@@ -90,7 +90,7 @@ import {
 } from "./speak.js";
 import { createEarcons } from "./earcon.js";
 import { MAX_RECORD_MS, createTranscriber, recordingSupported } from "./transcriber.js";
-import { speakPool } from "./viewmodel/speak.js";
+import { effectiveSource, speakPool } from "./viewmodel/speak.js";
 import { runView } from "./views/run.js";
 import { authGateView } from "./views/auth-gate.js";
 import { profileFormView } from "./views/profile-form.js";
@@ -105,19 +105,19 @@ const MINISTRY_CLOSE_MS = 120;
 /* How long to wait for Firebase before sending the member to the sign-in screen
  * anyway. Auth normally answers in a moment; if the SDK never loads (offline, a
  * blocked CDN) nothing else would ever arrive to move the splash on. A late
- * answer still lands — the observer in componentDidMount keeps running. */
+ * answer still lands, the observer in componentDidMount keeps running. */
 const SPLASH_MAX_MS = 8000;
 
 /* How long a fetched leaderboard roster is reused before it is read again.
  * The board is one press away in the header, and the figures on it move at the
- * speed of somebody sitting down to review — not at the speed of a member
+ * speed of somebody sitting down to review, not at the speed of a member
  * clicking back and forth between screens. */
 const ROSTER_TTL_MS = 60000;
 
 /* The shortest time the opening splash stays up. Local data loads in a blink and
  * a restored Firebase session usually answers in well under a second, so without
  * a floor the mark would be a flicker rather than a screen. The figure is
- * `appConfig.splashMinMs` — retune it there, or per deploy in config.js — and is
+ * `appConfig.splashMinMs`, retune it there, or per deploy in config.js, and is
  * clamped under SPLASH_MAX_MS, since a floor above the ceiling would hold the
  * member on the splash past the point the app had given up waiting. */
 const splashMinMs = () => {
@@ -158,13 +158,13 @@ function caretAfterRecitation(rest) {
  * window, and its type settles a little when the web font arrives. A number
  * written into the stylesheet would be right for one of those and wrong for
  * the rest, so it is measured. The observer is what covers the font, and
- * `attach` — called again on every update — is what covers the header not
+ * `attach`, called again on every update, is what covers the header not
  * being on the page yet: the splash and the sign-in gate come first, so at
  * mount there is nothing to measure.
  *
  * Absent ResizeObserver (or a document at all, under node:test) the CSS
  * fallback stands, which sticks the table head to the top of the window
- * instead of below the header — degraded, not broken. */
+ * instead of below the header, degraded, not broken. */
 function watchHeaderHeight() {
   if (typeof document === "undefined" || typeof ResizeObserver === "undefined") return { attach() {}, stop() {} };
   let watched = null;
@@ -187,8 +187,8 @@ function watchHeaderHeight() {
   };
 }
 
-/* A session opens at the top of the page, so the mode switch — all four
- * activities — is on screen from the first card rather than scrolled past
+/* A session opens at the top of the page, so the mode switch, all four
+ * activities, is on screen from the first card rather than scrolled past
  * from wherever the board or setup screen left off. */
 function scrollToTop() {
   if (typeof window.scrollTo === "function") window.scrollTo(0, 0);
@@ -197,7 +197,7 @@ function scrollToTop() {
 /* Send focus back to the recall box after a control beside it is pressed. The
  * voice switch and the first-letter toggle are both buttons, so clicking
  * either steals focus from the box the member was just writing or reciting
- * into — and the point of a box that stays live across both is that they
+ * into, and the point of a box that stays live across both is that they
  * should not have to click back into it themselves. */
 function focusRecall() {
   const el = document.getElementById(RECALL_INPUT_ID);
@@ -209,14 +209,14 @@ function focusRecall() {
  * begins in `typed` (see voice.js); at rest there is no such phrase. */
 const quietVoice = () => ({ status: "off", error: null, tail: 0, rest: 0 });
 
-/* Speak mode's clocks. The two that matter are in `speak.js` — how long a
+/* Speak mode's clocks. The two that matter are in `speak.js`, how long a
  * silence runs before a recital counts as finished, which depends on how much
  * of the passage has been heard. These are the rest:
  *
  *   STALL   how long a member gets before being offered the next few words
  *   PROMPTS how many times that help is given before the verse is simply read
  *   ENDPOINT the shortest the wait can be cut to when the engine says the
- *            speech has ended — a floor, so its judgement can hurry the loop
+ *            speech has ended, a floor, so its judgement can hurry the loop
  *            along but never take the last word out of somebody's mouth */
 const SPEAK_SILENCE_MS = 2500;
 const SPEAK_STALL_MS = 5000;
@@ -235,7 +235,7 @@ function initialState() {
     mobileAck: false,
     loaded: false,
     // The splash stands in front of everything until local data has loaded and
-    // Firebase has said whether there is a session to restore — only then does
+    // Firebase has said whether there is a session to restore, only then does
     // the app know whether the member is going to their board or to sign-in.
     // `splashHold` is the minimum it stays up (SPLASH_MIN_MS), so the boot reads
     // as a screen rather than a flash.
@@ -247,7 +247,7 @@ function initialState() {
     progress: {}, // { [passageId]: { hits, status, last, step, stability } }
     log: {}, // { [YYYY-MM-DD]: reviews that day }
 
-    // running session — review keeps committed verses fresh, learn commits new
+    // running session, review keeps committed verses fresh, learn commits new
     // ones. Same cards, same activities; see review.js for what separates them.
     sessionKind: REVIEW,
     mode: null,
@@ -263,7 +263,7 @@ function initialState() {
     // Unlike `peeks` above this belongs to the SITTING, not the card: a member
     // who has said they want the passage in front of them means it for the
     // sitting, and having to say it again on every verse is the tired fingers
-    // the latch was asked for. It still costs each card a peek — see
+    // the latch was asked for. It still costs each card a peek, see
     // resetCard, where a latched card arrives having already seen its verse.
     peekStick: false,
     revealed: false,
@@ -281,13 +281,13 @@ function initialState() {
     // the rest is the running microphone. See voice.js for where the words go.
     voice: { supported: false, ...quietVoice() },
 
-    /* Speak mode: the hands-free recitation loop. Practice only — a speak
+    /* Speak mode: the hands-free recitation loop. Practice only, a speak
      * session never calls record() or touches progress; SRS credit for a
      * clean spoken recital is follow-up work. Nothing here is persisted. */
     speak: {
       supported: false, // settled at startup: needs both a voice and an ear
       running: false,
-      mode: "passage", // 'passage' | 'word' | 'verse' — see src/speak.js
+      mode: "passage", // 'passage' | 'word' | 'verse', see src/speak.js
       source: "due", // 'due' | 'committed' | 'all'
       queue: [], // passage ids, wrapped forever until Stop
       index: 0,
@@ -296,7 +296,7 @@ function initialState() {
       lastResult: null, // feedbackFor()'s verdict on the last recital
       /* Why a session ended, when it ended by itself. A speak session that
        * stops because the microphone was refused looks exactly like one the
-       * member stopped — the screen simply goes back to the setup — and a
+       * member stopped, the screen simply goes back to the setup, and a
        * speakr has no way to find that out. */
       error: "",
     },
@@ -305,7 +305,7 @@ function initialState() {
     scrambleMisses: 0, // chunks tried in the wrong place on this card
     scrambleLevel: 1,
 
-    // running test (Test mode — see exam.js)
+    // running test (Test mode, see exam.js)
     examSetup: DEFAULT_SETUP,
     exam: null, // { questions, ids }, built once when the test starts
     examIndex: 0,
@@ -318,7 +318,7 @@ function initialState() {
     search: "",
     filter: "All",
     /* Which part of the set the passage list is showing; null is all of it.
-     * Device-local and deliberately unpersisted, like `search` and `filter` —
+     * Device-local and deliberately unpersisted, like `search` and `filter`,
      * where a member last left the tabs is worth nothing on the next visit. */
     listCategory: null,
     // Passage ids ticked on the list, so a sitting can be hand-picked rather
@@ -333,7 +333,7 @@ function initialState() {
     // account, profile, leaderboard
     auth: { status: "loading" }, // loading | signing-in | signed-out | denied | signed-in | disabled
     /* How the member's cloud record is doing, kept apart from `auth` because
-     * being signed in and having your record in hand are different things — and
+     * being signed in and having your record in hand are different things, and
      * conflating them is what asked a returning member to sign up again on every
      * device. idle (nothing to sync) | pulling | synced | error. */
     sync: { status: "idle" },
@@ -348,7 +348,7 @@ function initialState() {
     leaderFilter: { group: "All", gender: "All", gradClass: "All" },
     // Who the board is ranking: people, or one of the three things a member
     // says about themselves (see src/standings.js). Not persisted, like the
-    // filters beside it — which question you asked last visit is worth nothing
+    // filters beside it, which question you asked last visit is worth nothing
     // this one.
     leaderRankBy: "people",
 
@@ -361,19 +361,19 @@ function initialState() {
     explainerOpen: false,
 
     // the guide: where the freshness demonstration's slider sits. Not
-    // persisted — a slider position is worth nothing on the next visit,
+    // persisted, a slider position is worth nothing on the next visit,
     // unlike the setups above.
     guideDays: 6,
 
     // Which way round the page is printed: "light", "dark", or "system", which
     // is the default and follows the reader's own machine. Device-local like
     // the setups above, and the one preference the app has already acted on
-    // before this state exists — index.html stamps the ground before the first
+    // before this state exists, index.html stamps the ground before the first
     // paint, so this is the app catching up with the page it booted on rather
     // than the other way round (see theme.js).
     theme: DEFAULT_THEME,
 
-    /* samuel mode — the study screen for the 1 and 2 Samuel test. `record` is
+    /* samuel mode, the study screen for the 1 and 2 Samuel test. `record` is
      * the only part that outlives the sitting, and it is kept apart from the
      * passage progress on purpose: a multiple-choice answer about the census in
      * 2 Samuel 24 is not evidence about how well a verse is held. */
@@ -389,7 +389,7 @@ function initialState() {
       openChapter: "",
     },
 
-    /* run mode — the beat's settings, whether it is running, the verse being
+    /* run mode, the beat's settings, whether it is running, the verse being
      * called out, and the Spotify playlist (loaded lazily; see loadRunPlaylist). */
     run: {
       supported: beatSupported(),
@@ -398,7 +398,7 @@ function initialState() {
       playing: false,
       nowRef: "",
       nowText: "",
-      /* The line being spoken and what the audio hardware says it is doing —
+      /* The line being spoken and what the audio hardware says it is doing,
        * both on screen, because silence is otherwise a symptomless fault. */
       saying: "",
       audio: "off",
@@ -418,8 +418,8 @@ export class App extends React.Component {
   componentDidMount() {
     const profile = storage.loadProfile();
     const defaultDiff = profile.defaultDifficulty != null ? Number(profile.defaultDifficulty) : DEFAULT_DIFFICULTY;
-    /* The theme is already on the page — index.html settled it before the first
-     * paint — so this is only the app learning what the member chose, plus a
+    /* The theme is already on the page, index.html settled it before the first
+     * paint, so this is only the app learning what the member chose, plus a
      * standing subscription for a reader who turns their system over with the
      * app open. Stamped again all the same, so a stored value the pre-paint
      * line could not make sense of is corrected by normalizeTheme rather than
@@ -439,12 +439,14 @@ export class App extends React.Component {
       // Asked once, here, because it is a question about the browser.
       voice: { ...this.state.voice, supported: voiceSupported() },
       // Speak needs both halves of the conversation: a voice and an ear.
-      /* Either way of hearing will do — the browser's own recogniser, or a
-       * recording sent somewhere to be transcribed — but a voice is not
+      /* Either way of hearing will do, the browser's own recogniser, or a
+       * recording sent somewhere to be transcribed, but a voice is not
        * optional: a hands-free sitting that cannot speak has nothing to offer. */
       speak: {
         ...this.state.speak,
-        supported: (voiceSupported() || (!!appConfig.transcribeUrl && recordingSupported())) && speechSupported(),
+        supported:
+          (voiceSupported() || (!!appConfig.transcribeUrl && recordingSupported())) &&
+          speechSupported(appConfig.speakUrl),
       },
       scrambleLevel: storage.loadScrambleLevel(defaultDiff, SCRAMBLE_LEVELS.length),
       examSetup: normalizeSetup(storage.loadExamSetup()),
@@ -477,7 +479,7 @@ export class App extends React.Component {
     this.headerHeight.attach();
   }
 
-  /* The header arrives on the page some renders after mount — see
+  /* The header arrives on the page some renders after mount, see
    * watchHeaderHeight for why this is where it is picked up. */
   componentDidUpdate() {
     if (this.headerHeight) this.headerHeight.attach();
@@ -491,7 +493,7 @@ export class App extends React.Component {
   startAuth() {
     return initAuth({
       onChange: (auth) => {
-        // Whatever it says, Firebase has answered — the splash can stop waiting.
+        // Whatever it says, Firebase has answered, the splash can stop waiting.
         clearTimeout(this.authWaitTimer);
         this.setState({ auth });
         if (auth.status === "signed-in") this.loadRoster();
@@ -516,18 +518,18 @@ export class App extends React.Component {
   /* Recitation is a second way to fill the recall box, not a second exercise:
    * what a member says lands in `state.typed`, where grading.js finds it and
    * srs.js marks it exactly as it marks something typed. So the only state
-   * unique to it is the microphone's — whether it is on, why it stopped, and
+   * unique to it is the microphone's, whether it is on, why it stopped, and
    * where the phrase still being heard begins (see voice.js).
    *
    * The recognizer itself is not state. It is a live object holding a
    * microphone, so it hangs off the instance and is torn down rather than
-   * re-rendered — and it is never started by anything but the member. */
+   * re-rendered, and it is never started by anything but the member. */
 
   setVoice(patch) {
     this.setState((s) => ({ voice: { ...s.voice, ...patch } }));
   }
 
-  /* Let the microphone go, without touching state — so the callers that are
+  /* Let the microphone go, without touching state, so the callers that are
    * already writing a state patch of their own can do both in one pass. */
   stopListening() {
     if (this.recognizer) this.recognizer.stop();
@@ -552,7 +554,7 @@ export class App extends React.Component {
 
   stopVoice() {
     this.stopListening();
-    // Whatever was still provisional when they stopped is theirs to keep — it
+    // Whatever was still provisional when they stopped is theirs to keep, it
     // is the last thing they said, and it is already in the box.
     this.setState((s) => ({ voice: { ...s.voice, status: "off", tail: s.typed.length, rest: 0 } }));
   }
@@ -565,7 +567,7 @@ export class App extends React.Component {
     focusRecall();
   }
 
-  /* A phrase from the engine, settled or still being revised (see voice.js —
+  /* A phrase from the engine, settled or still being revised (see voice.js,
    * an unsettled one replaces the last version rather than piling up after it).
    *
    * Guarded rather than trusted: a phrase can arrive after the member has moved
@@ -576,7 +578,7 @@ export class App extends React.Component {
     let landed = 0;
     this.setState(
       (s) => {
-        // The verse is handed over so the words can be fitted back onto it —
+        // The verse is handed over so the words can be fitted back onto it,
         // the passage's own spelling and punctuation, which the engine has no
         // way to know (see voice.js).
         const verse = s.passages.find((p) => p.id === s.queue[s.qi]);
@@ -616,7 +618,7 @@ export class App extends React.Component {
    * then persist the result (which pushes the merge back to the cloud).
    *
    * The local side is read from storage rather than from `this.state`, because
-   * the pull can land before componentDidMount's setState has flushed — and
+   * the pull can land before componentDidMount's setState has flushed, and
    * state, at that moment, is still the empty initial map. Merging against it
    * would drop this device's records, and the queued setState would then
    * overwrite the merge with the local copy alone. Storage is the source of
@@ -677,8 +679,8 @@ export class App extends React.Component {
 
   /* Start the set over: every passage back to Not started.
    *
-   * What goes is the record of what has been memorized — the progress map and
-   * the daily log — and nothing else. The profile, the settings sitting on the
+   * What goes is the record of what has been memorized, the progress map and
+   * the daily log, and nothing else. The profile, the settings sitting on the
    * same screen, and the device-local exercise preferences are not that record,
    * so they stay. The wipe goes to the cloud copy as a replacement rather than
    * a merge (storage.clearProgressAndLog), because a wipe that only reached
@@ -694,7 +696,7 @@ export class App extends React.Component {
 
   /* Pull the leaderboard roster. Self is dropped here and re-added from local
    * state by the view-model, so "You" always reflects the newest, not-yet-synced
-   * progress. Members without a finished profile are skipped — a row with no
+   * progress. Members without a finished profile are skipped, a row with no
    * ministry or class cannot be filtered or grouped, so it is not a row.
    *
    * The rows arrive already reduced to what the board ranks (see
@@ -744,14 +746,14 @@ export class App extends React.Component {
 
   /* Record a completed card. There is still no self-report: the activity, the
    * mark the attempt earned, and the peeks it took decide one figure
-   * (srs.reviewAward), and that figure does both jobs — it moves the verse
+   * (srs.reviewAward), and that figure does both jobs, it moves the verse
    * along the interval ladder (srs.nextStep) and it is the freshness the verse
    * is dated to. The result is kept for the session so the card can show what it
    * was worth, and so a verse walked back to is not marked twice.
    *
    * This is also the one place a verse becomes committed, and only by the one
    * thing that commits it: writing the passage out in full from memory
-   * (srs.commitsVerse). Nothing demotes a verse — a bad morning costs freshness
+   * (srs.commitsVerse). Nothing demotes a verse, a bad morning costs freshness
    * and a rung, never the status the member has already earned. */
   record(id, score) {
     const now = Date.now();
@@ -768,7 +770,7 @@ export class App extends React.Component {
       ...cur,
       hits: (cur.hits || 0) + 1,
       // `last` is the point on the new curve the attempt earned, so it is not
-      // the moment of writing — hence updatedAt (see storage.mergeProgress).
+      // the moment of writing, hence updatedAt (see storage.mergeProgress).
       last: reviewedLast(stability, award, now),
       updatedAt: now,
       step,
@@ -779,7 +781,7 @@ export class App extends React.Component {
     const today = dayKey(new Date());
     log[today] = (log[today] || 0) + 1;
     this.save(progress, log);
-    // Only an actual submission — never the flashcard's unmarked auto-record
+    // Only an actual submission, never the flashcard's unmarked auto-record
     // (moveCard calls record(id) with no score), which the member never chose
     // to hand in.
     if (score != null) {
@@ -803,7 +805,7 @@ export class App extends React.Component {
           peeks: s.peeks,
           before: freshness(prev, now),
           after: freshness(progress[id], now),
-          // Whether this card is what committed the verse — the moment a learn
+          // Whether this card is what committed the verse, the moment a learn
           // session is working towards, so the summary can mark it.
           committed: prev.status !== "memorized" && committed,
         },
@@ -825,7 +827,7 @@ export class App extends React.Component {
 
   /* ------------------------------------------------------------------ */
   /* Speak mode: the hands-free loop. The cycle itself is modelled in
-   * src/speak.js; what lives here is only what needs a browser — the
+   * src/speak.js; what lives here is only what needs a browser, the
    * speaker, the recognizer, and the silence timer that decides the
    * member has finished reciting. Half-duplex is the one hard rule: the
    * recognizer is torn down before the speaker opens its mouth and only
@@ -858,13 +860,16 @@ export class App extends React.Component {
   startSpeak() {
     const d = this.state.speak;
     if (!d.supported || d.running) return;
-    const queue = speakPool(d.source, this.state.passages, this.state.progress, this.state.profile, Date.now()).map(
+    // The same source the screen is showing, never the raw stored one: see
+    // effectiveSource in viewmodel/speak.js.
+    const source = effectiveSource(d.source, this.state.passages, this.state.progress);
+    const queue = speakPool(source, this.state.passages, this.state.progress, this.state.profile, Date.now()).map(
       (p) => p.id,
     );
     if (!queue.length) return;
-    // One speaker for the whole session — the Start press is the user gesture
+    // One speaker for the whole session, the Start press is the user gesture
     // the browser's audio policy wants, and everything after it is hands-free.
-    this.speakVoice = createSpeaker();
+    this.speakVoice = createSpeaker({ endpoint: appConfig.speakUrl });
     // Built on the same press, for the same reason: an AudioContext made
     // outside a gesture starts silent.
     this.speakEarcons = createEarcons();
@@ -936,20 +941,20 @@ export class App extends React.Component {
         }
         // Any sound, settled or not, is the member still going: push the
         // deadline back. How long that deadline is depends on how much of the
-        // passage has been heard — see silenceMsFor. The timer lives here
+        // passage has been heard, see silenceMsFor. The timer lives here
         // rather than in the pure module, which holds no timers by design.
         this.speakArmSilence(this.speakSilenceMs());
       },
       /* The engine's own view of when the speech ended. It has the audio and a
        * voice model; the timer below has neither. Where it fires, it only
-       * shortens the wait — never lengthens it — so it can improve the loop's
+       * shortens the wait, never lengthens it, so it can improve the loop's
        * pace but never cut a member off earlier than the window allows. */
       onEndpoint: () => {
         if (!this.state.speak.running || this.state.speak.phase !== "listen") return;
         if (this.speakHeardSettled) this.speakArmSilence(Math.min(SPEAK_ENDPOINT_MS, this.speakSilenceMs()));
       },
       // A real failure (mic denied, no microphone, network) can never resolve
-      // itself mid-speak — grading past it would loop "I did not hear
+      // itself mid-speak, grading past it would loop "I did not hear
       // anything" over the whole queue forever. Stop the session instead.
       onError: (err) => this.stopSpeak(copy.speak.micError(err)),
     });
@@ -965,7 +970,7 @@ export class App extends React.Component {
    * Streaming is what makes the Web Speech API feel bad: the recogniser ends a
    * continuous session of its own accord after about a minute, has to be
    * restarted into a rate-limiter, and on Chrome for Android ignores
-   * `continuous` altogether — which is the phone in the car, the case this mode
+   * `continuous` altogether, which is the phone in the car, the case this mode
    * exists for. Recording the whole recital and transcribing it once is the
    * shape that fixes all three, and it is what good dictation tools actually
    * do. It is off unless a deploy configures somewhere to send the audio, and
@@ -974,8 +979,8 @@ export class App extends React.Component {
     return !!appConfig.transcribeUrl && recordingSupported();
   }
 
-  /* Record the turn instead of streaming it. The rest of the loop — the bands,
-   * the read-back, the prompter — never learns which way the words arrived. */
+  /* Record the turn instead of streaming it. The rest of the loop, the bands,
+   * the read-back, the prompter, never learns which way the words arrived. */
   speakRecord() {
     const p = this.speakPassage();
     this.speakRecorder = createTranscriber({
@@ -991,7 +996,7 @@ export class App extends React.Component {
     if (!this.speakRecorder) return this.stopSpeak(copy.speak.noMic);
     this.speakRecorder.start();
     // A stall is still a stall, and a ceiling in case nothing is ever heard at
-    // all — with no transcript yet there is nothing to read a coverage ratio off.
+    // all, with no transcript yet there is nothing to read a coverage ratio off.
     this.speakArmSilence(SPEAK_STALL_MS, true);
     this.speakCeiling = setTimeout(
       () => this.speakGrade(),
@@ -1036,7 +1041,7 @@ export class App extends React.Component {
   }
 
   /* Nothing has been said and the silence has run long. Feed the next few words
-   * — the audio equivalent of the first-letter scaffold — and reopen the
+   *, the audio equivalent of the first-letter scaffold, and reopen the
    * microphone on the same attempt. After two of those, read the verse and move
    * on: a third prompt is the app reciting the passage to itself. */
   speakStalled() {
@@ -1075,7 +1080,7 @@ export class App extends React.Component {
 
   /* Mark the recital and answer it.
    *
-   * The answer is the verse itself on every turn that was not clean — see the
+   * The answer is the verse itself on every turn that was not clean, see the
    * note on BANDS in speak.js. A clean one is answered with speed, and a shaky
    * one gets the passage read and then one more attempt at it, straight away,
    * which is the only moment a second attempt is worth anything. */
@@ -1085,7 +1090,7 @@ export class App extends React.Component {
     if (!p) return this.stopSpeak();
     if (this.speakEarcons) this.speakEarcons.close();
 
-    /* A recorded turn has said nothing yet — the words are still in a blob that
+    /* A recorded turn has said nothing yet, the words are still in a blob that
      * has to go and be transcribed. The recorder is detached before the
      * teardown so that stopping the turn does not cancel the very upload the
      * mark depends on. */
@@ -1114,7 +1119,7 @@ export class App extends React.Component {
     const retried = this.speakRetried;
     this.speakSet({ phase: "feedback", lastResult: result, band });
 
-    /* What the chosen mode adds on top of the band line — the words missed, or
+    /* What the chosen mode adds on top of the band line, the words missed, or
      * a figure per verse. Whole-passage mode adds nothing, which is why the
      * commonest turn is also the shortest. */
     const detail = result.abstained ? "" : result.spokenFeedback;
@@ -1127,7 +1132,7 @@ export class App extends React.Component {
     }
 
     if (band === "shaky" && !retried) {
-      // Hear it, then say it — once. Never twice: failing the same verse twice
+      // Hear it, then say it, once. Never twice: failing the same verse twice
       // inside half a minute is how a session stops being worth doing.
       this.speakRetried = true;
       return this.sayThen(say(copy.speak.shaky, p.text, copy.speak.nowYou), () => this.speakListen());
@@ -1142,7 +1147,7 @@ export class App extends React.Component {
   /* Start a session over `ids`, or over the stalest SESSION_SIZE passages.
    *
    * `kind` says which sitting this is (review or learn). It only changes how the
-   * session frames itself and what finishing a card can earn — the cards, the
+   * session frames itself and what finishing a card can earn, the cards, the
    * activities, and the walk through the queue are identical. */
   startSession(mode, ids, kind = REVIEW) {
     const queue =
@@ -1170,13 +1175,13 @@ export class App extends React.Component {
     scrollToTop();
   }
 
-  /* Clear everything that belongs to the card being left — including what it
+  /* Clear everything that belongs to the card being left, including what it
    * cost, since peeks and wrong tries are per attempt. What a submitted card
    * was worth lives in `results`, keyed by passage, and survives.
    *
    * The Peek latch is the exception, and the only thing here that outlives the
    * card: it is the member saying how they want to work this sitting, not
-   * something they did to this verse. So it is carried over — and the card it
+   * something they did to this verse. So it is carried over, and the card it
    * carries onto opens with its passage on screen, which is a peek, and is
    * charged as one. A latched sitting is a sitting where every card starts a
    * peek down; it is not a way of reading the set for free. */
@@ -1220,7 +1225,7 @@ export class App extends React.Component {
 
   /* Try the same card again after a learn attempt did not commit the verse.
    * Clears the mark so Submit is live again, and gives the card the same clean
-   * slate resetCard gives a fresh one — without moving off it, so the second
+   * slate resetCard gives a fresh one, without moving off it, so the second
    * attempt is still this passage. record() reads whatever progress the first
    * attempt already left, so nothing about it is undone; a second clean recall
    * can still commit the verse. */
@@ -1235,14 +1240,14 @@ export class App extends React.Component {
     this.resetCard();
   }
 
-  /* Whether the card in front of us has already been handed in — after which it
+  /* Whether the card in front of us has already been handed in, after which it
    * cannot be marked again this session. */
   cardSubmitted() {
     const id = this.state.queue[this.state.qi];
     return id != null && !!this.state.results[id];
   }
 
-  /* Whether the mark on this card was earned in the exercise now on screen — in
+  /* Whether the mark on this card was earned in the exercise now on screen, in
    * which case that exercise is showing its marked paper, and must stop taking
    * answers so the paper cannot change under the mark.
    *
@@ -1259,7 +1264,7 @@ export class App extends React.Component {
   /* Whether this card can still be handed in again: the mark it got left the
    * verse uncommitted, so what the sitting is for is still open. A review
    * session only ever deals committed verses, so this is only ever a learn card
-   * that fell short — the same case "Try again" is offered for (see
+   * that fell short, the same case "Try again" is offered for (see
    * viewmodel/review.js, learnRetryShown). */
   cardOpenAgain() {
     const id = this.state.queue[this.state.qi];
@@ -1270,7 +1275,7 @@ export class App extends React.Component {
   /* Walk one card forward or back, ending the session past the queue's end.
    *
    * A card that was never submitted records nothing and its answers are not
-   * kept, so the member is asked first — in either direction, since leaving a
+   * kept, so the member is asked first, in either direction, since leaving a
    * card unmarked costs the same whichever way they walk off it. The flashcard
    * is the exception: nothing marks it, so it is recorded on the way out (an
    * unmarked activity earns the plain "I reviewed it" award). */
@@ -1298,8 +1303,8 @@ export class App extends React.Component {
     this.resetCard();
   }
 
-  /* Leaving part-way through keeps every card already submitted — only the rest
-   * of the queue is dropped — which is still worth confirming. */
+  /* Leaving part-way through keeps every card already submitted, only the rest
+   * of the queue is dropped, which is still worth confirming. */
   leaveReview() {
     this.stopListening();
     this.setState((s) => ({
@@ -1404,7 +1409,7 @@ export class App extends React.Component {
     this.setState({ examPick: null });
   }
 
-  /* Questions can be walked in both directions until the paper is handed in —
+  /* Questions can be walked in both directions until the paper is handed in,
    * answers are held by question index, so going back shows what was left
    * there and lets it be changed. */
   nextQuestion() {
@@ -1436,7 +1441,7 @@ export class App extends React.Component {
   }
 
   /* Leaving part-way through is a walk-out, not a fail: nothing is marked and
-   * no verse moves — which is worth confirming, since a half-finished paper is
+   * no verse moves, which is worth confirming, since a half-finished paper is
    * thrown away rather than kept. */
   leaveExam() {
     this.setState({ view: "board", exam: null, examPick: null, examLeaveAsk: false });
@@ -1472,7 +1477,7 @@ export class App extends React.Component {
     this.setSamuel({ index: s.index + 1, answer: null });
   }
 
-  /* Jump from a weak chapter straight to reading it — the one place the two
+  /* Jump from a weak chapter straight to reading it, the one place the two
    * halves of the screen talk to each other. */
   readSamuelChapter(book, chapter) {
     this.setSamuel({ view: "read", book, openChapter: book + " " + chapter });
@@ -1480,7 +1485,7 @@ export class App extends React.Component {
 
   /* ── run mode ───────────────────────────────────────────────────────────── */
 
-  /* The playlist ships in the main tree, not on every branch — a static import
+  /* The playlist ships in the main tree, not on every branch, a static import
    * of a missing module would white-screen the whole app (no bundler), so it
    * is fetched lazily and its absence is an empty list. */
   loadRunPlaylist() {
@@ -1496,8 +1501,8 @@ export class App extends React.Component {
     this.setState((s) => ({ run: { ...s.run, ...patch } }));
   }
 
-  /* One press starts everything — the gesture is what unlocks the AudioContext
-   * and speechSynthesis — and it runs hands-free until Stop: the beat under a
+  /* One press starts everything, the gesture is what unlocks the AudioContext
+   * and speechSynthesis, and it runs hands-free until Stop: the beat under a
    * loop of callouts (reference, verse, then an echo pause for the runner to
    * say it back in their head), the beat ducked while the voice speaks. */
   startRun() {
@@ -1513,7 +1518,7 @@ export class App extends React.Component {
   }
 
   /* A run is spent looking anywhere but at the phone, so the screen is asked to
-   * stay awake — a locked screen is a background tab, and a background tab is
+   * stay awake, a locked screen is a background tab, and a background tab is
    * where audio goes to die. The lock is a courtesy the browser may refuse
    * (and always refuses without HTTPS), so nothing depends on it. */
   holdScreenAwake() {
@@ -1566,6 +1571,7 @@ export class App extends React.Component {
       }
       this.setRun({ saying: script[si].text });
       speak(script[si].text, {
+        endpoint: appConfig.speakUrl,
         /* Ducked when the voice really starts, not when it is asked to: a
          * browser that takes a moment to find its voice would otherwise play a
          * quiet beat under nothing at all. */
@@ -1593,12 +1599,12 @@ export class App extends React.Component {
     if (this.state.run.playing) this.setRun({ playing: false, nowRef: "", nowText: "", saying: "", audio: "off" });
   }
 
-  /* Two beeps on demand — the one thing that tells a member whether the fault
+  /* Two beeps on demand, the one thing that tells a member whether the fault
    * is the app or the machine it is playing on. */
   testRunSound() {
     if (!this.runBeat) this.runBeat = createBeat();
     if (this.runBeat) this.runBeat.testTone();
-    speak(copy.run.testSpoken, {});
+    speak(copy.run.testSpoken, { endpoint: appConfig.speakUrl });
     this.watchRunAudio();
   }
 
@@ -1649,7 +1655,7 @@ export class App extends React.Component {
       setProfileField: (key, value) => this.setProfileField(key, value),
       /* Appearance is not one of the profile's fields, and the way it behaves
        * says so: it is saved and on screen the moment it is pressed, rather
-       * than waiting for the form's Save with the rest — there is nothing to
+       * than waiting for the form's Save with the rest, there is nothing to
        * confirm about a choice the member can already see, and nothing to
        * cancel back to. */
       setTheme: (theme) => {
@@ -1658,7 +1664,7 @@ export class App extends React.Component {
         set({ theme });
       },
       // Wiping the record is asked about first, and the dialog is the only way
-      // to reach resetProgress — the button on the form only opens it.
+      // to reach resetProgress, the button on the form only opens it.
       askResetProgress: () => set({ resetAsk: true }),
       cancelResetProgress: () => set({ resetAsk: false }),
       resetProgress: () => this.resetProgress(),
@@ -1676,7 +1682,7 @@ export class App extends React.Component {
       setFilter: (filter) => set({ filter }),
       setListCategory: (listCategory) => set({ listCategory }),
       // A row ticked on its own also becomes the anchor a later shift-click
-      // measures its range from — including a row just unticked, since that is
+      // measures its range from, including a row just unticked, since that is
       // the end a shift-click would clear a run from.
       toggleSelect: (id) =>
         this.setState((s) => ({
@@ -1694,20 +1700,20 @@ export class App extends React.Component {
           const held = new Set(s.selection);
           return { selection: [...s.selection, ...ids.filter((id) => !held.has(id))] };
         }),
-      // Ticking every shown row, and clearing, are both a whole new selection —
+      // Ticking every shown row, and clearing, are both a whole new selection,
       // the view-model works out which ids that is, since it is what knows
       // which rows the search and filter have left on screen. Neither leaves an
       // end to extend from, so both drop the anchor.
       setSelection: (selection) => set({ selection, selectAnchor: null }),
 
-      // review — shared
+      // review, shared
       setMode: (mode) => {
         set({ mode });
         // A card not yet handed in starts the new exercise clean. One already
         // handed in is not cleared: the answers sit in a slot per activity, so
         // the marked paper stays there to come back to and the exercise switched
         // to is live because the mark is not its (see activityMarked). The
-        // exception is a mark that left the verse uncommitted — what the sitting
+        // exception is a mark that left the verse uncommitted, what the sitting
         // is for is still open, so the switch reopens the card exactly as "Try
         // again" does, and the new exercise can be handed in.
         if (!this.cardSubmitted()) this.resetCard();
@@ -1715,7 +1721,7 @@ export class App extends React.Component {
       },
       // Peeking is counted, not prevented: each press costs the card freshness
       // (see srs.reviewAward), so only the press is worth counting. A peek that
-      // is already showing costs nothing further — that is only reachable with
+      // is already showing costs nothing further, that is only reachable with
       // the latch on, and charging for pressing Peek at a passage already on
       // screen would be charging for nothing.
       //
@@ -1727,7 +1733,7 @@ export class App extends React.Component {
           showHelp: showHelp || s.peekStick,
           peeks: showHelp && !s.showHelp ? s.peeks + 1 : s.peeks,
         })),
-      // The latch itself. Switching it on is a peek — it reveals the passage —
+      // The latch itself. Switching it on is a peek, it reveals the passage,
       // and is charged as one; switching it off puts the passage away and
       // refunds nothing, since it was seen.
       togglePeekStick: () =>
@@ -1746,7 +1752,7 @@ export class App extends React.Component {
       cancelLeaveReview: () => set({ reviewLeaveAsk: false }),
       leaveReview: () => this.leaveReview(),
 
-      // review — flashcard
+      // review, flashcard
       setRevealed: (revealed) => set({ revealed }),
       // Both the passage and the first-letter scaffold are on the back, so each
       // of the two buttons below the card turns it over to its own side of the
@@ -1759,7 +1765,7 @@ export class App extends React.Component {
           s.revealed && s.flipLetters === letters ? { revealed: false } : { revealed: true, flipLetters: letters },
         ),
 
-      // review — fill the blanks
+      // review, fill the blanks
       setAnswer: (index, value, focusIndex) => {
         if (this.activityMarked()) return;
         this.setState(
@@ -1773,7 +1779,7 @@ export class App extends React.Component {
         set({ blankLevel: level, answers: {}, blanksChecked: false });
       },
       // Turning the passage over asks for a different set of words, so what was
-      // filled in against the old set is dropped — the same clean slate
+      // filled in against the old set is dropped, the same clean slate
       // setBlankLevel gives, and for the same reason.
       setBlankParity: (parity) => {
         storage.saveBlankParity(parity);
@@ -1785,7 +1791,7 @@ export class App extends React.Component {
         set({ blankHint: on });
       },
 
-      // review — from memory (typed, or recited aloud)
+      // review, from memory (typed, or recited aloud)
       // A hand edit settles everything in the box: the member has taken the
       // transcript over, so the next phrase heard starts after what they left
       // rather than overwriting it.
@@ -1809,7 +1815,7 @@ export class App extends React.Component {
       },
       // Moving the cursor without typing anything says the same thing a hand
       // edit does about where the next phrase belongs. Only worth tracking
-      // while the microphone is open — nothing else in the app reads it, and a
+      // while the microphone is open, nothing else in the app reads it, and a
       // member who is only typing should not pay for a setState per keystroke.
       setCaret: (caret) => {
         if (this.state.voice.status === "off" || this.activityMarked()) return;
@@ -1839,11 +1845,11 @@ export class App extends React.Component {
         );
       },
 
-      // review — reciting aloud. One switch, and nothing else: correcting a
+      // review, reciting aloud. One switch, and nothing else: correcting a
       // misheard word is what the textarea is already for.
       toggleVoice: () => this.toggleVoice(),
 
-      // review — order the phrases
+      // review, order the phrases
       placeChunk: (index) => this.placeChunk(index),
       // Starting over is the ordering attempted again from scratch, so the board
       // and the wrong tries both go: a tally carried over from an attempt the
@@ -1923,7 +1929,7 @@ export class App extends React.Component {
   render() {
     const { isMobile, loaded, splashHold, auth, sync, profile, editingProfile, welcomePrompt } = this.state;
 
-    // A phone or a tablet is warned before the app — and the warning comes
+    // A phone or a tablet is warned before the app, and the warning comes
     // before the splash, since it is the first thing worth saying. Continue
     // passes through it for this visit; the acknowledgement is never saved,
     // so the safety warning is shown again next time.
@@ -1932,7 +1938,7 @@ export class App extends React.Component {
 
     // The splash is up until the app knows where the member is going: their
     // board if Firebase restores a session, the sign-in screen if it does not.
-    // Deciding behind the splash is the point — otherwise a returning member
+    // Deciding behind the splash is the point, otherwise a returning member
     // would be shown a sign-in prompt for the moment the check takes.
     if (!loaded || auth.status === "loading" || splashHold) {
       // The set's size comes from the module rather than from state: state.passages
@@ -1941,7 +1947,7 @@ export class App extends React.Component {
     }
 
     // Sign-in is required before the app. "disabled" means Firebase is
-    // unreachable — fall through to local-only rather than lock members out.
+    // unreachable, fall through to local-only rather than lock members out.
     if (auth.status !== "signed-in" && auth.status !== "disabled") {
       return authGateView(
         authGateVals({ auth, groupName: this.groupName(), motto: this.motto(), actions: this.actions }),
@@ -1953,7 +1959,7 @@ export class App extends React.Component {
      *
      * But an incomplete profile only means "new member" once the cloud record
      * has actually been read. While the read is in flight, or after it has
-     * failed, the app does not know what this member has — and sending them
+     * failed, the app does not know what this member has, and sending them
      * through sign-up would stamp a fresh profile that then wins the merge and
      * replaces the real one. So the sync gate stands in front of the form (and
      * only of the form: a member whose profile is already complete on this
@@ -1992,7 +1998,7 @@ export class App extends React.Component {
     }
 
     // A one-time nudge toward the guide, shown between finishing sign-up and
-    // landing on the board — see submitProfile.
+    // landing on the board, see submitProfile.
     if (welcomePrompt) {
       return welcomeView(welcomeVals({ groupName: this.groupName(), actions: this.actions }));
     }

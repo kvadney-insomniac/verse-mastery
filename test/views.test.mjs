@@ -1,6 +1,6 @@
 /* Render smoke tests for the view layer.
  *
- * There is no DOM in this test suite (see test/helpers/dom-env.mjs) — every
+ * There is no DOM in this test suite (see test/helpers/dom-env.mjs), every
  * scenario in test/helpers/scenarios.mjs is instantiated as an App and
  * rendered to static markup. This is what makes the views/ + viewmodel/
  * split safe to change: a broken template throws here, and a stray leading
@@ -71,7 +71,7 @@ test("a browser with no WebAudio still gets the playlist", () => {
 test("a session the microphone ended says so, rather than just going quiet", () => {
   const markup = shown("speak/stopped-by-mic");
   assert.match(markup, /microphone was blocked/i);
-  // And it is still offering the way back in — the screen is not a dead end.
+  // And it is still offering the way back in, the screen is not a dead end.
   assert.match(markup, /Start speaking/);
 });
 
@@ -119,7 +119,7 @@ test("the alternating level asks which half goes; the keyword levels do not", ()
 });
 
 test("turning the passage over asks for the other words", () => {
-  // The two ways round are different exercises, not a relabelling of one — so
+  // The two ways round are different exercises, not a relabelling of one, so
   // the markup of the two screens must actually differ.
   assert.notEqual(shown("review/blanks-alternating"), shown("review/blanks-alternating-flipped"));
 });
@@ -157,7 +157,7 @@ test("the splash decides where the member lands, so neither destination shows ea
 });
 
 test("the splash holds its minimum even when there is nothing left to wait for", () => {
-  // Local data is in and the member is signed in — only splashHold is up, and
+  // Local data is in and the member is signed in, only splashHold is up, and
   // the animation still gets its turn rather than flashing past.
   const holding = shown("splash/holding");
   assert.match(holding, /class="splash-mark"/);
@@ -186,7 +186,7 @@ test("the mark stands beside the wordmark, on the way in and once inside", () =>
 
 test("and it is the same drawing as the favicon, not a second one", () => {
   // src/icon.svg has to be a standalone file a browser can fetch, so the
-  // geometry is copied rather than imported — which is exactly why it is worth
+  // geometry is copied rather than imported, which is exactly why it is worth
   // a test. An app with two marks has no mark.
   const file = readFileSync(new URL("../src/icon.svg", import.meta.url), "utf8");
   const inline = shown("auth/signed-out");
@@ -258,13 +258,13 @@ test("the settings form offers a reset, and the setup form does not", () => {
   assert.match(editing, /You have 3 passages committed and 3 passages in progress\./);
   assert.doesNotMatch(editing, /cannot be undone/);
 
-  // The setup form is a gate with nothing behind it yet — no record to wipe.
+  // The setup form is a gate with nothing behind it yet, no record to wipe.
   assert.doesNotMatch(shown("profile/setup-empty"), /Reset all progress/);
 });
 
 /* Signing up asks for who the member is and nothing else. How reviews behave
- * is a set of questions nobody can answer before they have used the app — how
- * many verses a sitting should hold, how far one may fade — so they wait until
+ * is a set of questions nobody can answer before they have used the app, how
+ * many verses a sitting should hold, how far one may fade, so they wait until
  * there is something to judge them against. */
 test("signing up asks for personal details only", () => {
   const setup = shown("profile/setup-empty");
@@ -293,7 +293,7 @@ test("and the settings form still carries every one of them", () => {
 });
 
 /* The appearance switch. The theme itself is a token block in styles.css and a
- * stamp on the root element — neither of which a static render can see — so what
+ * stamp on the root element, neither of which a static render can see, so what
  * is asserted here is the part the form owns: that the three choices are offered
  * where a setting belongs, that the one in force is the one standing selected,
  * and that the note does not promise the member's other devices anything. */
@@ -341,7 +341,7 @@ test("resetting says what goes, where it goes from, and what stays", () => {
 test("a member with nothing recorded has nothing to reset", () => {
   const empty = shown("profile/edit-nothing-to-reset");
   assert.match(empty, /not recorded anything yet/);
-  // The button is there, but dead — there is no record behind it.
+  // The button is there, but dead, there is no record behind it.
   const [button] = empty.match(/<button[^>]*>Reset all progress<\/button>/) || [];
   assert.match(button || "", /disabled=""/);
 });
@@ -387,14 +387,14 @@ test("a missed recall word shows what was written in its place", () => {
   assert.match(markup, />O<\/span>/, "the missed word is still shown in full");
   assert.match(markup, />israel</, "and what was typed in its place, right there beside it");
   assert.match(markup, />load</, "a wrong word shows what was actually written, not just that it's wrong");
-  // Once the input runs out there is nothing to show having been typed —
+  // Once the input runs out there is nothing to show having been typed,
   // "the", "is", "one" and the rest of the passage past "god" are missed with
   // no annotation, so exactly the two real mistakes get a strike-through line.
   assert.equal((markup.match(/text-decoration:line-through/g) || []).length, 2);
 });
 
 test("the flashcard's show and hide are one button in one place", () => {
-  // Same row, same order, same neighbour — only the label turns over.
+  // Same row, same order, same neighbour, only the label turns over.
   const pair = /Show first letters<\/button><button[^>]*>(Show|Hide) passage<\/button>/;
   assert.match(shown("review/flip-hidden").replace(/\s+</g, "<"), pair);
   assert.match(shown("review/flip-revealed").replace(/\s+</g, "<"), pair);
@@ -404,7 +404,7 @@ test("the flashcard's show and hide are one button in one place", () => {
 });
 
 test("the flashcard is a two-sided card: reference out, passage in", () => {
-  // Both faces are always in the card — turning it is what decides which one the
+  // Both faces are always in the card, turning it is what decides which one the
   // member looks at, and which one a screen reader is given.
   const front = shown("review/flip-hidden");
   assert.match(front, /class="flip-card-face" aria-hidden="false"/);
@@ -574,7 +574,7 @@ test("the freshness demonstration runs the real curve under the slider", () => {
   assert.match(start, /Still above the line/);
 
   // A month on, a well-held passage is just under the mark and a new one is all
-  // but gone — which is the whole point of the picture. Both curves are rungs of
+  // but gone, which is the whole point of the picture. Both curves are rungs of
   // the real ladder: the fortnight one a member reaches after seven clean
   // reviews, and the very first, a day.
   const later = shown("guide/month-later");
@@ -586,7 +586,7 @@ test("the freshness demonstration runs the real curve under the slider", () => {
 
 test("the schedule is drawn from the model's own ladder, rung for rung", () => {
   const markup = shown("guide/default");
-  // Not a list typed out beside srs.INTERVALS — the same list, in the member's
+  // Not a list typed out beside srs.INTERVALS, the same list, in the member's
   // words, so retuning the model redraws the picture.
   assert.equal((markup.match(/guide-rung"/g) || []).length, INTERVALS.length);
   for (const [days, label] of [
@@ -619,7 +619,7 @@ test("every activity is demonstrated, and only one is flagged as committing", ()
 /* The guide is the screen a member reads before they know how any of this
  * works, so it is written plainly on purpose (see the note atop
  * viewmodel/guide.js). These are the words the rest of the app is free to use
- * and this screen is not — a rewrite that reaches for them has drifted back. */
+ * and this screen is not, a rewrite that reaches for them has drifted back. */
 const GUIDE_JARGON = [
   /sitting/i,
   /upkeep/i,
@@ -641,8 +641,8 @@ test("the guide says none of it in the app's own shorthand", () => {
 
 /* The app is not offered on a device you hold (src/device.js, views/mobile-gate.js),
  * so a guide that tells a member to recite into their phone is describing a
- * screen they will never be shown. The recall card takes the words either way —
- * spoken or typed — and says so without naming hardware, which is the wording
+ * screen they will never be shown. The recall card takes the words either way,
+ * spoken or typed, and says so without naming hardware, which is the wording
  * the guide now borrows. */
 test("the guide never sends a member to a device the app refuses to run on", () => {
   for (const name of ["guide/default", "guide/day-zero", "guide/month-later"]) {
@@ -677,7 +677,7 @@ test("the board splits the set into what to review and what to learn", () => {
 
 test("each queue says why it is empty, and they say different things", () => {
   const fresh = shown("board/fresh-account");
-  assert.match(fresh, /Nothing to review yet — a verse arrives here once you have committed it/);
+  assert.match(fresh, /Nothing to review yet\. A verse arrives here once you have committed it/);
 
   const done = shown("board/all-committed");
   assert.match(done, /Every passage in the set is committed. Nothing left to learn/);
@@ -758,7 +758,7 @@ test("a verse already committed is shown as such rather than re-explained", () =
 /* Freshness is the upkeep idea: how much of a committed passage has decayed and
  * when it is worth topping up. A member committing a passage for the first time
  * cannot act on it, and quoting a percentage invites them to optimise it instead
- * of writing the passage out. The scheduling still runs underneath — it is just
+ * of writing the passage out. The scheduling still runs underneath, it is just
  * never what the learn screens are about. */
 const LEARN_SCREENS = [
   "learn-setup/default",
@@ -802,7 +802,7 @@ test("a learn card reports whether it committed, not a freshness delta", () => {
   assert.match(missed, /Head over to the Recall tab to commit/);
 });
 
-test("a card that fell short of committing offers a try again — a done one does not", () => {
+test("a card that fell short of committing offers a try again, a done one does not", () => {
   assert.match(
     shown("learn/not-committed"),
     /Try again/,
@@ -887,8 +887,8 @@ test("each activity renders its own panel", () => {
   assert.match(shown("test/last-question"), /Finish and mark/);
 });
 
-/* Every other activity puts the passage in front of the member — quoted, cut
- * into phrases, or blanked — and the four that ask where a verse is from must
+/* Every other activity puts the passage in front of the member, quoted, cut
+ * into phrases, or blanked, and the four that ask where a verse is from must
  * not. "Write it out" is the one that shows nothing, so it names the reference,
  * or there is no way to tell which passage is being asked for. */
 test("write it out names the passage it wants, since it quotes none of it", () => {
@@ -912,7 +912,7 @@ test("questions can be walked back, except the first", () => {
 
 test("a matched pair is tinted the same on both sides of the grid", () => {
   // test/match pairs the first verse with its own reference, so exactly two
-  // tiles — one in each column — carry that pair's colour.
+  // tiles, one in each column, carry that pair's colour.
   const markup = shown("test/match");
   const tint = markup.match(/hsl\(\d+,42%,92%\)/g) || [];
   assert.equal(tint.length, 2, "the verse and the reference filed under it, and nothing else");
@@ -965,7 +965,7 @@ test("a browser that cannot listen says so, and the switch is dead", () => {
   assert.match(markup, /disabled=""/);
 });
 
-test("the first-letter scaffold takes the switch away — there is nothing to recite", () => {
+test("the first-letter scaffold takes the switch away, there is nothing to recite", () => {
   assert.doesNotMatch(shown("voice/scaffold-on"), />Voice</);
 });
 
@@ -984,7 +984,7 @@ test("the words appear in the box the grader reads, and nowhere else", () => {
 });
 
 test("the hint gives way once it is on, and to an error if one lands", () => {
-  assert.match(shown("voice/off"), /Say the passage — the words appear as you go/);
+  assert.match(shown("voice/off"), /Say the passage; the words appear as you go/);
   assert.doesNotMatch(shown("voice/listening"), /Say the passage/, "not worth repeating while they are");
   assert.match(shown("voice/blocked"), /The microphone was blocked\. Allow it in your browser/);
 });
@@ -997,14 +997,14 @@ test("a review sitting gets the same one switch", () => {
  *
  * The bug these guard: a member whose cloud record could not be read looks
  * exactly like a member who has none, so the app used to show them the sign-up
- * profile form on every device — and the profile they filled in, being newer,
+ * profile form on every device, and the profile they filled in, being newer,
  * then won the merge and replaced the real one. */
 
 test("a member whose record is still being read is not asked to sign up", () => {
   const pulling = shown("sync/pulling");
   assert.doesNotMatch(pulling, /SET UP YOUR PROFILE/);
   assert.match(pulling, /FINDING YOUR RECORD/);
-  // Nothing to press while a read is in flight — only the failed state offers a way on.
+  // Nothing to press while a read is in flight, only the failed state offers a way on.
   assert.doesNotMatch(pulling, /Try again/);
 });
 
@@ -1012,7 +1012,7 @@ test("a refused read says so, and offers only the two safe moves", () => {
   const refused = shown("sync/refused");
   assert.doesNotMatch(refused, /SET UP YOUR PROFILE/);
   assert.match(refused, /COULD NOT REACH YOUR RECORD/);
-  // It must not tell the member they have no progress — the app does not know.
+  // It must not tell the member they have no progress, the app does not know.
   assert.doesNotMatch(refused, /no progress/i);
   // A permission-denied read is a rules problem, and the member is told it is not theirs.
   assert.match(refused, /setup problem, not your account/);
@@ -1045,7 +1045,7 @@ test("a healthy sync shows neither the gate nor the banner", () => {
   const board = shown("board/populated");
   assert.doesNotMatch(board, /COULD NOT REACH YOUR RECORD/);
   assert.doesNotMatch(board, /saved on this device only/);
-  // And a genuinely new member — record read, nothing in it — still gets the form.
+  // And a genuinely new member, record read, nothing in it, still gets the form.
   assert.match(shown("profile/setup-empty"), /SET UP YOUR PROFILE/);
 });
 
@@ -1066,7 +1066,7 @@ test("an unreachable SDK still lets a member with a profile work, with the warni
 });
 
 test("a build with no Firebase configured is local-only and says nothing", () => {
-  // Not a fault — there is no account to reach, so the form is correct here.
+  // Not a fault, there is no account to reach, so the form is correct here.
   const local = shown("sync/unconfigured");
   assert.match(local, /SET UP YOUR PROFILE/);
   assert.doesNotMatch(local, /COULD NOT REACH/);

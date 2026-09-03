@@ -50,8 +50,8 @@ test("same() is the voice.js comparison, unchanged", () => {
 
 /* ── Double Metaphone ─────────────────────────────────────────────────────── */
 
-/* Pinned against the words this corpus actually makes hard — transliterated
- * Hebrew and Greek — rather than against a generic surname suite. These are the
+/* Pinned against the words this corpus actually makes hard, transliterated
+ * Hebrew and Greek, rather than against a generic surname suite. These are the
  * keys *this* port emits; the reduction is per-implementation (the alphabet in
  * the design keeps B and P apart where Philips' own reference folds them), so a
  * change to any of these is a change to what the phonetic tier credits. */
@@ -110,11 +110,11 @@ test("names within one edit are caught by the edit tier first, which is strict-e
 /* The design is explicit that the phonetic tier does not reach these, and says
  * why: PH ≠ P and CH → X ≠ K are real distinctions in the algorithm rather than
  * defects in it. Pinning the keys keeps a future "improvement" from quietly
- * widening the tier — the sounds genuinely differ, and a phonetic table that
+ * widening the tier, the sounds genuinely differ, and a phonetic table that
  * said otherwise would be wrong about English, not merely lenient.
  *
  * Two of the three are rescued anyway, one tier up: `jerico` and `enock` are a
- * single edit from their spellings. That is the hybrid working as intended —
+ * single edit from their spellings. That is the hybrid working as intended,
  * edit distance asks whether these are two transcriptions of one utterance, and
  * on those two the answer is yes without any phonetics being consulted. */
 test("the phonetic tier does not reach a genuinely different sound", () => {
@@ -157,8 +157,8 @@ test("every blocklisted pair is refused, in both directions", () => {
 });
 
 /* The test that keeps the phonetic tier honest: it recomputes the entire
- * false-positive surface over the shipped set — every proper noun against every
- * vocabulary word — and asserts the blocklist already names all of it. It will
+ * false-positive surface over the shipped set, every proper noun against every
+ * vocabulary word, and asserts the blocklist already names all of it. It will
  * fail loudly the day somebody adds a passage that introduces a new collision,
  * which is exactly when somebody should be looking. */
 test("the blocklist is the complete collision surface over the whole passage set", () => {
@@ -173,14 +173,14 @@ test("the blocklist is the complete collision surface over the whole passage set
   }
   /* The corpus these figures were measured against, one row per translation
    * the set has actually been generated in. They move whenever
-   * data/passages.js does — a split passage, a new shelf, or a regeneration in
-   * another translation changes both — and moving them is the prompt to
+   * data/passages.js does, a split passage, a new shelf, or a regeneration in
+   * another translation changes both, and moving them is the prompt to
    * re-read the loop below rather than a failure in itself: the surface the
    * blocklist has to cover is exactly this vocabulary crossed with these names.
    *
    * Pinning per translation rather than gating the pin to ESV (which is what
    * test/passages.test.mjs does with Crossway's storage caps) is the choice
-   * here, and the reason is that these figures are not a licence term — they
+   * here, and the reason is that these figures are not a licence term, they
    * are a measurement, and a measurement that only runs on one of the two texts
    * we ship is a measurement that rots on the other. A translation with no row
    * yet is not a failure; it simply has nothing to have drifted from, and the
@@ -205,7 +205,7 @@ test("the blocklist is the complete collision surface over the whole passage set
 
   /* Nothing gets through. A pair that reaches the phonetic tier here is a pair
    * of real vocabulary words being credited for each other, which is the
-   * failure the design forbids — so the blocklist must already have caught it,
+   * failure the design forbids, so the blocklist must already have caught it,
    * and wordMatch must already be answering null. */
   for (const name of names) {
     for (const word of vocabulary) {
@@ -220,7 +220,7 @@ test("the blocklist is the complete collision surface over the whole passage set
    * documented pairs cannot fire under this port at all (see the comment on
    * PHONETIC_BLOCK); these are the six that can. `wouldCollide` is a question
    * about two strings and nothing else, so this list is the same on every
-   * translation — it is the table being audited here, not the corpus. Recomputed here rather than
+   * translation, it is the table being audited here, not the corpus. Recomputed here rather than
    * asserted from the source, so the day one goes inert somebody has to say so
    * on purpose. */
   const live = PHONETIC_BLOCK.filter(([a, b]) => wouldCollide(a, b))
@@ -266,7 +266,7 @@ test("the curated homophone table is bidirectional", () => {
 
 test("the table reaches the pairs no other tier can", () => {
   // Both are under MIN_FUZZY_LEN and under MIN_PHONETIC_LEN, so without an
-  // explicit entry "no" is simply a miss — and "I will fear no evil" needs it.
+  // explicit entry "no" is simply a miss, and "I will fear no evil" needs it.
   assert.equal(same("know", "no"), false, "the fuzzy tier is gated off by length");
   assert.equal(wordMatch("know", "no"), "homophone");
   // Two edits apart, so the fuzzy tier cannot reach these either.

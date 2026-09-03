@@ -4,7 +4,7 @@
  * (srs.commitsVerse), what a sitting draws from (progress.reviewPool /
  * learnPool), or how a verse is scheduled. All it does is narrow the passage
  * list handed to those, which is why every screen that offers a category also
- * offers "All" and defaults to it — with nothing chosen, the app behaves
+ * offers "All" and defaults to it, with nothing chosen, the app behaves
  * exactly as it did when there was one flat set.
  *
  * The names sit beside the keys here rather than in copy.js, for the same
@@ -14,7 +14,7 @@
  * drops a saved preference. `short` is what fits on a tab; `name` is the
  * shelf's full title.
  *
- * `goal: true` marks the one category the deadline is measured against — see
+ * `goal: true` marks the one category the deadline is measured against, see
  * viewmodel/totals.js. The other two are worth learning and count on the
  * leaderboard, but they are not what the pace on the board is counting down. */
 
@@ -26,7 +26,7 @@ import { appConfig } from "./config.js";
  * not moving a key, and the key is what every passage record and every saved
  * setup form was written with. A key the deployer left out (or one they invented
  * that matches no shelf) falls back to the name below, so a partial map renames
- * exactly what it mentions. The `short` tab labels are not configurable — they
+ * exactly what it mentions. The `short` tab labels are not configurable, they
  * are already generic, and a two-letter tab has nowhere to put a longer word. */
 const displayName = (key, fallback) => {
   const names = appConfig.categoryNames;
@@ -55,7 +55,7 @@ export const categoryOf = (passage) => (passage && passage.category) || GOAL_CAT
 export const categoryByKey = (key) => CATEGORIES.find((c) => c.key === key) || null;
 
 /* Narrow a passage list to one category. A null/unknown key means "All", and
- * returns the list untouched — that is what lets every caller apply this
+ * returns the list untouched, that is what lets every caller apply this
  * unconditionally instead of branching around it. */
 export function inCategory(passages, key) {
   if (!key || !categoryByKey(key)) return passages;

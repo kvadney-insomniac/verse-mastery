@@ -1,7 +1,7 @@
 {
   "name": "recital-score",
-  "version": "0.1.0",
-  "description": "Score a spoken recitation against text you already know, by sequence alignment with asymmetric gap costs — so false starts, repetitions, self-corrections and recognizer noise are free, and a genuinely forgotten clause is not.",
+  "version": "0.1.1",
+  "description": "Score a spoken recitation against text you already know, by sequence alignment with asymmetric gap costs, so false starts, repetitions, self-corrections and recognizer noise are free, and a genuinely forgotten clause is not.",
   "keywords": [
     "speech",
     "recitation",

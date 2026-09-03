@@ -3,8 +3,8 @@
  * licence where the translation has one.
  *
  * The licence half is the point of this file. Crossway's v3 terms cap how much
- * of their text may be stored and displayed — no more than 500 consecutive
- * verses, and no more than half of any one book — and the natural way to breach
+ * of their text may be stored and displayed, no more than 500 consecutive
+ * verses, and no more than half of any one book, and the natural way to breach
  * that is not a bad line of code but a well-meant addition to
  * tools/new-passages.json. So the limits are asserted over what we actually
  * ship, where they can fail the build, rather than left in the README where
@@ -14,7 +14,7 @@
  * that is a correction rather than a loosening: they were never a rule about
  * scripture, they are the terms Crossway attaches to their text, and applying
  * them to a public-domain set would be this repo inventing a restriction its
- * source does not carry. On an ESV build — which is what is committed today —
+ * source does not carry. On an ESV build, which is what is committed today,
  * they register and run and fail the build exactly as they always have. */
 
 import test from "node:test";
@@ -29,7 +29,7 @@ import { CATEGORIES, categoryOf } from "../src/categories.js";
 const KEYS = new Set(CATEGORIES.map((c) => c.key));
 
 /* Verses per book, for the books the set actually draws on. Only needed for the
- * half-a-book rule, so it is not the whole canon — a book added to the set
+ * half-a-book rule, so it is not the whole canon, a book added to the set
  * without a total here fails loudly below rather than skipping the check. */
 const BOOK_VERSES = {
   Genesis: 1533,
@@ -138,7 +138,7 @@ test("a verse-structured passage joins back to its own text", () => {
  * file recording which text they were computed from, and src/blanks.js prefers
  * them over its own heuristic. Regenerate the passages in another translation
  * without dealing with this file and every index survives, still well-formed,
- * now pointing at the wrong word — a failure with no symptom except a member
+ * now pointing at the wrong word, a failure with no symptom except a member
  * being asked to recall the wrong half of the sentence. An index past the end
  * of its own passage is the one shape of that mistake a machine can see, so it
  * is checked on every run. */
@@ -200,7 +200,7 @@ if (licensed)
     }
     for (const [book, verses] of Object.entries(stored)) {
       const total = BOOK_VERSES[book];
-      assert.ok(total, `${book} has no verse total — add it to BOOK_VERSES`);
+      assert.ok(total, `${book} has no verse total, add it to BOOK_VERSES`);
       assert.ok(
         verses.size <= total / 2,
         `${book}: ${verses.size} of ${total} verses stored, over the half-a-book limit`,

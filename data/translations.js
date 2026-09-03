@@ -6,14 +6,14 @@
  * rather than anything a fetch could work out, and `notice` in particular is a
  * legal string that must survive every regeneration byte for byte. Its
  * generated counterpart is `data/translation.js`, which records which of these
- * entries the shipped `data/passages.js` actually holds — the table says what
+ * entries the shipped `data/passages.js` actually holds, the table says what
  * is possible, that file says what is true of this build.
  *
  * Why the app is pluggable at all: it began as one church's tool and shipped
  * ESV under Crossway's API terms, which cap how much of their text may be
  * stored and displayed (test/passages.test.mjs asserts both caps over the
  * shipped set). That is fine for the congregation the key was issued to and
- * wrong for anything a stranger clones — a fork cannot lawfully redistribute
+ * wrong for anything a stranger clones, a fork cannot lawfully redistribute
  * ESV at will and has no API key to fetch it with either. A public-domain
  * default is what makes the repo runnable by somebody who is not us.
  *
@@ -22,9 +22,9 @@
  * passage word for word, so the wording *is* the thing being learned: a set
  * regenerated in another translation is a different set of verses to memorize,
  * not the same verses fetched from somewhere cheaper. The sharpest instance is
- * the divine name — the WEB prints "Yahweh" where the ESV and the KJV print
+ * the divine name, the WEB prints "Yahweh" where the ESV and the KJV print
  * "the LORD", so Proverbs 3:5 comes back as "Trust in Yahweh with all your
- * heart" — and a congregation that recites the older wording aloud together
+ * heart", and a congregation that recites the older wording aloud together
  * will notice on the first card. Neither rendering is the better one; a
  * deployer simply needs to know the difference exists before picking, which is
  * what this comment is for and what tools/fetch_passages.mjs prints before it
@@ -67,7 +67,7 @@ export const translations = [
   {
     /* The default for anyone deploying their own copy. A modern-English
      * revision of the ASV released into the public domain outright, so a fork
-     * may ship it, edit it, and hand it on without asking anybody — which is
+     * may ship it, edit it, and hand it on without asking anybody, which is
      * the whole point of having a default that is not ESV. Prints "Yahweh" for
      * the divine name (see above). */
     id: "web",
@@ -79,7 +79,7 @@ export const translations = [
   },
   {
     /* The familiar one. Its English is four centuries old, which cuts both
-     * ways for memorization — the cadence is what half of these passages are
+     * ways for memorization, the cadence is what half of these passages are
      * already carried in, and the second-person verbs are a real obstacle for a
      * member who has never recited any of it before.
      *

@@ -1,4 +1,4 @@
-/* The guide — the one screen that draws the app rather than describing it.
+/* The guide, the one screen that draws the app rather than describing it.
  *
  * Two things are worth pressing here. The figures on it are read off the model
  * (srs.js and the member's own profile), so they have to agree with what the
@@ -22,7 +22,7 @@ test("the guide quotes the model's own figures", async ({ app, page }) => {
   // The commit rule, drawn as a crossing from one half of the set to the other.
   await expect(page.getByText("gave it back from memory")).toBeVisible();
   await expect(page.getByText("not committed yet")).toBeVisible();
-  await expect(page.getByText("committed — now you keep it fresh")).toBeVisible();
+  await expect(page.getByText("committed: now you keep it fresh")).toBeVisible();
 });
 
 test("the slider redraws the forgetting curve", async ({ app, page }) => {
@@ -33,7 +33,7 @@ test("the slider redraws the forgetting curve", async ({ app, page }) => {
   await expect(page.getByText("6 days later")).toBeVisible();
 
   await slider.fill("0");
-  await expect(page.getByText("Days since you last reviewed it — the same day")).toBeVisible();
+  await expect(page.getByText("Days since you last reviewed it, the same day")).toBeVisible();
   // Day zero: both curves read full, which is the one figure the curve cannot
   // get wrong, and the verse is plainly not due.
   await expect(page.getByText("100%").first()).toBeVisible();

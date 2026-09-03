@@ -2,7 +2,7 @@
  *
  * Written like firebase.js: an optional overlay the app runs happily without.
  * `voiceSupported()` coming back false just means the recall activity is a box
- * you type in, which is what it has always been — Firefox has no
+ * you type in, which is what it has always been, Firefox has no
  * SpeechRecognition, and nothing about that is worth working around here.
  *
  * A recognizer is `{ start, stop }`, driven through four callbacks:
@@ -10,11 +10,11 @@
  *   onStatus(status)   "off" | "starting" | "listening"
  *   onText(text, settled, alternatives)
  *                      a phrase, whether the browser will still revise it (see
- *                      voice.js — an unsettled phrase replaces the last version
+ *                      voice.js, an unsettled phrase replaces the last version
  *                      rather than being appended), and on a settled phrase the
  *                      engine's other readings of it (see MAX_ALTERNATIVES)
  *   onEndpoint()       the engine's own judgement that the speech it was
- *                      following has ended — see below
+ *                      following has ended, see below
  *   onError(code)      a key from ERRORS
  *
  * It is never started by anything but the member: a microphone that switches
@@ -34,7 +34,7 @@ export const voiceSupported = () => !!ctor();
  *
  * The engine ranks its hypotheses by how confident it is that the words were
  * *said*, which is not the question this app asks. It asks whether a particular
- * passage was said — and it knows the passage. So a caller with a verse in hand
+ * passage was said, and it knows the passage. So a caller with a verse in hand
  * can look past the top reading to the others and take whichever is closest to
  * the verse, which is N-best rescoring done in ten lines.
  *
@@ -46,8 +46,8 @@ export const voiceSupported = () => !!ctor();
  * engine produced on its own, and choosing among them cannot invent a word
  * nobody spoke.
  *
- * Chrome may well hand back one reading whatever this is set to — the reports
- * disagree and no primary source settles it — so nothing depends on there being
+ * Chrome may well hand back one reading whatever this is set to, the reports
+ * disagree and no primary source settles it, so nothing depends on there being
  * more than one. A single alternative simply makes the pick a pick of one. */
 export const MAX_ALTERNATIVES = 5;
 
@@ -114,7 +114,7 @@ export function createRecognizer(handlers, { schedule = setTimeout, unschedule =
    * timer is still underneath. */
   rec.onspeechend = () => onEndpoint();
   rec.onerror = (event) => {
-    // Silence is not a failure — it is a member thinking about the next line.
+    // Silence is not a failure, it is a member thinking about the next line.
     if (event.error === "no-speech" || event.error === "aborted") return;
     wanted = false;
     handlers.onError(errorFor(event.error));
@@ -134,7 +134,7 @@ export function createRecognizer(handlers, { schedule = setTimeout, unschedule =
       try {
         rec.start();
       } catch {
-        /* still winding down — the next onend backs off again */
+        /* still winding down, the next onend backs off again */
       }
     }, wait);
   };

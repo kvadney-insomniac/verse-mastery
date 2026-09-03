@@ -2,7 +2,7 @@
  * two settings on it that the rest of the app then reads.
  *
  * These boot with the Firebase stub signed in, because the profile is an
- * account's — the header only carries a name, a settings button and a sign-out
+ * account's, the header only carries a name, a settings button and a sign-out
  * once there is a session behind them.
  *
  * The second half is the part worth driving in a browser: the member's own
@@ -28,8 +28,8 @@ test("a member with no profile fills one in before the app", async ({ app, page 
   await expect(save).toBeDisabled();
 
   await page.getByPlaceholder("Your full name").fill("Grace Hopper");
-  await page.getByPlaceholder("Start typing to search…").fill("Kai");
-  await page.getByRole("button", { name: "Kairos" }).click();
+  await page.getByPlaceholder("Start typing to search…").fill("Col");
+  await page.getByRole("button", { name: "College" }).click();
   await page.getByRole("button", { name: "Sister" }).click();
   await page.getByPlaceholder("e.g. 2016").fill("2027");
 
@@ -37,7 +37,7 @@ test("a member with no profile fills one in before the app", async ({ app, page 
   await save.click();
 
   // Finishing the form for the first time lands on the welcome nudge, not the
-  // board — it is shown once, between sign-up and the app (App.submitProfile).
+  // board, it is shown once, between sign-up and the app (App.submitProfile).
   await page.getByRole("button", { name: "Start learning right away" }).click();
   await app.nav("Home").click();
 
@@ -49,14 +49,14 @@ test("a member with no profile fills one in before the app", async ({ app, page 
   await expect(app.board).toBeVisible();
   expect(await app.stored("mv.profile")).toMatchObject({
     name: "Grace Hopper",
-    ministryGroup: "Kairos",
+    ministryGroup: "College",
     gender: "Female",
   });
 });
 
 /* Signing up asks who the member is and stops there. How reviews behave is a
  * set of questions nobody can answer before they have used the app, so they
- * wait for Settings — and nothing is lost by waiting, because the defaults are
+ * wait for Settings, and nothing is lost by waiting, because the defaults are
  * written either way (App.submitProfile). */
 test("signing up never asks how reviews should work", async ({ app, page }) => {
   await app.boot({ profile: null, firebase: signedIn });
@@ -67,14 +67,14 @@ test("signing up never asks how reviews should work", async ({ app, page }) => {
   await expect(page.getByText("You can change how reviews work later, under Settings.")).toBeVisible();
 
   await page.getByPlaceholder("Your full name").fill("Grace Hopper");
-  await page.getByPlaceholder("Start typing to search…").fill("Kai");
-  await page.getByRole("button", { name: "Kairos" }).click();
+  await page.getByPlaceholder("Start typing to search…").fill("Col");
+  await page.getByRole("button", { name: "College" }).click();
   await page.getByRole("button", { name: "Sister" }).click();
   await page.getByPlaceholder("e.g. 2016").fill("2027");
   await page.getByRole("button", { name: "Save and continue" }).click();
   await page.getByRole("button", { name: "Start learning right away" }).click();
 
-  // The defaults went in all the same — the questions were skipped, not the
+  // The defaults went in all the same, the questions were skipped, not the
   // answers.
   expect(await app.stored("mv.profile")).toMatchObject({
     dueTopX: 10,
@@ -122,7 +122,7 @@ test("editing can be backed out of", async ({ app, page }) => {
 
 /* Resetting the record. Worth driving in a browser rather than asserting on the
  * view-model: what makes a wipe a wipe is that it is still gone on the next
- * visit, and that it went up as a replacement — a merged push would leave every
+ * visit, and that it went up as a replacement, a merged push would leave every
  * verse in the cloud copy to come back on the following sign-in. */
 test("resetting all progress empties the board, and stays empty", async ({ app, page }) => {
   await app.boot({ progress: { 1: committed(1), 2: committed(0.6), 3: started(0.5) }, firebase: signedIn });
@@ -152,7 +152,7 @@ test("resetting all progress empties the board, and stays empty", async ({ app, 
   expect(await app.figure(app.committedFigure)).toBe(0);
   expect(await app.stored("mv.progress")).toEqual({});
 
-  // The wipe went up as a whole document — no merge option — since merging an
+  // The wipe went up as a whole document, no merge option, since merging an
   // empty map into the stored one would delete nothing, and every wiped verse
   // would come back on the next sign-in. (Ordinary saves after it still merge,
   // so it is the write without options that has to be found.)

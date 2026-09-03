@@ -1,4 +1,4 @@
-/* Run mode: what the run screen shows — the beat controls, the verse being
+/* Run mode: what the run screen shows, the beat controls, the verse being
  * called out, and the playlist panel. The audio itself lives behind the
  * actions (src/beat.js via App); nothing here touches it. */
 
@@ -45,7 +45,7 @@ export function runVals({ state, actions }) {
     runIdleNote: copy.run.idleNote,
     /* The three things a silent run cannot otherwise tell anyone: what the
      * audio hardware is doing, what is being said, and that a backgrounded tab
-     * is the usual culprit — plus the beeps that settle app-or-machine. */
+     * is the usual culprit, plus the beeps that settle app-or-machine. */
     runAudioNote: run.playing ? copy.run.audioState(run.audio) : "",
     runSayingNote: run.saying ? copy.run.saying(run.saying) : "",
     runBackgroundNote: copy.run.backgroundNote,

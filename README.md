@@ -1,16 +1,16 @@
-# Verse Mastery — public edition
+# Verse Mastery, public edition
 
 A spaced-repetition Bible-verse memorization app. Work through a set of
 passages, review them several ways, and watch a "freshness" score decay and
 recover along the Ebbinghaus forgetting curve so you know what to revisit and
-when. There is also a **Speak mode** that runs hands-free — the app reads a
-reference, you recite the verse aloud, and it marks you — and a **Run mode**
+when. There is also a **Speak mode** that runs hands-free, the app reads a
+reference, you recite the verse aloud, and it marks you, and a **Run mode**
 that calls verses out over a synthesized beat.
 
 **Try it: https://kvadney-insomniac.github.io/verse-mastery/**
 
 No sign-up, nothing to install. Progress is saved in your own browser and goes
-nowhere else — there is no account and no server holding your data.
+nowhere else, there is no account and no server holding your data.
 
 ---
 
@@ -33,7 +33,7 @@ member there, use their deployment, not this one.
 
 ## Deploy your own
 
-Everything a congregation needs to change is configuration rather than code —
+Everything a congregation needs to change is configuration rather than code,
 sign-in domains, group name, ministry groups, category names, the goal deadline.
 See **[docs/DEPLOYING.md](docs/DEPLOYING.md)** for standing up an instance with
 your own Firebase project, and _Scripture text_ below for choosing a
@@ -44,22 +44,22 @@ translation. Deploying to GitHub Pages costs nothing and needs no credentials:
 
 ## Features
 
-- **Four review modes** — Flashcard, Fill the blanks, Write it out, Order the phrases.
-- **Spaced repetition** — each verse's stability grows with successful reviews;
+- **Four review modes**, Flashcard, Fill the blanks, Write it out, Order the phrases.
+- **Spaced repetition**, each verse's stability grows with successful reviews;
   free recall builds more durable memory than cued recall than recognition.
-- **Intelligent blanks** — key words are chosen by an offline spaCy pass
+- **Intelligent blanks**, key words are chosen by an offline spaCy pass
   (`tools/gen_keywords.py`), not by naive position.
 - **Progress board, passage list, and leaderboard** views.
 
 ## Quick start
 
 ```bash
-npm install       # dev tooling only — eslint, prettier, serve, wrangler, plus
+npm install       # dev tooling only, eslint, prettier, serve, wrangler, plus
                    # react/react-dom/htm for the render smoke tests (see test/)
 npm run dev       # serve at http://localhost:8080
 ```
 
-Any static file server works too (e.g. `python3 -m http.server 8080`) — the app
+Any static file server works too (e.g. `python3 -m http.server 8080`), the app
 has no server-side component. Because it uses ES modules, it must be served over
 HTTP; opening `index.html` from the filesystem will not work.
 
@@ -70,7 +70,7 @@ HTTP; opening `index.html` from the filesystem will not work.
 ├── index.html            # entry document: loads CDN libs, config.js, src/main.js
 ├── config.example.js     # deploy-time config template (copy to config.js)
 ├── src/                   # application source (ES modules)
-│   ├── main.js            #   entry point — mounts <App/>
+│   ├── main.js            #   entry point, mounts <App/>
 │   ├── App.js             #   stateful shell: state, actions, view dispatch
 │   ├── dom.js             #   React/htm globals, sx() style parser, corners()
 │   ├── config.js          #   app config + defaults (reads deploy overrides)
@@ -102,13 +102,13 @@ HTTP; opening `index.html` from the filesystem will not work.
 │   └── new-passages.json  #   what that fetch should pull
 ├── scripts/
 │   └── build.mjs          # assembles ./dist for the Cloudflare Workers deploy
-├── test/                  # node:test suite — pure modules + view render tests
+├── test/                  # node:test suite, pure modules + view render tests
 │   └── helpers/            #  dom-env.mjs (render harness), scenarios.mjs (fixtures)
 ├── deploy/
 │   ├── nginx.conf         # static-serving config for the container
-│   └── firestore.rules    # Firestore security rules (generated — npm run rules)
+│   └── firestore.rules    # Firestore security rules (generated, npm run rules)
 ├── design/                # provenance: source docs + original design export
-│                           #  (design/claude-design/ is gitignored — absent on a fresh clone)
+│                           #  (design/claude-design/ is gitignored, absent on a fresh clone)
 ├── docs/                  # standards & reference; DEPLOYING.md for a new church
 ├── wrangler.jsonc         # Cloudflare Workers static-assets config
 ├── Dockerfile             # nginx image (container-based deploy, per A2N)
@@ -118,7 +118,7 @@ HTTP; opening `index.html` from the filesystem will not work.
 The rule for where a change belongs: **how something looks** goes in `views/`,
 **what is shown** goes in `viewmodel/`, **how memory/grading/scheduling work**
 goes in `srs.js` / `grading.js` / `progress.js` / `review.js`. `App.js` holds
-state and an `actions` table and dispatches to views — nothing else.
+state and an `actions` table and dispatches to views, nothing else.
 
 ## Configuration
 
@@ -137,12 +137,12 @@ and Acts 2 Network - Berkeley is simply the deployment whose values are the
 defaults: `groupName`, `motto`, `deadline`, `splashMinMs`, `allowedDomains` +
 `primaryDomain`, `ministryGroups`, `categoryNames`, `transcribeUrl`, and the
 Firebase config. Changing `allowedDomains` also means regenerating the Firestore
-rules — see below. **Standing this up for your own church? Start with
+rules, see below. **Standing this up for your own church? Start with
 [`docs/DEPLOYING.md`](docs/DEPLOYING.md).**
 
 ## Adding passages
 
-`data/passages.js` is authored offline and shipped as a static module — **the
+`data/passages.js` is authored offline and shipped as a static module, **the
 app never calls a Bible API at run time**, and there is no key in the build.
 To add passages, list them in `tools/new-passages.json` (reference, book,
 testament, category, and a `group` if the entry is one section of a longer
@@ -157,14 +157,14 @@ Get a key at [api.esv.org/account](https://api.esv.org/account/). It is read
 from the environment and never written to the repo. A reference already in the
 set is refreshed in place, so the script is safe to re-run.
 
-A long chapter is listed as several sections sharing one `group` — each is an
+A long chapter is listed as several sections sharing one `group`, each is an
 ordinary passage that commits on its own, and the group is only what holds them
 together on the list. Sections also keep each record inside the ESV licence and
 inside what a member can actually give back in one sitting.
 
 `test/passages.test.mjs` asserts the two limits Crossway's terms put on what may
-be stored — no more than half of any book, and no run of 500 consecutive verses
-— so an over-eager addition fails the build rather than the licence.
+be stored, no more than half of any book, and no run of 500 consecutive verses,
+so an over-eager addition fails the build rather than the licence.
 
 ## Regenerating keywords
 
@@ -175,23 +175,23 @@ pip install spacy && python3 -m spacy download en_core_web_sm
 npm run keywords   # == python3 tools/gen_keywords.py
 ```
 
-Do not edit `data/keywords.js` by hand — re-run the generator.
+Do not edit `data/keywords.js` by hand, re-run the generator.
 
 ## Authentication & cloud sync (Firebase)
 
 Access is restricted to Google accounts in the deployment's configured Workspace
-domains — for this deployment, **gpmail.org** and **acts2.network**. Members sign
+domains, for this deployment, **gpmail.org** and **acts2.network**. Members sign
 in with Google; each member's progress then syncs across devices via Firebase
 (project `verse-memory`):
 
 - **Google sign-in**, gated to the configured domains. The client rejects and
-  signs out any account outside them, and — authoritatively — **Firestore rules
+  signs out any account outside them, and, authoritatively, **Firestore rules
   only allow verified identities in those domains** (`deploy/firestore.rules`).
   Never trust the client alone; the rules are the real enforcement. The list is
   `appConfig.allowedDomains` in `src/config.js`, and `deploy/firestore.rules` is
   **generated from it** by `npm run rules` (`tools/gen_rules.mjs`) so the two
   halves cannot drift; `test/rules.test.mjs` fails if they have. An empty list
-  admits nobody, deliberately — to open the app to any Google account, say so
+  admits nobody, deliberately, to open the app to any Google account, say so
   with the single entry `["*"]`.
 - **Firestore** stores one doc per user at
   `users/{uid}` = `{ name, email, progress, log, profile, updatedAt }`. On
@@ -231,7 +231,7 @@ read/write) and `src/storage.js` (`registerRemoteSync`, `mergeProgress`,
 
 Two independent deploy paths exist.
 
-**Container → Amazon ECS via Drone CI** — the [A2N dev standard](docs/a2n-dev-best-practices.md):
+**Container → Amazon ECS via Drone CI**, the [A2N dev standard](docs/a2n-dev-best-practices.md):
 
 ```bash
 docker build -t verse-mastery .
@@ -242,7 +242,7 @@ docker run --rm -p 8080:80 verse-mastery   # http://localhost:8080
 to Amazon ECR (us-east-1). Set the `aws_access_key_id` / `aws_secret_access_key`
 secrets and the ECR registry in the Drone repo settings.
 
-**Cloudflare Workers static assets** — an alternative host with no container:
+**Cloudflare Workers static assets**, an alternative host with no container:
 
 ```bash
 npm run build    # scripts/build.mjs assembles ./dist: index.html, src/, data/, config.js
@@ -251,14 +251,14 @@ npm run cf:dev     # build + `wrangler dev`, for a local preview of the Worker
 ```
 
 `wrangler.jsonc` points the Worker's static-assets binding at `./dist`.
-`scripts/build.mjs` copies only the files the app actually serves — never point
+`scripts/build.mjs` copies only the files the app actually serves, never point
 a host at the repo root, since that would also serve `node_modules/`, `design/`,
 `test/`, and everything else not meant to ship.
 
 ## Development
 
 ```bash
-npm test               # node:test — pure modules + view render smoke tests
+npm test               # node:test, pure modules + view render smoke tests
 npm run lint           # ESLint
 npm run format         # Prettier (write)
 npm run format:check   # Prettier (check, as CI runs it)
@@ -273,7 +273,7 @@ The set shipped here is the **English Standard Version (ESV)**, © Crossway,
 fetched from the [ESV API](https://api.esv.org/) at authoring time (see _Adding
 passages_). Use is noncommercial and subject to Crossway's
 [copyright and permissions](https://www.crossway.org/permissions/) and the
-[API v3 guidelines](https://api.esv.org/docs/) — which cap how much may be
+[API v3 guidelines](https://api.esv.org/docs/), which cap how much may be
 stored: no run of 500 consecutive verses and no more than half of any one book.
 Those limits are not left in this file to be remembered; `test/passages.test.mjs`
 asserts both over the set actually shipped, so a well-meant addition to
@@ -282,7 +282,7 @@ notice appears in the app's footer under every signed-in screen, because the
 terms ask for it wherever the text appears.
 
 **That is fine for one church running its own tool, and it is the wrong default
-for anything public** — a fork cannot lawfully redistribute ESV at will, and has
+for anything public**, a fork cannot lawfully redistribute ESV at will, and has
 no API key in any case. So the translation is pluggable, and several
 public-domain texts need no key and no permission:
 
@@ -305,13 +305,13 @@ Proverbs 3:5 begins "Trust in Yahweh with all your heart". Pick the one your
 congregation actually recites.
 
 Switching translations also invalidates `data/keywords.js`, whose indices are
-aligned to the old text — the fetcher handles this for you and explains why in
+aligned to the old text, the fetcher handles this for you and explains why in
 `tools/fetch_passages.mjs`; see _Regenerating keywords_.
 
 ## Credit
 
 Verse Mastery was written for **Acts 2 Network - Berkeley**, and the MIT
 copyright is theirs. Everything church-specific is now a setting rather than a
-constant, so other congregations can deploy it — but the defaults are Acts 2
+constant, so other congregations can deploy it, but the defaults are Acts 2
 Network's because it is their app, and the work of designing it was done there.
 If you stand up your own instance, please keep the attribution intact.

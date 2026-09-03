@@ -1,7 +1,7 @@
 /* The speech-synthesis seam, against a stand-in for the browser.
  *
  * Two halves, split the way the module is. `pickVoice` and `chunkForSpeech` are
- * pure rules over plain values and are asserted directly — which is the point
+ * pure rules over plain values and are asserted directly, which is the point
  * of having lifted them out, since the interesting decision (which of 47 voices
  * a member hears) has nothing to do with a browser being present. The speaker
  * itself needs a window, and gets a fake one: a synthesiser that records what
@@ -44,7 +44,7 @@ const voice = (name, lang, extra = {}) => ({
 });
 
 /* The 47 English voices this Mac really exposes, verbatim from
- * docs/research/tts.md §1.1 — the list is the fixture, so the ranking is being
+ * docs/research/tts.md §1.1, the list is the fixture, so the ranking is being
  * asserted against the machine it has to run on rather than against a tidy
  * imaginary browser. macOS suffixes the locale onto a name it ships twice. */
 const both = (name) => [
@@ -169,7 +169,7 @@ function withWindow(win, run) {
 }
 
 /* A speaker, its fake world, and a count of how often the caller was told the
- * line was finished — which is the number every cancel test is really about. */
+ * line was finished, which is the number every cancel test is really about. */
 function speaking(opts = {}) {
   const world = fakeWindow(opts);
   const done = { count: 0 };
@@ -182,7 +182,7 @@ function speaking(opts = {}) {
 test("on this Mac, the curated ranking lands on Samantha", () => {
   const picked = pickVoice(MAC_VOICES, { lang: "en-US" });
   assert.equal(picked.name, "Samantha");
-  // The array's own object, never a copy — Chrome ignores an utterance whose
+  // The array's own object, never a copy, Chrome ignores an utterance whose
   // voice is not one of the objects it handed out.
   assert.equal(picked, MAC_VOICES[0]);
 });
@@ -332,7 +332,7 @@ test("an option can override the rate without disturbing the two-argument call",
   assert.equal(s.spoken[1].rate, RATE);
 });
 
-test("a browser with no voices yet still speaks — it just speaks in its own", () => {
+test("a browser with no voices yet still speaks, it just speaks in its own", () => {
   const s = speaking({ voices: [] });
   withWindow(s.win, () => s.speaker.speak("Psalm 23", s.onDone));
   assert.equal(s.spoken.length, 1);
@@ -476,7 +476,7 @@ test("voices arriving late are polled for, and picked up when they land", () => 
   assert.equal(world.spoken[0].voice.name, "Samantha");
 });
 
-test("the event is an accelerator, not a gate — and it stays attached after", () => {
+test("the event is an accelerator, not a gate, and it stays attached after", () => {
   const world = fakeWindow({ voices: [] });
   warmVoices(world.win);
   assert.equal(typeof world.win.speechSynthesis.onvoiceschanged, "function");

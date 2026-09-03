@@ -1,8 +1,8 @@
-/* Cloud sync, driven in a browser — specifically the case that made a member's
+/* Cloud sync, driven in a browser, specifically the case that made a member's
  * progress vanish on every device: a Firestore read the rules refuse.
  *
  * The app cannot tell a refused read from an empty one by looking at the data,
- * and it used to treat both as "new member" — showing the sign-up form, whose
+ * and it used to treat both as "new member", showing the sign-up form, whose
  * freshly stamped profile then won the merge and replaced the real one. So the
  * thing worth asserting in a real browser is the negative: that a refused read
  * never puts that form on screen, and that what is already on the device is
@@ -33,7 +33,7 @@ test("a member whose profile is already on this device gets the app, and a warni
     firebase: { ...signedIn, refuseReads: true },
   });
 
-  // Past the gate — the profile is complete here, so the app is usable.
+  // Past the gate, the profile is complete here, so the app is usable.
   await expect(app.board).toBeVisible();
   await expect(app.queue("Review today")).toContainText(passageById(2).ref);
   // But the strip says the work is not leaving the device.
@@ -97,7 +97,7 @@ test("a blocked SDK still lets a member with a profile work, and says so", async
 });
 
 test("a build with no Firebase configured stays silent and local", async ({ app, page }) => {
-  // firebase: false — no stub, no config. Nothing to reach, so nothing to warn about.
+  // firebase: false, no stub, no config. Nothing to reach, so nothing to warn about.
   await app.boot({ progress: { 2: committed(0.6) } });
 
   await expect(app.board).toBeVisible();
@@ -105,7 +105,7 @@ test("a build with no Firebase configured stays silent and local", async ({ app,
   await expect(page.getByText("COULD NOT REACH YOUR ACCOUNT")).toHaveCount(0);
 });
 
-/* A merge push is not "leave everything else alone" — it writes the fields in
+/* A merge push is not "leave everything else alone", it writes the fields in
  * the payload, and an empty map has no leaves for the mask to reach, so it
  * replaces the stored one with nothing. A device that has not pulled yet holds
  * exactly those empties, which is how one browser signing in erased the profile
@@ -158,7 +158,7 @@ test("a device that has not pulled yet never pushes an empty slice", async ({ ap
 
 /* The board reads a summary of each member rather than each member's record
  * (see src/standings.js). The summary is derived, so the thing to assert is
- * that the push keeps it in step with the record it is derived from — and that
+ * that the push keeps it in step with the record it is derived from, and that
  * it carries only what the board ranks. */
 
 test("a push writes the board's summary alongside the record", async ({ app }) => {
@@ -173,7 +173,7 @@ test("a push writes the board's summary alongside the record", async ({ app }) =
   }).toPass();
 
   const summary = await app.cloudSummary();
-  expect(summary.fresh.length, "two committed verses, two numbers each — the third is not committed").toBe(4);
+  expect(summary.fresh.length, "two committed verses, two numbers each, the third is not committed").toBe(4);
   expect(summary.ministryGroup).toBe(PROFILE.ministryGroup);
   expect(summary.progress, "the record itself is exactly what the board no longer reads").toBe(undefined);
   expect(summary.log).toBe(undefined);
@@ -209,7 +209,7 @@ test("the cloud profile survives a fresh device signing in", async ({ app, page 
 /* The incognito bug: a brand-new browser was shown the sign-up form while the
  * server held a full record. Firestore's getDoc can answer from the local view,
  * and the identity write the app makes on sign-in is a pending write inside it
- * — so the read came back as a document with a name and an email and nothing
+ *, so the read came back as a document with a name and an email and nothing
  * else, which is exactly what a member who has never used the app looks like.
  * An established browser has the real document cached, so only a cold one
  * showed it. `localView` below is that half-built view. */
@@ -245,7 +245,7 @@ test("a cold browser reads the server, not its own pending writes", async ({ app
  * the others, and the two disagreed for good.
  *
  * A push used to be a field-mask merge of whatever this device held. The mask
- * leaves alone the keys the payload does not mention — but every key it does
+ * leaves alone the keys the payload does not mention, but every key it does
  * mention it overwrites, however old this device's copy of it is. So a device
  * that still had a verse as `learning` wrote that over the commit another
  * device had just made. It settled into a standoff rather than a race: the
@@ -280,7 +280,7 @@ test("a device holding an older copy does not roll back a verse committed elsewh
   // Another device commits the third verse while this one sits open.
   await app.cloudWrite({ progress: { 3: committed(1) } });
 
-  // Any save here pushes this device's whole record — including its own, older
+  // Any save here pushes this device's whole record, including its own, older
   // copy of that verse.
   const before = (await app.writes()).length;
   await app.header.getByRole("button", { name: "Settings" }).click();

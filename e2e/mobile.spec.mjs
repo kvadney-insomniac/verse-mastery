@@ -1,10 +1,10 @@
 /* The app on a phone (the "mobile" project in playwright.config.mjs).
  *
- * A phone is no longer refused — it is warned. The app was designed for a desk
+ * A phone is no longer refused, it is warned. The app was designed for a desk
  * sitting and is at its best on a computer, so a phone gets one screen saying
  * so, with the Speak-mode safety warning on it and a single Continue button
- * through. What these check is that the warning is first — it arrives before
- * anything else, whatever the member has already done — that Continue really
+ * through. What these check is that the warning is first, it arrives before
+ * anything else, whatever the member has already done, that Continue really
  * does reach the app, and that the acknowledgement is deliberately not saved,
  * so the safety warning is shown again on the next visit.
  *
@@ -64,7 +64,7 @@ test("the acknowledgement is not saved: a reload shows the warning again", async
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(app.board).toBeVisible();
 
-  // A second visit is warned again — the safety line is re-shown each visit,
+  // A second visit is warned again, the safety line is re-shown each visit,
   // deliberately, so the acknowledgement lives in state and nowhere else.
   await page.reload();
   await expect(page.getByText(MESSAGE)).toBeVisible();
@@ -75,8 +75,8 @@ test("the acknowledgement is not saved: a reload shows the warning again", async
 test("the sentences are what is read out; the drawing beside them is not", async ({ app, page }) => {
   await app.boot();
 
-  // Three marks — the device in hand, the arrow, and the computer it is best on
-  // — drawn as SVG and hidden from assistive tech, since the sentences under
+  // Three marks, the device in hand, the arrow, and the computer it is best on
+  //, drawn as SVG and hidden from assistive tech, since the sentences under
   // them already say it.
   const marks = page.locator("[aria-hidden='true'] svg");
   await expect(marks).toHaveCount(3);

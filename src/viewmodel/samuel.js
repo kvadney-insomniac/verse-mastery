@@ -2,7 +2,7 @@
  *
  * Two halves, and they are the two things a member does the fortnight before an
  * exam: answer questions until the weak spots surface, and read the chapters
- * those weak spots point at. Nothing here reaches the passage set or the SRS —
+ * those weak spots point at. Nothing here reaches the passage set or the SRS,
  * see the note at the top of src/samuel.js for why the two models stay apart. */
 
 import { copy } from "../copy.js";
@@ -29,7 +29,7 @@ export function samuelVals({ state, actions, now = Date.now() }) {
     samuelCountdown: copy.samuel.countdown(days),
     samuelUrgent: days >= 0 && days <= 7,
 
-    /* Readiness is coverage, not a score — see readiness() for why. */
+    /* Readiness is coverage, not a score, see readiness() for why. */
     samuelReadyLabel: copy.samuel.readiness(ready.held, ready.total),
     samuelReadyPct: ready.pct,
     samuelSeenLabel: copy.samuel.seen(ready.seen, ready.total),
@@ -79,7 +79,7 @@ export function samuelVals({ state, actions, now = Date.now() }) {
             key: choice,
             label: choice,
             /* Once answered, the right one is always marked and the member's
-             * pick is marked too — being shown the answer is the whole point of
+             * pick is marked too, being shown the answer is the whole point of
              * getting it wrong. */
             state: !answered ? "open" : choice === question.answer ? "right" : choice === s.answer ? "wrong" : "idle",
             onClick: answered ? undefined : () => actions.answerSamuel(choice),

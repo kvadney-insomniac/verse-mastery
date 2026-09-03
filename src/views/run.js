@@ -1,4 +1,4 @@
-/* Run mode — big simple controls, readable at arm's length on a run:
+/* Run mode, big simple controls, readable at arm's length on a run:
  * preset, BPM, one Start/Stop, the verse being called out in large type,
  * and the running playlist below. */
 
@@ -88,7 +88,7 @@ export function runView(v) {
             target="_blank"
             rel="noreferrer"
             style=${sx("font-size:14px;color:var(--color-text)")}
-            >${s.title} — ${s.artist}${s.ref ? html` <span style=${sx(`color:${muted(50)}`)}>(${s.ref})</span>` : ""}</a
+            >${s.title}, ${s.artist}${s.ref ? html` <span style=${sx(`color:${muted(50)}`)}>(${s.ref})</span>` : ""}</a
           >`,
       )}
     </div>

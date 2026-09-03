@@ -1,6 +1,6 @@
 /* Samuel mode's pure half: the countdown, the draw, and the record.
  *
- * The dataset itself is asserted here too — a study aid for a real exam is only
+ * The dataset itself is asserted here too, a study aid for a real exam is only
  * worth having if the chapters are right, so the shape checks below are as much
  * about the content as about the code that reads it. */
 

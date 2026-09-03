@@ -1,7 +1,7 @@
 /* Ranking groups rather than people.
  *
  * The measure is per member throughout, and most of what is worth asserting
- * here is that it stays per member — a total would rank by attendance, which is
+ * here is that it stays per member, a total would rank by attendance, which is
  * the one thing the board must not do. */
 
 import test from "node:test";
@@ -21,7 +21,7 @@ const member = (group, count, freshnessScore, over = {}) => ({
 });
 
 test("a small group is not out-run by a large one", () => {
-  // Five people holding their verses well beat forty who are not — which is the
+  // Five people holding their verses well beat forty who are not, which is the
   // whole reason the figure is an average.
   const rows = [
     ...Array.from({ length: 5 }, () => member("Kairos", 10, 9)),
@@ -50,7 +50,7 @@ test("the figures a group reports are per member", () => {
 
 test("a member who has not started does not drag their group down", () => {
   // The individual board already leaves them out, so counting them in a group
-  // average would quietly re-admit them — and would mean a ministry that
+  // average would quietly re-admit them, and would mean a ministry that
   // recruits well scores worse for it.
   const rows = [member("ECM", 10, 9), member("ECM", 0, 0)];
   const [ecm] = standingsBy(rows, "ministryGroup");
@@ -136,7 +136,7 @@ test("a summary carries the board's three figures and nothing else about the mem
 
   assert.equal(s.name, "Ada");
   assert.equal(s.ministryGroup, "Kairos");
-  assert.equal(s.fresh.length, 4, "two committed verses, two numbers each — the third is not committed");
+  assert.equal(s.fresh.length, 4, "two committed verses, two numbers each, the third is not committed");
   assert.equal(s.streak, 1);
   assert.equal(s.streakDay, day(0));
   assert.equal(s.email, undefined, "the board never needed it, so it is not sent");
@@ -178,7 +178,7 @@ test("a streak stands only for the day it was true of", () => {
   assert.equal(s.streak, 3);
 
   assert.equal(rowFromSummary(s, NOW).streak, 3);
-  assert.equal(rowFromSummary(s, NOW + DAY).streak, 3, "still live the next day — the member may yet review");
+  assert.equal(rowFromSummary(s, NOW + DAY).streak, 3, "still live the next day, the member may yet review");
   assert.equal(rowFromSummary(s, NOW + 2 * DAY).streak, 0, "after that it is plainly broken");
 });
 

@@ -2,7 +2,7 @@
  *
  * Everything in transcriber.js that needs a microphone is deliberately kept out
  * of these three functions, which is what lets them be asserted in node with no
- * browser anywhere in sight — the same split speaker.js makes around
+ * browser anywhere in sight, the same split speaker.js makes around
  * `pickVoice`. What is worth pinning here is what the file decides rather than
  * what it wires: which container to record in, what a response body meant, and
  * when a recording should not be sent at all. */
@@ -73,7 +73,7 @@ test("transcriptFrom accepts Workers AI's own envelope", () => {
 });
 
 test("transcriptFrom answers a malformed body with nothing rather than a throw", () => {
-  // Every one of these is a real way this fails in the field — an endpoint that
+  // Every one of these is a real way this fails in the field, an endpoint that
   // 404s to an HTML page, a proxy login screen, a provider error object, a
   // response that parsed to a bare string. None of them may throw: the caller
   // is a hands-free loop, and an empty recital is something it already answers
@@ -94,7 +94,7 @@ test("transcriptFrom answers a malformed body with nothing rather than a throw",
 /* ------------------------------------------------------------- the guards */
 
 test("recordingRejection passes an ordinary recitation", () => {
-  // Forty seconds of Opus at the configured bitrate — the shape of nearly every
+  // Forty seconds of Opus at the configured bitrate, the shape of nearly every
   // real turn.
   assert.equal(recordingRejection({ bytes: 80000, ms: 40000 }), null);
 });
@@ -135,7 +135,7 @@ test("the size cap is checked before the duration cap", () => {
 test("recordingSupported is false with no window at all", () => {
   // Asked at startup by App.js, which the unit suite instantiates in node. A
   // seam that questioned a window that is not there would take the whole suite
-  // down with it — the same reason voiceSupported() and speechSupported() are
+  // down with it, the same reason voiceSupported() and speechSupported() are
   // written the way they are.
   assert.equal(typeof globalThis.window, "undefined");
   assert.equal(recordingSupported(), false);
