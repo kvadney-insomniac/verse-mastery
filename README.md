@@ -351,7 +351,8 @@ Three questions, a minute or two:
 Answer here: [the feedback form](https://docs.google.com/forms/d/e/1FAIpQLSc_3ztRXdPM8C7e8GCb43oO_2RcmQSij2pKcIkUSaSxtUhPfA/viewform) (one form for all of these Bible
 tools; the first question asks which one), or open an issue on this repository.
 
-If you want help memorizing or studying, reach out: <!-- HELP_CONTACT -->(contact coming soon).
+If you want help memorizing or studying, reach out through [the same form](https://docs.google.com/forms/d/e/1FAIpQLSc_3ztRXdPM8C7e8GCb43oO_2RcmQSij2pKcIkUSaSxtUhPfA/viewform);
+it asks whether you would like help and leaves room for how to reach you.
 
 ## Credit
 
