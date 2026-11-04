@@ -1965,7 +1965,7 @@ export class App extends React.Component {
      * only of the form: a member whose profile is already complete on this
      * device goes straight through, with the banner below telling them their
      * work is staying local). */
-    const needsProfile = !isProfileComplete(profile);
+    const needsProfile = appConfig.requireProfile !== false && !isProfileComplete(profile);
     const syncStatus = (sync || {}).status;
     /* Three ways the app can fail to know what this member has, and all three
      * must keep the sign-up form off the screen: the read is still in flight,

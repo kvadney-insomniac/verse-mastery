@@ -22,7 +22,7 @@ window.__APP_CONFIG__ = {
   // wordmark on every gate, on the leaderboard, and in the sign-in refusal.
   groupName: "Acts 2 Network - Berkeley",
 
-  deadline: "2026-10-31", // YYYY-MM-DD, the memorization goal date
+  deadline: "2027-01-31", // YYYY-MM-DD, the memorization goal date
   splashMinMs: 3000, // least time the opening splash stays up, in milliseconds
 
   // One short line under the group name on the sign-in gate and the board, a

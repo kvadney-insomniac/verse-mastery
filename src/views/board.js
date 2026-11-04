@@ -130,11 +130,11 @@ export function boardView(v) {
     })}
 
     <div style=${sx("display:flex;flex-direction:column;gap:16px")}>
-      <div style=${sx("display:flex;align-items:baseline;gap:12px")}>
+      <div style=${sx("display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px")}>
         <h4 style=${sx("margin:0;letter-spacing:.02em")}>${copy.board.mapTitle}</h4>
         <div style=${sx(LABEL_META)}>${copy.board.mapNote}</div>
         <div
-          style=${sx(`margin-left:auto;display:flex;gap:18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:${muted(55)}`)}
+          style=${sx(`margin-left:auto;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:${muted(55)}`)}
         >
           <span style=${sx("display:flex;align-items:center;gap:6px")}
             ><i style=${sx("width:10px;height:10px;background:var(--color-accent-900);display:block")}></i
