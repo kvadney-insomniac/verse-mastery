@@ -19,7 +19,7 @@ export const appConfig = {
    * setting was written down; a deployer with nothing to say leaves it empty
    * rather than inventing a slogan to fill the space. */
   motto: "",
-  deadline: "2026-10-31",
+  deadline: "2027-01-31",
   /* The Google Workspace domains permitted to sign in.
    *
    * This is only half the gate, and the half that is not security: the
@@ -116,6 +116,26 @@ export const appConfig = {
    * per line, so a member on a bad connection loses the good voice for a
    * sentence rather than for the drive. */
   speakUrl: "",
+  /* Whether a new member must give a name and ministry group before the app
+   * opens. A church deployment wants it, because the leaderboard groups by
+   * those fields. A public, local-only build has no leaderboard to feed, and
+   * asking a stranger for their full name and church group before they can
+   * read a verse is a reason to close the tab, so it sets this false and the
+   * profile stays optional under the header link. */
+  requireProfile: true,
+  /* The footer's feedback line: where it links and what it says. Empty url
+   * hides the line rather than linking nowhere. The default is the original
+   * deployment's bug and feature-request form. */
+  feedbackUrl: "https://forms.gle/H3YGDEJ4XXtN4Aoz5",
+  feedbackPrompt: "",
+  feedbackLink: "",
+  /* An optional "reach out" line under the feedback line, for a deployer who
+   * offers help with memorizing or study. Empty means no line. A bare email
+   * address becomes a mailto link. */
+  helpContact: "",
+  /* An optional link to a plain statement of what this app does and does not
+   * do (a README section, say). Empty means no link. */
+  aboutUrl: "",
   ...appOverrides,
 };
 

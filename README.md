@@ -31,6 +31,33 @@ be redistributed as-is:
 This is **not** Acts 2 Network's app and does not speak for them. If you are a
 member there, use their deployment, not this one.
 
+## Who it is for
+
+- **Anyone who wants to memorize Bible passages** and keep them: it schedules
+  each passage for review before you are likely to forget it.
+- **People who learn by ear or on the move**: Speak mode reads a reference and
+  listens while you recite; Run mode calls verses out over a beat.
+- **A church or small group** that wants its own copy with sign-in and a shared
+  board: see _Deploy your own_.
+
+It works on a phone, and it is at its best on a computer; a phone is shown a
+short note saying so before the app opens.
+
+## What it does not do
+
+- **It does not teach or interpret.** It helps you hold the words; what a
+  passage means is for your own reading, your church and the people who read
+  it with you.
+- **It has one translation in this edition,** the King James Version. If your
+  church memorizes another, the wording here will differ from theirs.
+- **It does not keep your progress anywhere but this browser.** There is no
+  account and no server. Clearing site data, or switching phone or browser,
+  starts you over.
+- **It is not a substitute for reading the whole of Scripture.** The passage
+  set is a starting list, not the Bible.
+- **Speech marking is a helper, not a judge.** Speak mode uses your browser's
+  speech recognition, which can mishear, so a miss is worth a second try.
+
 ## Deploy your own
 
 Everything a congregation needs to change is configuration rather than code,
@@ -93,7 +120,7 @@ HTTP; opening `index.html` from the filesystem will not work.
 │       ├── header.js, board.js, list.js, review.js, done.js,
 │       └── leaderboard.js, auth-gate.js, profile-form.js
 ├── data/                  # generated/authored content
-│   ├── passages.js        #   the passage set (ESV)
+│   ├── passages.js        #   the passage set (KJV in this edition)
 │   └── keywords.js        #   per-passage keyword indices (generated)
 ├── tools/
 │   ├── gen_keywords.py    # spaCy keyword generator -> data/keywords.js
@@ -266,12 +293,14 @@ npm run format:check   # Prettier (check, as CI runs it)
 
 ## Scripture text, and choosing a translation
 
-**The code is MIT. The scripture text is not, and the difference matters most to
-anyone deploying this themselves.**
+**The code is MIT. The scripture text has its own terms, and the difference
+matters most to anyone deploying this themselves.**
 
-The set shipped here is the **English Standard Version (ESV)**, © Crossway,
-fetched from the [ESV API](https://api.esv.org/) at authoring time (see _Adding
-passages_). Use is noncommercial and subject to Crossway's
+**This edition ships the King James Version (KJV)**, which is in the public
+domain in the United States, fetched from bible-api.com at authoring time with
+`--translation kjv`. The original application ships the **English Standard
+Version (ESV)**, © Crossway, fetched from the [ESV API](https://api.esv.org/)
+(see _Adding passages_). ESV use is noncommercial and subject to Crossway's
 [copyright and permissions](https://www.crossway.org/permissions/) and the
 [API v3 guidelines](https://api.esv.org/docs/), which cap how much may be
 stored: no run of 500 consecutive verses and no more than half of any one book.
@@ -307,6 +336,20 @@ congregation actually recites.
 Switching translations also invalidates `data/keywords.js`, whose indices are
 aligned to the old text, the fetcher handles this for you and explains why in
 `tools/fetch_passages.mjs`; see _Regenerating keywords_.
+
+## Tell us what helped
+
+This is a small project, and it gets better when people say how it went.
+Three questions, a minute or two:
+
+1. What helped?
+2. What did not work, or was confusing?
+3. What would you want it to do?
+
+Answer here: [the feedback form](https://docs.google.com/forms/d/e/1FAIpQLSc_3ztRXdPM8C7e8GCb43oO_2RcmQSij2pKcIkUSaSxtUhPfA/viewform) (one form for all of these Bible
+tools; the first question asks which one), or open an issue on this repository.
+
+If you want help memorizing or studying, reach out: <!-- HELP_CONTACT -->(contact coming soon).
 
 ## Credit
 

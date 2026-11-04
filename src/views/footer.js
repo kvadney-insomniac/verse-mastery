@@ -20,22 +20,51 @@
  * notice is data about the build rather than copy about the app.) */
 
 import { copy } from "../copy.js";
+import { appConfig } from "../config.js";
 import { translation } from "../../data/translation.js";
 import { html, sx } from "../dom.js";
 import { muted } from "../ui/tokens.js";
 
+const LINK = "color:var(--color-accent);text-decoration:underline";
+
+/* The feedback line, the optional "reach out" line and the optional "what this
+ * does not do" link are per-deploy settings (src/config.js). An empty setting
+ * draws nothing, so a build never links to a form or an address it does not
+ * have. */
+function contactHref(c) {
+  if (/^(https?:|mailto:)/i.test(c)) return c;
+  return c.includes("@") ? `mailto:${c}` : c;
+}
+
 export function footerView() {
+  const { feedbackUrl, feedbackPrompt, feedbackLink, helpContact, aboutUrl } = appConfig;
   return html`<div
     style=${sx(`max-width:1280px;margin:0 auto;padding:0 36px 48px;font-size:13px;line-height:1.6;color:${muted(55)}`)}
   >
-    ${copy.footer.prompt}${" "}
-    <a
-      href=${copy.footer.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      style=${sx("color:var(--color-accent);text-decoration:underline")}
-      >${copy.footer.link}</a
-    >
+    ${
+      feedbackUrl &&
+      html`<div>
+        ${feedbackPrompt || copy.footer.prompt}${" "}
+        <a href=${feedbackUrl} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}
+          >${feedbackLink || copy.footer.link}</a
+        >
+      </div>`
+    }
+    ${
+      helpContact &&
+      html`<div>
+        If you want help memorizing or studying,${" "}
+        <a href=${contactHref(helpContact)} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}>reach out</a>.
+      </div>`
+    }
+    ${
+      aboutUrl &&
+      html`<div>
+        <a href=${aboutUrl} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}
+          >What this app does and does not do</a
+        >
+      </div>`
+    }
     <div
       style=${sx(`margin-top:14px;padding-top:12px;border-top:1px solid var(--color-divider);font-size:11px;color:${muted(42)};max-width:80ch`)}
     >
