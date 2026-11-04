@@ -81,6 +81,7 @@ export class AppHarness {
     voice,
     reducedMotion = "reduce",
     waitForApp = true,
+    config = {},
   } = {}) {
     // Emulated here rather than declared in the config: the context-level
     // option does not reach the page in this Chromium build.
@@ -90,7 +91,7 @@ export class AppHarness {
     if (scenario) await installFirebaseStub(this.page, scenario);
 
     await this.vendorCdn();
-    await this.serveConfig({ splashMinMs, deadline, groupName, firebase: scenario ? STUB_CONFIG : null });
+    await this.serveConfig({ splashMinMs, deadline, groupName, config, firebase: scenario ? STUB_CONFIG : null });
 
     const seeded = {
       "mv.progress": JSON.stringify(progress),
@@ -183,10 +184,11 @@ export class AppHarness {
    * Serving it rather than injecting the globals keeps the test on the same seam
    * a real deploy uses, and stops a stray local config.js from deciding what
    * the suite sees. */
-  async serveConfig({ splashMinMs, deadline, groupName, firebase }) {
+  async serveConfig({ splashMinMs, deadline, groupName, config = {}, firebase }) {
     const appConfig = {
       ...(groupName ? { groupName } : {}),
       ...(deadline ? { deadline } : {}),
+      ...config,
       splashMinMs,
     };
     const body =
