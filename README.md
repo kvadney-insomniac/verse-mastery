@@ -56,7 +56,9 @@ short note saying so before the app opens.
 - **It is not a substitute for reading the whole of Scripture.** The passage
   set is a starting list, not the Bible.
 - **Speech marking is a helper, not a judge.** Speak mode uses your browser's
-  speech recognition, which can mishear, so a miss is worth a second try.
+  speech recognition, which can mishear, so a miss is worth a second try. In
+  Chrome that recognition runs on Google's servers, so your recitation is sent
+  to Google to be transcribed; the rest of the app sends nothing anywhere.
 
 ## Deploy your own
 
