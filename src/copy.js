@@ -35,11 +35,14 @@ export const copy = {
 
   app: {
     wordmark: "VERSE MASTERY",
-    /* The epigraph under the wordmark, on the sign-in gate and the board hero. */
+    /* The epigraph under the wordmark, on the sign-in gate and the board hero.
+     * It is scripture, so it is in the translation this edition ships (the
+     * KJV, word for word); a build that switches translation changes this
+     * line with the passages, or the hero quotes one Bible over another's. */
     epigraph:
-      '"For the word of God is living and active, sharper than any two-edged sword, piercing to the division of ' +
-      'soul and of spirit, of joints and of marrow, and discerning the thoughts and intentions of the heart." ' +
-      "(Hebrews 4:12)",
+      '"For the word of God is quick, and powerful, and sharper than any twoedged sword, piercing even to the ' +
+      "dividing asunder of soul and spirit, and of the joints and marrow, and is a discerner of the thoughts and " +
+      'intents of the heart." (Hebrews 4:12)',
     /* Stands in for a member who has not filled in their profile yet. */
     anonymousMember: "Member",
   },

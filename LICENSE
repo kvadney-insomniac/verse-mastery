@@ -13,9 +13,10 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 This license applies to the application source code only. Scripture text
-included in the data files is the English Standard Version (ESV), copyright
-Crossway, and is used subject to Crossway's copyright and permissions policy;
-it is not covered by this license.
+included in the data files of this edition is the King James Version (KJV),
+which is in the public domain in the United States; it is not covered by this
+license. The original application ships the English Standard Version (ESV),
+copyright Crossway, which is not included here.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
