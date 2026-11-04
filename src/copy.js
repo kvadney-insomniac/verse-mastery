@@ -114,6 +114,11 @@ export const copy = {
     url: "https://forms.gle/H3YGDEJ4XXtN4Aoz5",
     prompt: "🐛 Spotted bugs or got a feature request?",
     link: "Fill out this form.",
+    /* The optional lines under it, each drawn only when its setting is set
+     * (helpContact, aboutUrl in src/config.js). */
+    helpPrompt: "If you want help memorizing or studying,",
+    helpLink: "reach out",
+    aboutLink: "What this app does and does not do",
     /* Crossway's required notice, which has to appear where the text does and
      * not only in the repo's README. The footer is under every signed-in
      * screen, so this is the one place in the app that shows scripture without

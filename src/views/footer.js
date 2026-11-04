@@ -53,16 +53,16 @@ export function footerView() {
     ${
       helpContact &&
       html`<div>
-        If you want help memorizing or studying,${" "}
-        <a href=${contactHref(helpContact)} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}>reach out</a>.
+        ${copy.footer.helpPrompt}${" "}
+        <a href=${contactHref(helpContact)} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}
+          >${copy.footer.helpLink}</a
+        >.
       </div>`
     }
     ${
       aboutUrl &&
       html`<div>
-        <a href=${aboutUrl} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}
-          >What this app does and does not do</a
-        >
+        <a href=${aboutUrl} target="_blank" rel="noopener noreferrer" style=${sx(LINK)}>${copy.footer.aboutLink}</a>
       </div>`
     }
     <div
