@@ -81,6 +81,17 @@ jobs:
       - name: Build
         run: ALLOW_LOCAL_ONLY_BUILD=1 npm run build
 
+      # Search and AI-answer basics for this deploy only (title, description, canonical, share
+      # card, JSON-LD, page text without scripts, sitemap.xml, llms.txt), then the check that
+      # they are all there. index.html in the repository is left as it is.
+      - name: Search and AI-answer basics
+        run: |
+          node scripts/pages-seo.mjs dist
+          mkdir -p /tmp/site && cp -r dist /tmp/site/verse-mastery
+          python3 -m http.server 8765 -d /tmp/site >/dev/null 2>&1 &
+          sleep 1
+          python3 scripts/check_seo.py http://127.0.0.1:8765/verse-mastery/ --site-base http://127.0.0.1:8765/verse-mastery/ --live-base https://kvadney-insomniac.github.io/verse-mastery/
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
