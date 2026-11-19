@@ -1,0 +1,19 @@
+# Verse Mastery, public edition
+
+> A free spaced-repetition app for memorizing Bible verses, with the public-domain King James Version text. It runs in the browser with no sign-up and nothing to install, and progress is saved in the user's own browser and goes nowhere else.
+
+The app offers several ways to review a passage: a flashcard, fill the blanks, order the phrases, and writing it from memory. A freshness score fades and recovers along the forgetting curve, so the app shows what to revisit and when. Speak mode is hands-free: the app reads a reference aloud and the user recites the verse. Run mode calls verses out over a synthesized beat.
+
+What it does not do: it does not teach or interpret Scripture, it has one translation in this edition, it keeps progress only in the browser it was used in, and its speech marking is a helper that can mishear.
+
+This is a derived edition under the MIT license. The design and most of the code are the original authors'; the README's credit section names them. This edition swaps in the King James text so it can be shared freely.
+
+## App
+
+- [Verse Mastery, public edition](https://kvadney-insomniac.github.io/verse-mastery/): the app, in the browser
+
+## Source and docs
+
+- [README](https://github.com/kvadney-insomniac/verse-mastery#readme): what it does, what is different in this edition, and what it does not do
+- [Credit](https://github.com/kvadney-insomniac/verse-mastery#credit): who wrote the original
+- [Source code](https://github.com/kvadney-insomniac/verse-mastery): MIT license
